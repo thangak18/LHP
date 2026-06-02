@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Slide web tĩnh trình bày lộ trình thuật toán Level 0 đến Level 3 với lý thuyết, ví dụ, mã giả và C++ mẫu.">
+    <title>Lộ trình thuật toán Level 0-3</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Điều hướng lộ trình">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div>
+            <p class="eyebrow">Algorithm Roadmap</p>
+            <h1>Level 0-3</h1>
+          </div>
+        </div>
+
+        <label class="search-box">
+          <span>Tìm chủ đề</span>
+          <input id="searchInput" type="search" placeholder="Ví dụ: DP, mảng, stack">
+        </label>
+
+        <nav class="level-tabs" id="levelTabs" aria-label="Chọn level"></nav>
+        <div class="topic-list" id="topicList"></div>
+      </aside>
+
+      <main class="deck">
+        <header class="deck-header">
+          <div>
+            <p class="eyebrow" id="levelKicker">LEVEL MODULE</p>
+            <h2 id="deckTitle">Lộ trình thuật toán</h2>
+          </div>
+          <div class="deck-actions">
+            <button class="icon-button" id="prevBtn" type="button" aria-label="Slide trước">‹</button>
+            <button class="icon-button" id="nextBtn" type="button" aria-label="Slide sau">›</button>
+          </div>
+        </header>
+
+        <div class="progress-wrap" aria-hidden="true">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <article class="slide" id="slide" aria-live="polite"></article>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

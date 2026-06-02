@@ -1,0 +1,2672 @@
+const levels = [
+  {
+    level: 0,
+    id: "level-0",
+    title: "Level 0 - Làm quen với lập trình",
+    subtitle: "Nhập xuất, kiểu dữ liệu, điều kiện, vòng lặp, mảng, xâu và hàm cơ bản.",
+    topics: [
+      {
+        title: "Luyện tập tổng hợp",
+        definition: "Nhóm bài tổng hợp giúp nối các kỹ năng nhỏ thành một quy trình giải bài hoàn chỉnh: đọc đề, xác định input/output, chọn biến, viết thuật toán, kiểm thử.",
+        theory: [
+          "Ở Level 0, mục tiêu quan trọng nhất là biến đề bài thành các bước tuần tự rõ ràng.",
+          "Luôn xác định miền giá trị của dữ liệu để chọn kiểu phù hợp: int cho số nhỏ, long long cho tổng hoặc tích lớn.",
+          "Sau khi code xong, thử ít nhất ba nhóm test: nhỏ nhất, bình thường, và biên lớn nhất."
+        ],
+        example: "Cho n số nguyên, tính tổng các số chẵn và đếm số lẻ. Bài này kết hợp nhập xuất, vòng lặp, điều kiện và biến đếm.",
+        pseudo: String.raw`read n
+sumEven <- 0
+countOdd <- 0
+repeat n times:
+    read x
+    if x is even:
+        sumEven <- sumEven + x
+    else:
+        countOdd <- countOdd + 1
+print sumEven, countOdd`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+    long long sumEven = 0;
+    int countOdd = 0;
+
+    for (int i = 0; i < n; ++i) {
+        long long x;
+        cin >> x;
+        if (x % 2 == 0) sumEven += x;
+        else countOdd++;
+    }
+
+    cout << sumEven << ' ' << countOdd << '\n';
+    return 0;
+}`,
+        notes: [
+          "Nếu tổng có thể vượt 2 tỷ, dùng long long.",
+          "Không cần lưu mảng khi chỉ xử lý từng số một lần.",
+          "Viết test tay trước khi nộp giúp phát hiện sai điều kiện chẵn lẻ rất nhanh."
+        ],
+        complexity: "O(n)",
+        visual: "flow",
+        visualCaption: "Luồng giải Level 0: đọc dữ liệu, xử lý từng phần tử, in kết quả."
+      },
+      {
+        title: "Nhập, xuất",
+        definition: "Nhập xuất là thao tác nhận dữ liệu từ input và đưa đáp án ra output đúng định dạng mà đề yêu cầu.",
+        theory: [
+          "Trong C++, cin đọc dữ liệu theo khoảng trắng, cout in dữ liệu ra màn hình hoặc hệ thống chấm.",
+          "Dùng ios::sync_with_stdio(false) và cin.tie(nullptr) để tăng tốc nhập xuất.",
+          "Kiểu dữ liệu thường gặp: int, long long, double, char, string và bool."
+        ],
+        example: "Đọc hai số a, b rồi in tổng, hiệu và tích của chúng.",
+        pseudo: String.raw`read a, b
+print a + b
+print a - b
+print a * b`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    long long a, b;
+    cin >> a >> b;
+    cout << a + b << '\n';
+    cout << a - b << '\n';
+    cout << a * b << '\n';
+    return 0;
+}`,
+        notes: [
+          "Đọc kỹ yêu cầu xuống dòng hay cách nhau bởi dấu cách.",
+          "Nếu có số thực, đặt cout << fixed << setprecision(k).",
+          "Không in thêm chữ giải thích nếu đề không yêu cầu."
+        ],
+        complexity: "O(1)",
+        visual: "flow",
+        visualCaption: "Input đi vào chương trình, qua phép tính, rồi ra output."
+      },
+      {
+        title: "Vòng lặp for",
+        definition: "Vòng lặp for dùng khi biết trước số lần lặp hoặc muốn duyệt một dãy chỉ số có quy luật.",
+        theory: [
+          "Cấu trúc cơ bản gồm khởi tạo, điều kiện tiếp tục và bước cập nhật.",
+          "Chỉ số mảng trong C++ thường bắt đầu từ 0, nên duyệt n phần tử bằng i = 0 đến i < n.",
+          "for phù hợp để tính tổng, đếm, tìm min/max hoặc sinh các giá trị liên tiếp."
+        ],
+        example: "Tính tổng các số từ 1 đến n bằng vòng lặp for.",
+        pseudo: String.raw`read n
+sum <- 0
+for i from 1 to n:
+    sum <- sum + i
+print sum`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    long long n;
+    cin >> n;
+
+    long long sum = 0;
+    for (long long i = 1; i <= n; ++i) {
+        sum += i;
+    }
+
+    cout << sum << '\n';
+    return 0;
+}`,
+        notes: [
+          "Cẩn thận i <= n và i < n, dùng sai rất dễ thiếu hoặc thừa một lượt.",
+          "Nếu n rất lớn, có thể thay vòng lặp bằng công thức n * (n + 1) / 2.",
+          "Biến điều khiển vòng lặp nên đặt tên ngắn như i, j khi phạm vi nhỏ."
+        ],
+        complexity: "O(n)",
+        visual: "array",
+        visualCaption: "Mỗi ô tượng trưng cho một lượt lặp của chỉ số i."
+      },
+      {
+        title: "Vòng lặp while, nhiều vòng for lồng nhau",
+        definition: "while lặp khi điều kiện còn đúng; vòng lặp lồng nhau dùng để duyệt cặp, bảng hai chiều hoặc mọi tổ hợp nhỏ.",
+        theory: [
+          "while phù hợp khi chưa biết chính xác số lần lặp, ví dụ tách chữ số của một số.",
+          "Hai vòng for lồng nhau thường tạo O(n^2), ba vòng tạo O(n^3), cần so với giới hạn đề.",
+          "break dừng vòng lặp gần nhất, continue bỏ qua phần còn lại của lượt hiện tại."
+        ],
+        example: "Đếm số cặp (i, j) với 1 <= i < j <= n và i + j chia hết cho k.",
+        pseudo: String.raw`read n, k
+answer <- 0
+for i from 1 to n:
+    for j from i + 1 to n:
+        if (i + j) mod k = 0:
+            answer <- answer + 1
+print answer`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, k;
+    cin >> n >> k;
+
+    int ans = 0;
+    for (int i = 1; i <= n; ++i) {
+        for (int j = i + 1; j <= n; ++j) {
+            if ((i + j) % k == 0) ans++;
+        }
+    }
+
+    cout << ans << '\n';
+    return 0;
+}`,
+        notes: [
+          "Nếu n khoảng 10^5 thì O(n^2) thường không chạy kịp.",
+          "Vòng while phải có bước làm thay đổi điều kiện, nếu không sẽ lặp vô hạn.",
+          "Khi debug vòng lặp lồng nhau, in thử i, j với test nhỏ."
+        ],
+        complexity: "O(n^2)",
+        visual: "grid",
+        visualCaption: "Vòng ngoài chọn hàng, vòng trong chọn cột hoặc phần tử đi kèm."
+      },
+      {
+        title: "Mảng - Array",
+        definition: "Mảng là cấu trúc lưu nhiều phần tử cùng kiểu, cho phép truy cập nhanh bằng chỉ số.",
+        theory: [
+          "Mảng tĩnh có kích thước cố định, vector linh hoạt hơn và thường tiện trong bài thi.",
+          "Truy cập a[i] là O(1), nhưng phải đảm bảo i nằm trong đoạn hợp lệ.",
+          "Các thao tác cơ bản: nhập mảng, duyệt mảng, tìm min/max, tính tổng và đếm tần suất."
+        ],
+        example: "Đọc n số, in giá trị nhỏ nhất, lớn nhất và tổng của mảng.",
+        pseudo: String.raw`read n
+read array a
+mn <- a[0], mx <- a[0], sum <- 0
+for each x in a:
+    mn <- min(mn, x)
+    mx <- max(mx, x)
+    sum <- sum + x
+print mn, mx, sum`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<long long> a(n);
+
+    long long sum = 0;
+    for (long long &x : a) cin >> x;
+
+    long long mn = a[0], mx = a[0];
+    for (long long x : a) {
+        mn = min(mn, x);
+        mx = max(mx, x);
+        sum += x;
+    }
+
+    cout << mn << ' ' << mx << ' ' << sum << '\n';
+    return 0;
+}`,
+        notes: [
+          "Không truy cập a[0] nếu n có thể bằng 0.",
+          "vector<int> a(n) tự tạo n phần tử được gán giá trị mặc định 0.",
+          "Dùng long long cho tổng, ngay cả khi từng phần tử là int."
+        ],
+        complexity: "O(n)",
+        visual: "array",
+        visualCaption: "Mảng có chỉ số liên tiếp, mỗi ô lưu một giá trị."
+      },
+      {
+        title: "Xâu cơ bản",
+        definition: "Xâu là dãy ký tự; trong C++ kiểu string hỗ trợ truy cập từng ký tự, nối xâu, lấy độ dài và duyệt.",
+        theory: [
+          "cin >> s đọc một từ, getline(cin, s) đọc cả dòng có khoảng trắng.",
+          "s.size() trả về độ dài, s[i] truy cập ký tự thứ i theo chỉ số 0.",
+          "Bài xâu cơ bản thường hỏi đếm ký tự, đổi hoa thường, kiểm tra palindrome hoặc tách chuỗi."
+        ],
+        example: "Kiểm tra một xâu có phải palindrome hay không.",
+        pseudo: String.raw`read s
+l <- 0, r <- length(s) - 1
+while l < r:
+    if s[l] != s[r]:
+        print NO
+        stop
+    l <- l + 1
+    r <- r - 1
+print YES`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    string s;
+    cin >> s;
+
+    bool ok = true;
+    for (int l = 0, r = (int)s.size() - 1; l < r; ++l, --r) {
+        if (s[l] != s[r]) {
+            ok = false;
+            break;
+        }
+    }
+
+    cout << (ok ? "YES" : "NO") << '\n';
+    return 0;
+}`,
+        notes: [
+          "Ký tự 'a' khác 'A', nếu đề không phân biệt hoa thường cần chuẩn hóa trước.",
+          "Với getline sau cin >>, cần bỏ ký tự xuống dòng còn lại bằng cin.ignore().",
+          "Duyệt hai đầu là kỹ thuật rất hay gặp trong bài palindrome."
+        ],
+        complexity: "O(n)",
+        visual: "string",
+        visualCaption: "Hai con trỏ đi từ hai đầu xâu vào giữa để so sánh."
+      },
+      {
+        title: "Hàm, Truy vấn",
+        definition: "Hàm đóng gói một công việc nhỏ để tái sử dụng; truy vấn là yêu cầu trả lời nhiều câu hỏi trên cùng dữ liệu.",
+        theory: [
+          "Hàm giúp chương trình dễ đọc hơn: mỗi hàm nên làm một nhiệm vụ rõ ràng.",
+          "Khi có nhiều truy vấn, thường cần tiền xử lý để mỗi truy vấn trả lời nhanh hơn.",
+          "Tham số truyền bằng const reference giúp tránh copy dữ liệu lớn."
+        ],
+        example: "Cho mảng a và q truy vấn l, r, trả lời tổng a[l] + ... + a[r].",
+        pseudo: String.raw`build prefix sum pref
+for each query l, r:
+    answer <- pref[r] - pref[l - 1]
+    print answer`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+long long rangeSum(const vector<long long>& pref, int l, int r) {
+    return pref[r] - pref[l - 1];
+}
+
+int main() {
+    int n, q;
+    cin >> n >> q;
+    vector<long long> pref(n + 1, 0);
+
+    for (int i = 1; i <= n; ++i) {
+        long long x;
+        cin >> x;
+        pref[i] = pref[i - 1] + x;
+    }
+
+    while (q--) {
+        int l, r;
+        cin >> l >> r;
+        cout << rangeSum(pref, l, r) << '\n';
+    }
+    return 0;
+}`,
+        notes: [
+          "Nếu q lớn, trả lời mỗi truy vấn O(n) sẽ dễ quá thời gian.",
+          "Quy ước chỉ số 1-based giúp công thức pref[r] - pref[l - 1] gọn.",
+          "Tên hàm nên nói rõ kết quả trả về, ví dụ rangeSum, isPrime, gcdFast."
+        ],
+        complexity: "Tiền xử lý O(n), mỗi truy vấn O(1)",
+        visual: "prefix",
+        visualCaption: "Prefix sum lưu tổng từ đầu mảng đến từng vị trí."
+      },
+      {
+        title: "Tổng hợp cấp tốc",
+        definition: "Phần tổng hợp cấp tốc tập trung rèn tốc độ nhận dạng dạng bài và viết khung giải ổn định trong thời gian ngắn.",
+        theory: [
+          "Tách đề thành ba dòng: dữ liệu vào, kết quả cần in, quy tắc xử lý.",
+          "Nếu bài có nhiều trường hợp, xử lý từng test case bằng hàm solve().",
+          "Luôn kiểm tra lỗi phổ biến: tràn số, chia cho 0, chỉ số vượt mảng và thiếu xuống dòng."
+        ],
+        example: "Nhiều test, mỗi test đọc n rồi in tổng bình phương các số từ 1 đến n.",
+        pseudo: String.raw`read t
+repeat t times:
+    read n
+    ans <- 0
+    for i from 1 to n:
+        ans <- ans + i * i
+    print ans`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+void solve() {
+    long long n;
+    cin >> n;
+    long long ans = 0;
+
+    for (long long i = 1; i <= n; ++i) {
+        ans += i * i;
+    }
+
+    cout << ans << '\n';
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int t;
+    cin >> t;
+    while (t--) solve();
+    return 0;
+}`,
+        notes: [
+          "solve() giúp tránh lặp code khi có nhiều test.",
+          "Nếu công thức có thể tối ưu O(1), hãy dùng khi n lớn.",
+          "Giữ template ngắn, chỉ thêm thư viện hoặc hàm khi thật sự cần."
+        ],
+        complexity: "O(t * n)",
+        visual: "flow",
+        visualCaption: "Mỗi test case đi qua cùng một hàm solve()."
+      }
+    ]
+  },
+  {
+    level: 1,
+    id: "level-1",
+    title: "Level 1 - Thuật toán cơ bản",
+    subtitle: "Vector, đệ quy, brute force, STL cơ bản, greedy, prefix sum, two pointer và toán nền.",
+    topics: [
+      {
+        title: "Luyện tập tổng hợp",
+        definition: "Level 1 tổng hợp các kỹ thuật nền để giải bài có dữ liệu lớn hơn Level 0 và cần chọn cấu trúc dữ liệu phù hợp.",
+        theory: [
+          "Đọc giới hạn n trước khi chọn thuật toán: n <= 20 có thể brute force, n <= 10^5 thường cần O(n log n) hoặc O(n).",
+          "STL như vector, sort, map, set giúp giảm lỗi cài đặt và viết nhanh hơn.",
+          "Mỗi bài nên có một ý chính: sắp xếp, đếm tần suất, tiền xử lý, hai con trỏ hoặc tham lam."
+        ],
+        example: "Cho n số, in các giá trị xuất hiện đúng một lần theo thứ tự tăng dần.",
+        pseudo: String.raw`read n
+count frequency of each value
+for values in increasing order:
+    if frequency = 1:
+        print value`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    map<int, int> freq;
+
+    for (int i = 0; i < n; ++i) {
+        int x;
+        cin >> x;
+        freq[x]++;
+    }
+
+    for (auto [value, count] : freq) {
+        if (count == 1) cout << value << ' ';
+    }
+    return 0;
+}`,
+        notes: [
+          "map tự sắp xếp key tăng dần.",
+          "Nếu không cần thứ tự, unordered_map có thể nhanh hơn.",
+          "Tách việc đếm và việc in giúp code ít rối."
+        ],
+        complexity: "O(n log n)",
+        visual: "map",
+        visualCaption: "Dữ liệu được gom theo key để đếm tần suất."
+      },
+      {
+        title: "Vector",
+        definition: "vector là mảng động trong C++, có thể thay đổi kích thước và hỗ trợ truy cập theo chỉ số.",
+        theory: [
+          "push_back thêm phần tử vào cuối, pop_back xóa phần tử cuối.",
+          "vector lưu liên tiếp trong bộ nhớ nên truy cập a[i] là O(1).",
+          "Xóa hoặc chèn ở giữa vector tốn O(n) vì phải dời các phần tử phía sau."
+        ],
+        example: "Đọc n số, sắp xếp và loại bỏ giá trị trùng nhau.",
+        pseudo: String.raw`read n and vector a
+sort a
+remove duplicate values
+print remaining values`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (int &x : a) cin >> x;
+
+    sort(a.begin(), a.end());
+    a.erase(unique(a.begin(), a.end()), a.end());
+
+    for (int x : a) cout << x << ' ';
+    return 0;
+}`,
+        notes: [
+          "unique chỉ gom phần tử trùng kề nhau, nên thường cần sort trước.",
+          "a.size() trả về size_t, khi so sánh với int cần cẩn thận cảnh báo kiểu.",
+          "Dùng reserve(n) nếu biết trước số lượng push_back lớn."
+        ],
+        complexity: "O(n log n)",
+        visual: "vector",
+        visualCaption: "Vector mở rộng khi thêm phần tử, vẫn truy cập nhanh như mảng."
+      },
+      {
+        title: "Đệ quy",
+        definition: "Đệ quy là kỹ thuật một hàm tự gọi chính nó để giải bài toán bằng cách chia về bài toán nhỏ hơn.",
+        theory: [
+          "Một hàm đệ quy phải có điều kiện dừng và bước chuyển làm bài toán nhỏ đi.",
+          "Mỗi lời gọi nằm trên call stack, vì vậy đệ quy quá sâu có thể tràn stack.",
+          "Đệ quy hợp với cây, quay lui, chia để trị và định nghĩa toán học như giai thừa."
+        ],
+        example: "Tính ước chung lớn nhất bằng thuật toán Euclid đệ quy.",
+        pseudo: String.raw`gcd(a, b):
+    if b = 0:
+        return a
+    return gcd(b, a mod b)`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+long long gcdRec(long long a, long long b) {
+    if (b == 0) return a;
+    return gcdRec(b, a % b);
+}
+
+int main() {
+    long long a, b;
+    cin >> a >> b;
+    cout << gcdRec(a, b) << '\n';
+    return 0;
+}`,
+        notes: [
+          "Điều kiện dừng sai sẽ gây lặp vô hạn.",
+          "Với n lớn, cân nhắc chuyển sang vòng lặp để tránh tràn stack.",
+          "Luôn tự hỏi: lời gọi sau có nhỏ hơn lời gọi hiện tại không?"
+        ],
+        complexity: "O(log min(a, b))",
+        visual: "recursion",
+        visualCaption: "Mỗi lời gọi đệ quy tạo một tầng mới cho đến khi gặp điều kiện dừng."
+      },
+      {
+        title: "Brute Force - Backtracking",
+        definition: "Brute force thử tất cả khả năng; backtracking là brute force có quay lui và thường kèm cắt nhánh để bỏ trạng thái vô ích.",
+        theory: [
+          "Brute force phù hợp khi không gian tìm kiếm nhỏ hoặc dùng để kiểm chứng lời giải tối ưu.",
+          "Backtracking xây đáp án từng bước, thử một lựa chọn, đi sâu, rồi hoàn tác lựa chọn đó.",
+          "Cắt nhánh dựa trên ràng buộc giúp giảm số trạng thái phải duyệt."
+        ],
+        example: "Sinh tất cả hoán vị của các số từ 1 đến n.",
+        pseudo: String.raw`backtrack(pos):
+    if pos > n:
+        print permutation
+        return
+    for value from 1 to n:
+        if value not used:
+            choose value
+            backtrack(pos + 1)
+            unchoose value`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int n;
+vector<int> perm, used;
+
+void backtrack(int pos) {
+    if (pos == n) {
+        for (int x : perm) cout << x << ' ';
+        cout << '\n';
+        return;
+    }
+    for (int x = 1; x <= n; ++x) {
+        if (!used[x]) {
+            used[x] = 1;
+            perm.push_back(x);
+            backtrack(pos + 1);
+            perm.pop_back();
+            used[x] = 0;
+        }
+    }
+}
+
+int main() {
+    cin >> n;
+    used.assign(n + 1, 0);
+    backtrack(0);
+    return 0;
+}`,
+        notes: [
+          "Số hoán vị là n!, chỉ dùng cho n nhỏ.",
+          "Phần hoàn tác phải đảo đúng những gì đã chọn.",
+          "Nên in hoặc debug trạng thái với n nhỏ trước."
+        ],
+        complexity: "O(n!)",
+        visual: "tree",
+        visualCaption: "Backtracking duyệt cây lựa chọn, mỗi nhánh là một quyết định."
+      },
+      {
+        title: "Pair - Struct",
+        definition: "pair lưu hai giá trị đi chung; struct định nghĩa một kiểu dữ liệu mới gồm nhiều trường có ý nghĩa.",
+        theory: [
+          "pair<int, int> thường dùng cho tọa độ, khoảng, cạnh hoặc cặp giá trị.",
+          "struct giúp code dễ hiểu hơn khi dữ liệu có nhiều thuộc tính như tên, điểm, thời gian.",
+          "Có thể sort vector struct bằng comparator tự viết."
+        ],
+        example: "Sắp xếp danh sách học sinh giảm dần theo điểm, nếu bằng điểm thì tăng dần theo tên.",
+        pseudo: String.raw`read students
+sort by:
+    higher score first
+    if same score, smaller name first
+print result`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+struct Student {
+    string name;
+    int score;
+};
+
+int main() {
+    int n;
+    cin >> n;
+    vector<Student> a(n);
+    for (auto &s : a) cin >> s.name >> s.score;
+
+    sort(a.begin(), a.end(), [](const Student& x, const Student& y) {
+        if (x.score != y.score) return x.score > y.score;
+        return x.name < y.name;
+    });
+
+    for (const auto &s : a) cout << s.name << ' ' << s.score << '\n';
+    return 0;
+}`,
+        notes: [
+          "Comparator phải tạo thứ tự nhất quán.",
+          "pair so sánh mặc định theo first rồi second.",
+          "Tên trường trong struct làm code rõ nghĩa hơn first/second khi dữ liệu phức tạp."
+        ],
+        complexity: "O(n log n)",
+        visual: "struct",
+        visualCaption: "Mỗi bản ghi gom nhiều thuộc tính thành một đơn vị dữ liệu."
+      },
+      {
+        title: "Greedy",
+        definition: "Greedy chọn phương án tốt nhất tại thời điểm hiện tại với hy vọng dẫn đến đáp án tối ưu toàn cục.",
+        theory: [
+          "Greedy cần chứng minh bằng trao đổi, bất biến hoặc lập luận rằng lựa chọn hiện tại không làm mất đáp án tối ưu.",
+          "Nhiều bài greedy bắt đầu bằng sắp xếp theo một tiêu chí quan trọng.",
+          "Không phải lựa chọn trông hợp lý nào cũng đúng; luôn thử phản ví dụ nhỏ."
+        ],
+        example: "Chọn nhiều đoạn không giao nhau nhất bằng cách sắp xếp theo thời điểm kết thúc tăng dần.",
+        pseudo: String.raw`sort intervals by end time
+lastEnd <- -infinity
+answer <- 0
+for interval in intervals:
+    if interval.start >= lastEnd:
+        choose interval
+        lastEnd <- interval.end
+        answer <- answer + 1
+print answer`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<pair<int, int>> seg(n);
+    for (auto &p : seg) cin >> p.first >> p.second;
+
+    sort(seg.begin(), seg.end(), [](auto a, auto b) {
+        return a.second < b.second;
+    });
+
+    int ans = 0;
+    int lastEnd = INT_MIN;
+    for (auto [l, r] : seg) {
+        if (l >= lastEnd) {
+            ans++;
+            lastEnd = r;
+        }
+    }
+
+    cout << ans << '\n';
+    return 0;
+}`,
+        notes: [
+          "Tiêu chí sắp xếp là linh hồn của greedy.",
+          "Nếu chọn đoạn kết thúc sớm nhất, ta để lại nhiều không gian nhất cho các đoạn sau.",
+          "Khi không chứng minh được greedy, hãy nghĩ đến DP hoặc tìm kiếm."
+        ],
+        complexity: "O(n log n)",
+        visual: "flow",
+        visualCaption: "Greedy lặp lại việc chọn ứng viên tốt nhất theo tiêu chí đã chứng minh."
+      },
+      {
+        title: "Map",
+        definition: "map là cấu trúc key-value, cho phép lưu và truy vấn giá trị theo khóa.",
+        theory: [
+          "map trong C++ được sắp xếp theo key, thao tác cơ bản O(log n).",
+          "unordered_map dùng bảng băm, trung bình O(1), nhưng không giữ thứ tự.",
+          "Ứng dụng phổ biến: đếm tần suất, ánh xạ tên sang điểm, lưu vị trí xuất hiện."
+        ],
+        example: "Đếm số lần xuất hiện của từng từ trong văn bản.",
+        pseudo: String.raw`read n
+for i from 1 to n:
+    read word
+    freq[word] <- freq[word] + 1
+for each key in freq:
+    print key and freq[key]`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    map<string, int> freq;
+
+    for (int i = 0; i < n; ++i) {
+        string word;
+        cin >> word;
+        freq[word]++;
+    }
+
+    for (auto [word, count] : freq) {
+        cout << word << ' ' << count << '\n';
+    }
+    return 0;
+}`,
+        notes: [
+          "freq[x] tự tạo key x với giá trị 0 nếu chưa tồn tại.",
+          "Dùng count hoặc find để kiểm tra key có tồn tại mà không bắt buộc tạo mới.",
+          "map hữu ích khi key là string hoặc số rất lớn không thể dùng mảng tần suất."
+        ],
+        complexity: "O(n log n)",
+        visual: "map",
+        visualCaption: "Map nối mỗi khóa với một giá trị, ví dụ từ với số lần xuất hiện."
+      },
+      {
+        title: "Set",
+        definition: "set lưu các giá trị không trùng và tự sắp xếp; unordered_set lưu không trùng nhưng không có thứ tự.",
+        theory: [
+          "insert thêm phần tử, erase xóa phần tử, count/find kiểm tra tồn tại.",
+          "set phù hợp khi cần tập giá trị duy nhất hoặc cần truy vấn theo thứ tự.",
+          "Các thao tác của set thường O(log n)."
+        ],
+        example: "Đếm số giá trị phân biệt trong dãy.",
+        pseudo: String.raw`read n
+create empty set s
+for each x:
+    insert x into s
+print size of s`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    set<int> values;
+
+    for (int i = 0; i < n; ++i) {
+        int x;
+        cin >> x;
+        values.insert(x);
+    }
+
+    cout << values.size() << '\n';
+    return 0;
+}`,
+        notes: [
+          "Nếu chỉ cần đếm phân biệt và không cần thứ tự, unordered_set thường nhanh.",
+          "set không lưu hai phần tử bằng nhau.",
+          "lower_bound trong set tìm phần tử đầu tiên không nhỏ hơn x."
+        ],
+        complexity: "O(n log n)",
+        visual: "set",
+        visualCaption: "Set tự loại trùng, mỗi giá trị chỉ xuất hiện một lần."
+      },
+      {
+        title: "Sortings, Counting",
+        definition: "Sắp xếp đưa dữ liệu về thứ tự mong muốn; counting dùng tần suất khi miền giá trị nhỏ để xử lý nhanh hơn sort thông thường.",
+        theory: [
+          "sort trong C++ dùng introsort, độ phức tạp O(n log n).",
+          "Counting sort phù hợp khi giá trị nằm trong đoạn nhỏ 0..K.",
+          "Sau khi sắp xếp, nhiều bài trở nên dễ hơn: tìm cặp, loại trùng, greedy, two pointer."
+        ],
+        example: "Sắp xếp dãy số không âm có giá trị từ 0 đến K bằng counting.",
+        pseudo: String.raw`read n, K
+count each value
+for value from 0 to K:
+    print value count[value] times`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, k;
+    cin >> n >> k;
+    vector<int> cnt(k + 1, 0);
+
+    for (int i = 0; i < n; ++i) {
+        int x;
+        cin >> x;
+        cnt[x]++;
+    }
+
+    for (int value = 0; value <= k; ++value) {
+        while (cnt[value]--) cout << value << ' ';
+    }
+    return 0;
+}`,
+        notes: [
+          "Counting sort không hợp khi K quá lớn so với n.",
+          "Comparator của sort trả về true nếu phần tử trái đứng trước phần tử phải.",
+          "Nếu cần ổn định thứ tự của phần tử bằng nhau, tìm hiểu stable_sort."
+        ],
+        complexity: "O(n + K)",
+        visual: "sort",
+        visualCaption: "Counting gom dữ liệu theo tần suất rồi trải lại theo thứ tự."
+      },
+      {
+        title: "PrefixSum, Difference array",
+        definition: "Prefix sum trả lời tổng đoạn nhanh; difference array hỗ trợ cộng một giá trị vào nhiều đoạn rồi khôi phục mảng cuối.",
+        theory: [
+          "Prefix sum: pref[i] = a[1] + ... + a[i], tổng l..r là pref[r] - pref[l - 1].",
+          "Difference array: muốn cộng v vào đoạn l..r, làm diff[l] += v và diff[r + 1] -= v.",
+          "Hai kỹ thuật này đổi nhiều thao tác chậm thành tiền xử lý tuyến tính."
+        ],
+        example: "Có q lần cộng v vào đoạn l..r, in mảng sau tất cả cập nhật.",
+        pseudo: String.raw`create diff array initialized by 0
+for each update l, r, v:
+    diff[l] <- diff[l] + v
+    diff[r + 1] <- diff[r + 1] - v
+current <- 0
+for i from 1 to n:
+    current <- current + diff[i]
+    a[i] <- a[i] + current
+print a`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, q;
+    cin >> n >> q;
+    vector<long long> a(n + 1), diff(n + 2, 0);
+    for (int i = 1; i <= n; ++i) cin >> a[i];
+
+    while (q--) {
+        int l, r;
+        long long v;
+        cin >> l >> r >> v;
+        diff[l] += v;
+        diff[r + 1] -= v;
+    }
+
+    long long add = 0;
+    for (int i = 1; i <= n; ++i) {
+        add += diff[i];
+        cout << a[i] + add << ' ';
+    }
+    return 0;
+}`,
+        notes: [
+          "Cấp phát diff n + 2 để thao tác r + 1 an toàn.",
+          "Difference array phù hợp khi chỉ cần mảng cuối, không hỏi giữa chừng.",
+          "Prefix sum và difference array là hai mặt ngược nhau."
+        ],
+        complexity: "O(n + q)",
+        visual: "prefix",
+        visualCaption: "Difference lưu điểm bắt đầu và kết thúc ảnh hưởng của cập nhật đoạn."
+      },
+      {
+        title: "Two pointer",
+        definition: "Two pointer dùng hai chỉ số di chuyển có kiểm soát để xử lý mảng hoặc xâu trong thời gian tuyến tính.",
+        theory: [
+          "Hai con trỏ có thể đi từ hai đầu vào giữa hoặc cùng đi từ trái sang phải tạo cửa sổ.",
+          "Kỹ thuật này thường cần mảng đã sắp xếp hoặc điều kiện có tính đơn điệu.",
+          "Mỗi con trỏ chỉ tiến tối đa n lần nên tổng thời gian thường O(n)."
+        ],
+        example: "Với mảng số không âm, tìm độ dài đoạn liên tiếp dài nhất có tổng không vượt S.",
+        pseudo: String.raw`left <- 0
+sum <- 0
+answer <- 0
+for right from 0 to n - 1:
+    sum <- sum + a[right]
+    while sum > S:
+        sum <- sum - a[left]
+        left <- left + 1
+    answer <- max(answer, right - left + 1)
+print answer`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    long long s;
+    cin >> n >> s;
+    vector<long long> a(n);
+    for (auto &x : a) cin >> x;
+
+    int left = 0, ans = 0;
+    long long sum = 0;
+    for (int right = 0; right < n; ++right) {
+        sum += a[right];
+        while (sum > s) {
+            sum -= a[left];
+            left++;
+        }
+        ans = max(ans, right - left + 1);
+    }
+
+    cout << ans << '\n';
+    return 0;
+}`,
+        notes: [
+          "Cửa sổ trượt yêu cầu phần tử không âm trong ví dụ này.",
+          "Nếu có số âm, tổng cửa sổ không còn đơn điệu.",
+          "Luôn kiểm tra điều kiện while để cửa sổ hợp lệ trước khi cập nhật đáp án."
+        ],
+        complexity: "O(n)",
+        visual: "pointers",
+        visualCaption: "Hai chỉ số left và right xác định một cửa sổ đang xét."
+      },
+      {
+        title: "Math",
+        definition: "Nhóm toán cơ bản gồm chia hết, gcd/lcm, số nguyên tố, modulo và công thức đếm đơn giản.",
+        theory: [
+          "gcd hỗ trợ rút gọn phân số, tính lcm và giải nhiều bài chia hết.",
+          "Sàng Eratosthenes tìm số nguyên tố đến n trong O(n log log n).",
+          "Khi đáp án lớn, đề thường yêu cầu lấy modulo, cần modulo sau mỗi phép cộng hoặc nhân."
+        ],
+        example: "In tất cả số nguyên tố không vượt quá n.",
+        pseudo: String.raw`isPrime[0] <- false, isPrime[1] <- false
+for p from 2 to sqrt(n):
+    if isPrime[p]:
+        mark multiples of p as composite
+print all i with isPrime[i] = true`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<bool> prime(n + 1, true);
+    if (n >= 0) prime[0] = false;
+    if (n >= 1) prime[1] = false;
+
+    for (long long p = 2; p * p <= n; ++p) {
+        if (prime[p]) {
+            for (long long x = p * p; x <= n; x += p) {
+                prime[x] = false;
+            }
+        }
+    }
+
+    for (int i = 2; i <= n; ++i) {
+        if (prime[i]) cout << i << ' ';
+    }
+    return 0;
+}`,
+        notes: [
+          "Bắt đầu đánh dấu từ p * p vì bội nhỏ hơn đã bị đánh dấu bởi số nguyên tố nhỏ hơn.",
+          "p * p nên dùng long long để tránh tràn khi n lớn.",
+          "lcm(a, b) = a / gcd(a, b) * b giúp giảm nguy cơ tràn hơn a * b / gcd."
+        ],
+        complexity: "O(n log log n)",
+        visual: "math",
+        visualCaption: "Sàng loại dần các bội số để giữ lại số nguyên tố."
+      },
+      {
+        title: "Tổng hợp cấp tốc",
+        definition: "Tổng hợp Level 1 luyện cách kết hợp STL, sort và tiền xử lý để xử lý dữ liệu lớn hơn trong thời gian ngắn.",
+        theory: [
+          "Nếu cần đếm, nghĩ đến map/unordered_map hoặc mảng tần suất.",
+          "Nếu cần tối ưu sau khi sắp xếp, thử greedy hoặc two pointer.",
+          "Nếu có nhiều truy vấn trên dữ liệu tĩnh, thử prefix sum hoặc tiền xử lý."
+        ],
+        example: "Cho n số và q truy vấn x, hỏi x xuất hiện bao nhiêu lần.",
+        pseudo: String.raw`read n
+count all values by map
+read q
+for each query x:
+    print freq[x]`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+    unordered_map<long long, int> freq;
+    for (int i = 0; i < n; ++i) {
+        long long x;
+        cin >> x;
+        freq[x]++;
+    }
+
+    int q;
+    cin >> q;
+    while (q--) {
+        long long x;
+        cin >> x;
+        cout << freq[x] << '\n';
+    }
+    return 0;
+}`,
+        notes: [
+          "Tiền xử lý một lần, trả lời nhiều lần là tư duy rất quan trọng.",
+          "unordered_map có thể bị hack trong một số hệ thống, map ổn định hơn nhưng chậm hơn.",
+          "Đặt ios fast I/O khi input lớn."
+        ],
+        complexity: "Trung bình O(n + q)",
+        visual: "map",
+        visualCaption: "Bảng tần suất biến truy vấn đếm từ O(n) thành O(1) trung bình."
+      }
+    ]
+  },
+  {
+    level: 2,
+    id: "level-2",
+    title: "Level 2 - Thuật toán quan trọng",
+    subtitle: "Binary search, nén tọa độ, stack, queue, deque, priority queue, meet-in-the-middle và toán nâng cao hơn.",
+    topics: [
+      {
+        title: "Luyện tập tổng hợp",
+        definition: "Level 2 tập trung vào bài có ràng buộc lớn, cần phát hiện tính đơn điệu, dùng cấu trúc dữ liệu đúng và tối ưu số trạng thái.",
+        theory: [
+          "Khi n lên 10^5 hoặc 10^6, O(n^2) thường không đủ; cần O(n log n) hoặc O(n).",
+          "Nhiều bài khó nằm ở bước biến đổi: nén giá trị, tìm điều kiện đơn điệu, hoặc chia đôi không gian tìm kiếm.",
+          "Dữ liệu có thứ tự thời gian thường hợp với stack, queue hoặc deque."
+        ],
+        example: "Cho nhiều giá trị lớn, nén chúng thành thứ hạng rồi đếm tần suất theo thứ hạng.",
+        pseudo: String.raw`read array a
+copy and sort unique values
+for each x in a:
+    rank <- lower_bound(uniqueValues, x)
+    count[rank] <- count[rank] + 1
+print count`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<long long> a(n), values;
+    for (auto &x : a) {
+        cin >> x;
+        values.push_back(x);
+    }
+
+    sort(values.begin(), values.end());
+    values.erase(unique(values.begin(), values.end()), values.end());
+
+    vector<int> cnt(values.size());
+    for (long long x : a) {
+        int id = lower_bound(values.begin(), values.end(), x) - values.begin();
+        cnt[id]++;
+    }
+
+    for (int c : cnt) cout << c << ' ';
+    return 0;
+}`,
+        notes: [
+          "Nén tọa độ giữ quan hệ thứ tự nhưng đổi giá trị lớn thành chỉ số nhỏ.",
+          "lower_bound yêu cầu mảng đã sắp xếp.",
+          "Đây là kỹ thuật nền cho Fenwick, segment tree và nhiều bài offline."
+        ],
+        complexity: "O(n log n)",
+        visual: "sort",
+        visualCaption: "Giá trị lớn được ánh xạ về thứ hạng nhỏ gọn."
+      },
+      {
+        title: "Binary Search",
+        definition: "Binary search tìm vị trí hoặc đáp án bằng cách liên tục chia đôi một miền có tính đơn điệu.",
+        theory: [
+          "Tìm kiếm nhị phân cần một điều kiện dạng false...false, true...true hoặc ngược lại.",
+          "Có hai kiểu phổ biến: tìm trong mảng đã sắp xếp và binary search on answer.",
+          "Cẩn thận vòng lặp vô hạn; thường dùng mid = l + (r - l) / 2."
+        ],
+        example: "Tìm sức chứa nhỏ nhất của thuyền để chở các gói theo thứ tự trong không quá d ngày.",
+        pseudo: String.raw`can(capacity):
+    days <- 1
+    current <- 0
+    for each weight:
+        if current + weight > capacity:
+            days <- days + 1
+            current <- 0
+        current <- current + weight
+    return days <= d
+
+binary search minimum capacity with can(capacity) = true`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+bool canShip(const vector<int>& w, int d, long long cap) {
+    int days = 1;
+    long long cur = 0;
+    for (int x : w) {
+        if (x > cap) return false;
+        if (cur + x > cap) {
+            days++;
+            cur = 0;
+        }
+        cur += x;
+    }
+    return days <= d;
+}
+
+int main() {
+    int n, d;
+    cin >> n >> d;
+    vector<int> w(n);
+    long long l = 0, r = 0;
+    for (int &x : w) {
+        cin >> x;
+        l = max(l, (long long)x);
+        r += x;
+    }
+
+    while (l < r) {
+        long long mid = l + (r - l) / 2;
+        if (canShip(w, d, mid)) r = mid;
+        else l = mid + 1;
+    }
+    cout << l << '\n';
+    return 0;
+}`,
+        notes: [
+          "Hàm can càng dễ đúng thì binary search càng ít lỗi.",
+          "Với bài tìm nhỏ nhất thỏa điều kiện, nếu mid thỏa thì kéo r = mid.",
+          "Luôn đặt biên trái/phải chắc chắn chứa đáp án."
+        ],
+        complexity: "O(n log sum)",
+        visual: "binary",
+        visualCaption: "Mỗi bước loại một nửa miền tìm kiếm nhờ tính đơn điệu."
+      },
+      {
+        title: "Coordinate Compression",
+        definition: "Nén tọa độ biến các giá trị lớn hoặc rời rạc thành chỉ số liên tiếp nhưng vẫn giữ thứ tự tương đối.",
+        theory: [
+          "Khi giá trị có thể tới 10^9 nhưng chỉ có n giá trị xuất hiện, có thể nén về 0..m-1.",
+          "Các bước chuẩn: copy, sort, unique, lower_bound để lấy rank.",
+          "Nén tọa độ không giữ khoảng cách thật giữa hai giá trị, chỉ giữ thứ tự."
+        ],
+        example: "Nén điểm số của thí sinh để dùng làm chỉ số mảng tần suất.",
+        pseudo: String.raw`values <- copy of a
+sort values
+remove duplicates
+for each a[i]:
+    compressed[i] <- position of a[i] in values`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<long long> a(n), values;
+    for (long long &x : a) {
+        cin >> x;
+        values.push_back(x);
+    }
+
+    sort(values.begin(), values.end());
+    values.erase(unique(values.begin(), values.end()), values.end());
+
+    for (long long x : a) {
+        int rank = lower_bound(values.begin(), values.end(), x) - values.begin();
+        cout << rank << ' ';
+    }
+    return 0;
+}`,
+        notes: [
+          "Nếu cần rank bắt đầu từ 1, in rank + 1.",
+          "Không dùng nén tọa độ khi bài cần khoảng cách thật x[j] - x[i].",
+          "Dùng vector values để giải nén ngược: giá trị gốc của rank r là values[r]."
+        ],
+        complexity: "O(n log n)",
+        visual: "compress",
+        visualCaption: "Các giá trị rời rạc được xếp hạng thành chỉ số liên tiếp."
+      },
+      {
+        title: "STACK",
+        definition: "Stack là cấu trúc LIFO: phần tử vào sau được lấy ra trước.",
+        theory: [
+          "stack hỗ trợ push, pop, top trong O(1).",
+          "Ứng dụng: kiểm tra ngoặc đúng, DFS lặp, undo, monotonic stack tìm phần tử gần hơn/lớn hơn.",
+          "Monotonic stack giữ stack tăng hoặc giảm để loại bỏ phần tử không còn hữu ích."
+        ],
+        example: "Tìm phần tử lớn hơn gần nhất bên phải cho mỗi vị trí.",
+        pseudo: String.raw`create empty stack
+for i from n - 1 downto 0:
+    while stack not empty and stack.top <= a[i]:
+        pop stack
+    if stack empty: answer[i] <- -1
+    else answer[i] <- stack.top
+    push a[i]`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<int> a(n), ans(n);
+    for (int &x : a) cin >> x;
+
+    stack<int> st;
+    for (int i = n - 1; i >= 0; --i) {
+        while (!st.empty() && st.top() <= a[i]) st.pop();
+        ans[i] = st.empty() ? -1 : st.top();
+        st.push(a[i]);
+    }
+
+    for (int x : ans) cout << x << ' ';
+    return 0;
+}`,
+        notes: [
+          "Không gọi top() khi stack rỗng.",
+          "Mỗi phần tử được push và pop tối đa một lần, nên tổng O(n).",
+          "Monotonic stack thường thay thế được vòng lặp lồng nhau O(n^2)."
+        ],
+        complexity: "O(n)",
+        visual: "stack",
+        visualCaption: "Stack lấy phần tử ở đỉnh trước, giống một chồng dữ liệu."
+      },
+      {
+        title: "Queue - Deque - Priority Queue",
+        definition: "Queue là FIFO, deque thêm/xóa ở cả hai đầu, priority_queue luôn lấy phần tử có độ ưu tiên cao nhất.",
+        theory: [
+          "queue dùng cho BFS và xử lý theo thứ tự đến trước.",
+          "deque mạnh trong cửa sổ trượt vì có thể pop cả đầu và cuối.",
+          "priority_queue là heap, phù hợp chọn min/max động như Dijkstra hoặc top k."
+        ],
+        example: "Tìm max của mọi cửa sổ độ dài k bằng deque đơn điệu.",
+        pseudo: String.raw`for i from 0 to n - 1:
+    remove indices outside window
+    while deque not empty and a[back] <= a[i]:
+        pop back
+    push i
+    if i >= k - 1:
+        print a[front]`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, k;
+    cin >> n >> k;
+    vector<int> a(n);
+    for (int &x : a) cin >> x;
+
+    deque<int> dq;
+    for (int i = 0; i < n; ++i) {
+        while (!dq.empty() && dq.front() <= i - k) dq.pop_front();
+        while (!dq.empty() && a[dq.back()] <= a[i]) dq.pop_back();
+        dq.push_back(i);
+
+        if (i >= k - 1) cout << a[dq.front()] << ' ';
+    }
+    return 0;
+}`,
+        notes: [
+          "Deque lưu chỉ số, không chỉ lưu giá trị, để biết phần tử có ra khỏi cửa sổ chưa.",
+          "priority_queue mặc định là max-heap.",
+          "Muốn min-heap: priority_queue<int, vector<int>, greater<int>> pq."
+        ],
+        complexity: "O(n)",
+        visual: "queue",
+        visualCaption: "Deque giữ các ứng viên max còn hiệu lực trong cửa sổ hiện tại."
+      },
+      {
+        title: "Chia đôi tập",
+        definition: "Chia đôi tập, hay meet-in-the-middle, tách n phần tử thành hai nửa để giảm từ 2^n xuống khoảng 2^(n/2).",
+        theory: [
+          "Kỹ thuật này hợp với n khoảng 30-40, nơi 2^n quá lớn nhưng 2^(n/2) còn xử lý được.",
+          "Ta liệt kê mọi trạng thái của mỗi nửa, rồi ghép hai danh sách bằng sort, binary search hoặc two pointer.",
+          "Thường dùng cho subset sum, đếm số tập con thỏa điều kiện và tối ưu trên tập nhỏ."
+        ],
+        example: "Đếm số tập con có tổng đúng bằng S.",
+        pseudo: String.raw`split array into left and right
+generate all subset sums of left
+generate all subset sums of right
+sort rightSums
+for each x in leftSums:
+    count values y in rightSums where x + y = S`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+vector<long long> subsetSums(vector<long long> a) {
+    int n = a.size();
+    vector<long long> sums;
+    for (int mask = 0; mask < (1 << n); ++mask) {
+        long long s = 0;
+        for (int i = 0; i < n; ++i) {
+            if (mask >> i & 1) s += a[i];
+        }
+        sums.push_back(s);
+    }
+    return sums;
+}
+
+int main() {
+    int n;
+    long long target;
+    cin >> n >> target;
+    vector<long long> a(n);
+    for (auto &x : a) cin >> x;
+
+    vector<long long> left(a.begin(), a.begin() + n / 2);
+    vector<long long> right(a.begin() + n / 2, a.end());
+    auto L = subsetSums(left);
+    auto R = subsetSums(right);
+    sort(R.begin(), R.end());
+
+    long long ans = 0;
+    for (long long x : L) {
+        auto range = equal_range(R.begin(), R.end(), target - x);
+        ans += range.second - range.first;
+    }
+    cout << ans << '\n';
+    return 0;
+}`,
+        notes: [
+          "Nếu mỗi nửa có hơn 30 phần tử, 2^(n/2) vẫn quá lớn.",
+          "Dùng long long cho tổng tập con.",
+          "equal_range đếm nhanh số phần tử bằng một giá trị trong mảng đã sort."
+        ],
+        complexity: "O(2^(n/2) * n + 2^(n/2) log 2^(n/2))",
+        visual: "mitm",
+        visualCaption: "Tập được tách làm hai nửa, sinh tổng từng nửa rồi ghép đáp án."
+      },
+      {
+        title: "Math_2",
+        definition: "Math_2 mở rộng toán thi đấu: lũy thừa nhanh, modulo, nghịch đảo modulo, tổ hợp và các biến đổi số học.",
+        theory: [
+          "Lũy thừa nhanh tính a^b trong O(log b) bằng bình phương liên tiếp.",
+          "Khi modulo là số nguyên tố, nghịch đảo của a là a^(mod - 2) theo Fermat nếu a không chia hết cho mod.",
+          "Công thức tổ hợp thường cần tiền xử lý factorial và inverse factorial."
+        ],
+        example: "Tính a^b mod m với b rất lớn.",
+        pseudo: String.raw`result <- 1
+a <- a mod m
+while b > 0:
+    if b is odd:
+        result <- result * a mod m
+    a <- a * a mod m
+    b <- b / 2
+print result`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+long long modPow(long long a, long long b, long long mod) {
+    long long res = 1 % mod;
+    a %= mod;
+    while (b > 0) {
+        if (b & 1) res = (__int128)res * a % mod;
+        a = (__int128)a * a % mod;
+        b >>= 1;
+    }
+    return res;
+}
+
+int main() {
+    long long a, b, mod;
+    cin >> a >> b >> mod;
+    cout << modPow(a, b, mod) << '\n';
+    return 0;
+}`,
+        notes: [
+          "__int128 giúp tránh tràn khi mod gần 10^18.",
+          "Nếu mod nhỏ như 1e9+7, long long nhân thường vẫn an toàn vì tích khoảng 1e18.",
+          "Không dùng pow(double) cho số nguyên lớn vì sai số."
+        ],
+        complexity: "O(log b)",
+        visual: "math",
+        visualCaption: "Số mũ được tách theo bit, mỗi bước bình phương cơ sở."
+      },
+      {
+        title: "Tổng hợp cấp tốc",
+        definition: "Tổng hợp Level 2 luyện nhận ra kỹ thuật quan trọng qua dấu hiệu trong đề và giới hạn dữ liệu.",
+        theory: [
+          "Có từ khóa nhỏ nhất/lớn nhất thỏa điều kiện đơn điệu: thử binary search on answer.",
+          "Giá trị lớn nhưng số lượng ít: nghĩ đến coordinate compression.",
+          "Cửa sổ liên tiếp, phần tử gần nhất, hoặc max/min động: cân nhắc stack/deque/priority_queue."
+        ],
+        example: "Tìm phần tử đầu tiên không nhỏ hơn x trong mảng đã sắp xếp cho nhiều truy vấn.",
+        pseudo: String.raw`sort array a
+for each query x:
+    pos <- lower_bound(a, x)
+    if pos exists:
+        print a[pos]
+    else:
+        print -1`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, q;
+    cin >> n >> q;
+    vector<int> a(n);
+    for (int &x : a) cin >> x;
+    sort(a.begin(), a.end());
+
+    while (q--) {
+        int x;
+        cin >> x;
+        auto it = lower_bound(a.begin(), a.end(), x);
+        if (it == a.end()) cout << -1 << '\n';
+        else cout << *it << '\n';
+    }
+    return 0;
+}`,
+        notes: [
+          "lower_bound trả iterator đến phần tử đầu tiên >= x.",
+          "Nếu cần > x, dùng upper_bound.",
+          "Truy vấn nhiều lần là lý do tốt để sort trước."
+        ],
+        complexity: "O(n log n + q log n)",
+        visual: "binary",
+        visualCaption: "Sort trước, sau đó mỗi truy vấn dùng tìm kiếm nhị phân."
+      }
+    ]
+  },
+  {
+    level: 3,
+    id: "level-3",
+    title: "Level 3 - Thuật toán cao cấp",
+    subtitle: "DP, KMP, duyệt đồ thị, segment tree, bao hàm loại trừ, hashing, chia căn và đường đi ngắn nhất.",
+    topics: [
+      {
+        title: "Luyện tập tổng hợp",
+        definition: "Level 3 đòi hỏi mô hình hóa bài toán thành trạng thái, đồ thị, đoạn hoặc công thức tối ưu trước khi cài đặt.",
+        theory: [
+          "Bắt đầu bằng việc gọi tên mô hình: graph, DP, string matching, range query, shortest path hoặc combinatorics.",
+          "Tách phần chứng minh ý tưởng khỏi phần cài đặt: đúng mô hình nhưng sai biên vẫn mất điểm.",
+          "Viết brute force cho test nhỏ là cách tốt để kiểm chứng thuật toán nâng cao."
+        ],
+        example: "So sánh lời giải nhanh với brute force trên test ngẫu nhiên nhỏ để bắt lỗi.",
+        pseudo: String.raw`repeat many times:
+    generate small random test
+    slow <- brute force answer
+    fast <- optimized answer
+    if slow != fast:
+        print failing test
+        stop`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+long long slow(vector<int> a) {
+    long long best = LLONG_MIN;
+    for (int l = 0; l < (int)a.size(); ++l) {
+        long long sum = 0;
+        for (int r = l; r < (int)a.size(); ++r) {
+            sum += a[r];
+            best = max(best, sum);
+        }
+    }
+    return best;
+}
+
+long long fast(vector<int> a) {
+    long long best = LLONG_MIN, cur = 0;
+    for (int x : a) {
+        cur = max((long long)x, cur + x);
+        best = max(best, cur);
+    }
+    return best;
+}
+
+int main() {
+    mt19937 rng(1);
+    for (int tc = 1; tc <= 1000; ++tc) {
+        int n = 1 + rng() % 8;
+        vector<int> a(n);
+        for (int &x : a) x = (int)(rng() % 21) - 10;
+        if (slow(a) != fast(a)) {
+            cout << "Wrong on test " << tc << '\n';
+            return 0;
+        }
+    }
+    cout << "All tests passed\n";
+    return 0;
+}`,
+        notes: [
+          "Stress test không chứng minh đúng tuyệt đối, nhưng bắt lỗi cài đặt rất tốt.",
+          "Giữ n nhỏ để brute force chạy được.",
+          "Khi phát hiện sai, in dữ liệu test để tái hiện."
+        ],
+        complexity: "Tùy thuật toán, ví dụ fast O(n)",
+        visual: "flow",
+        visualCaption: "Lời giải chậm và nhanh cùng chạy trên test nhỏ để đối chiếu."
+      },
+      {
+        title: "DP",
+        definition: "Quy hoạch động lưu kết quả của các bài toán con để tránh tính lại và xây đáp án bằng quan hệ chuyển trạng thái.",
+        theory: [
+          "Một bài DP cần xác định trạng thái, giá trị trạng thái, trạng thái gốc và công thức chuyển.",
+          "Top-down dùng đệ quy nhớ hóa; bottom-up duyệt trạng thái theo thứ tự phụ thuộc.",
+          "Tối ưu bộ nhớ khi trạng thái hiện tại chỉ phụ thuộc một vài lớp trước."
+        ],
+        example: "Tính số đồng xu ít nhất để tạo tổng S với các mệnh giá cho trước.",
+        pseudo: String.raw`dp[0] <- 0
+dp[x] <- infinity for x > 0
+for sum from 1 to S:
+    for coin in coins:
+        if sum >= coin:
+            dp[sum] <- min(dp[sum], dp[sum - coin] + 1)
+print dp[S]`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, S;
+    cin >> n >> S;
+    vector<int> coin(n);
+    for (int &c : coin) cin >> c;
+
+    const int INF = 1e9;
+    vector<int> dp(S + 1, INF);
+    dp[0] = 0;
+
+    for (int sum = 1; sum <= S; ++sum) {
+        for (int c : coin) {
+            if (sum >= c) dp[sum] = min(dp[sum], dp[sum - c] + 1);
+        }
+    }
+
+    cout << (dp[S] == INF ? -1 : dp[S]) << '\n';
+    return 0;
+}`,
+        notes: [
+          "dp[0] thường là trạng thái gốc vì tổng 0 cần 0 đồng.",
+          "INF phải đủ lớn nhưng không gây tràn khi cộng 1.",
+          "Nếu mỗi đồng chỉ được dùng một lần, thứ tự duyệt sẽ khác."
+        ],
+        complexity: "O(n * S)",
+        visual: "dp",
+        visualCaption: "DP lấp bảng từ trạng thái nhỏ đến trạng thái lớn."
+      },
+      {
+        title: "KMP",
+        definition: "KMP là thuật toán tìm mẫu trong xâu bằng prefix function, tránh quay lui con trỏ trên văn bản.",
+        theory: [
+          "Prefix function pi[i] là độ dài tiền tố dài nhất của mẫu cũng là hậu tố của đoạn kết thúc tại i.",
+          "Khi mismatch, KMP dùng pi để nhảy về vị trí còn có thể khớp, không so sánh lại từ đầu.",
+          "Tổng thời gian tìm tất cả lần xuất hiện là O(n + m)."
+        ],
+        example: "Đếm số lần pattern xuất hiện trong text.",
+        pseudo: String.raw`combined <- pattern + separator + text
+compute prefix function of combined
+answer <- count positions with pi[i] = length(pattern)`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+vector<int> prefixFunction(const string& s) {
+    vector<int> pi(s.size());
+    for (int i = 1; i < (int)s.size(); ++i) {
+        int j = pi[i - 1];
+        while (j > 0 && s[i] != s[j]) j = pi[j - 1];
+        if (s[i] == s[j]) j++;
+        pi[i] = j;
+    }
+    return pi;
+}
+
+int main() {
+    string pattern, text;
+    cin >> pattern >> text;
+
+    string combined = pattern + "#" + text;
+    vector<int> pi = prefixFunction(combined);
+
+    int ans = 0;
+    for (int x : pi) {
+        if (x == (int)pattern.size()) ans++;
+    }
+    cout << ans << '\n';
+    return 0;
+}`,
+        notes: [
+          "Ký tự phân cách nên là ký tự không xuất hiện trong pattern và text.",
+          "KMP hữu ích khi cần tìm nhiều vị trí khớp, không chỉ kiểm tra contains.",
+          "Cẩn thận pattern rỗng nếu đề có thể cho trường hợp đó."
+        ],
+        complexity: "O(n + m)",
+        visual: "string",
+        visualCaption: "KMP dùng thông tin tiền tố để không so sánh lại phần đã biết."
+      },
+      {
+        title: "BFS, DFS",
+        definition: "BFS và DFS là hai kỹ thuật duyệt đồ thị; BFS đi theo lớp, DFS đi sâu theo nhánh.",
+        theory: [
+          "BFS tìm đường đi ngắn nhất theo số cạnh trong đồ thị không trọng số.",
+          "DFS phù hợp tìm thành phần liên thông, thứ tự topo, phát hiện chu trình và duyệt cây.",
+          "Đồ thị thường lưu bằng adjacency list để tiết kiệm bộ nhớ."
+        ],
+        example: "Tìm khoảng cách ngắn nhất từ đỉnh 1 đến mọi đỉnh trong đồ thị không trọng số.",
+        pseudo: String.raw`dist[start] <- 0
+push start into queue
+while queue not empty:
+    u <- pop front
+    for v in adj[u]:
+        if dist[v] not set:
+            dist[v] <- dist[u] + 1
+            push v`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; ++i) {
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[1] = 0;
+    q.push(1);
+
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        for (int v : adj[u]) {
+            if (dist[v] == -1) {
+                dist[v] = dist[u] + 1;
+                q.push(v);
+            }
+        }
+    }
+
+    for (int i = 1; i <= n; ++i) cout << dist[i] << ' ';
+    return 0;
+}`,
+        notes: [
+          "Đặt dist = -1 cũng đóng vai trò mảng visited.",
+          "Với đồ thị có trọng số, BFS thường không còn đúng; cần Dijkstra hoặc thuật toán khác.",
+          "DFS đệ quy trên n lớn có thể tràn stack, có thể dùng stack lặp."
+        ],
+        complexity: "O(n + m)",
+        visual: "graph",
+        visualCaption: "BFS lan theo từng lớp từ đỉnh bắt đầu."
+      },
+      {
+        title: "Segment Tree",
+        definition: "Segment tree là cấu trúc cây lưu thông tin trên các đoạn, hỗ trợ truy vấn và cập nhật trong O(log n).",
+        theory: [
+          "Mỗi node đại diện một đoạn; node cha gộp kết quả từ hai node con.",
+          "Có thể dùng cho sum, min, max, gcd và nhiều phép có tính kết hợp.",
+          "Lazy propagation cần khi cập nhật cả đoạn nhiều lần."
+        ],
+        example: "Hỗ trợ cập nhật một phần tử và truy vấn tổng đoạn l..r.",
+        pseudo: String.raw`build tree from array
+update position p:
+    set leaf p
+    recompute ancestors
+query l, r:
+    combine nodes fully inside range`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+struct SegTree {
+    int n;
+    vector<long long> tree;
+
+    SegTree(vector<long long> a) {
+        n = a.size();
+        tree.assign(2 * n, 0);
+        for (int i = 0; i < n; ++i) tree[n + i] = a[i];
+        for (int i = n - 1; i > 0; --i) tree[i] = tree[i << 1] + tree[i << 1 | 1];
+    }
+
+    void update(int p, long long value) {
+        for (tree[p += n] = value; p > 1; p >>= 1) {
+            tree[p >> 1] = tree[p] + tree[p ^ 1];
+        }
+    }
+
+    long long query(int l, int r) {
+        long long res = 0;
+        for (l += n, r += n; l <= r; l >>= 1, r >>= 1) {
+            if (l & 1) res += tree[l++];
+            if (!(r & 1)) res += tree[r--];
+        }
+        return res;
+    }
+};
+
+int main() {
+    int n;
+    cin >> n;
+    vector<long long> a(n);
+    for (auto &x : a) cin >> x;
+    SegTree st(a);
+    cout << st.query(0, n - 1) << '\n';
+    return 0;
+}`,
+        notes: [
+          "Code trên dùng chỉ số 0-based cho mảng gốc.",
+          "Phép gộp phải có phần tử trung hòa: sum là 0, min là INF, max là -INF.",
+          "Segment tree mạnh hơn prefix sum khi có cập nhật xen kẽ truy vấn."
+        ],
+        complexity: "Build O(n), update/query O(log n)",
+        visual: "tree",
+        visualCaption: "Mỗi node lưu thông tin của một đoạn con."
+      },
+      {
+        title: "Inclusion-Exclusion",
+        definition: "Nguyên lý bao hàm loại trừ đếm hợp của nhiều tập bằng cách cộng tập đơn, trừ giao đôi, cộng giao ba, và tiếp tục luân phiên.",
+        theory: [
+          "Với hai tập: |A ∪ B| = |A| + |B| - |A ∩ B|.",
+          "Với ba tập: cộng ba tập đơn, trừ ba giao đôi, cộng giao ba.",
+          "Kỹ thuật này hay dùng trong bài chia hết, đếm số không thỏa điều kiện và tổ hợp."
+        ],
+        example: "Đếm số từ 1 đến n chia hết cho a hoặc b hoặc c.",
+        pseudo: String.raw`answer =
+    count multiples of a + b + c
+    - count multiples of lcm(a,b), lcm(a,c), lcm(b,c)
+    + count multiples of lcm(a,b,c)`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+long long lcmSafe(long long a, long long b) {
+    return a / gcd(a, b) * b;
+}
+
+int main() {
+    long long n, a, b, c;
+    cin >> n >> a >> b >> c;
+
+    long long ab = lcmSafe(a, b);
+    long long ac = lcmSafe(a, c);
+    long long bc = lcmSafe(b, c);
+    long long abc = lcmSafe(ab, c);
+
+    long long ans = n / a + n / b + n / c
+                  - n / ab - n / ac - n / bc
+                  + n / abc;
+
+    cout << ans << '\n';
+    return 0;
+}`,
+        notes: [
+          "Dùng lcm để đếm số chia hết đồng thời cho nhiều số.",
+          "Nếu lcm vượt n quá nhiều, vẫn cần tránh tràn số khi nhân.",
+          "Dấu cộng/trừ luân phiên theo kích thước giao."
+        ],
+        complexity: "O(log max(a,b,c))",
+        visual: "set",
+        visualCaption: "Đếm hợp các tập bằng cách sửa phần bị đếm lặp."
+      },
+      {
+        title: "DP Knapsack",
+        definition: "Knapsack là nhóm bài chọn vật có trọng lượng và giá trị để tối ưu dưới ràng buộc sức chứa.",
+        theory: [
+          "0/1 knapsack: mỗi vật chọn tối đa một lần, duyệt sức chứa giảm để tránh dùng lại vật.",
+          "Unbounded knapsack: mỗi vật dùng nhiều lần, thường duyệt sức chứa tăng.",
+          "Trạng thái phổ biến: dp[w] là giá trị tốt nhất với tổng trọng lượng không vượt w."
+        ],
+        example: "Chọn một số đồ vật để tổng trọng lượng <= W và tổng giá trị lớn nhất.",
+        pseudo: String.raw`dp[0..W] <- 0
+for each item weight, value:
+    for cap from W downto weight:
+        dp[cap] <- max(dp[cap], dp[cap - weight] + value)
+print dp[W]`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, W;
+    cin >> n >> W;
+    vector<long long> dp(W + 1, 0);
+
+    for (int i = 0; i < n; ++i) {
+        int weight, value;
+        cin >> weight >> value;
+        for (int cap = W; cap >= weight; --cap) {
+            dp[cap] = max(dp[cap], dp[cap - weight] + value);
+        }
+    }
+
+    cout << dp[W] << '\n';
+    return 0;
+}`,
+        notes: [
+          "Duyệt cap giảm là điểm then chốt của 0/1 knapsack.",
+          "Nếu W quá lớn nhưng tổng giá trị nhỏ, có thể DP theo giá trị.",
+          "dp[cap] không nhất thiết dùng hết cap, mà là tốt nhất trong giới hạn cap."
+        ],
+        complexity: "O(n * W)",
+        visual: "dp",
+        visualCaption: "Mỗi vật cập nhật các sức chứa có thể đạt được."
+      },
+      {
+        title: "DP LIS",
+        definition: "LIS là dãy con tăng dài nhất, giữ nguyên thứ tự ban đầu nhưng không nhất thiết liên tiếp.",
+        theory: [
+          "DP O(n^2): dp[i] là LIS kết thúc tại i.",
+          "Tối ưu O(n log n) dùng mảng tail, tail[len] là giá trị kết thúc nhỏ nhất của dãy tăng độ dài len + 1.",
+          "lower_bound cho LIS tăng nghiêm ngặt; upper_bound cho không giảm trong một số biến thể."
+        ],
+        example: "Tính độ dài dãy con tăng dài nhất.",
+        pseudo: String.raw`tail <- empty
+for x in a:
+    pos <- first index in tail where tail[pos] >= x
+    if pos does not exist:
+        append x
+    else:
+        tail[pos] <- x
+print length(tail)`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<int> tail;
+
+    for (int i = 0; i < n; ++i) {
+        int x;
+        cin >> x;
+        auto it = lower_bound(tail.begin(), tail.end(), x);
+        if (it == tail.end()) tail.push_back(x);
+        else *it = x;
+    }
+
+    cout << tail.size() << '\n';
+    return 0;
+}`,
+        notes: [
+          "tail không phải luôn là một LIS thật, nhưng độ dài của nó là đáp án.",
+          "Muốn truy vết dãy, cần lưu parent và vị trí.",
+          "LIS rất hay xuất hiện sau khi sort cặp dữ liệu."
+        ],
+        complexity: "O(n log n)",
+        visual: "array",
+        visualCaption: "Mảng tail giữ kết thúc nhỏ nhất cho từng độ dài."
+      },
+      {
+        title: "DP LCS",
+        definition: "LCS là dãy con chung dài nhất giữa hai xâu hoặc hai dãy.",
+        theory: [
+          "dp[i][j] là độ dài LCS của i ký tự đầu xâu A và j ký tự đầu xâu B.",
+          "Nếu A[i-1] == B[j-1], lấy dp[i-1][j-1] + 1.",
+          "Nếu khác, lấy max(dp[i-1][j], dp[i][j-1])."
+        ],
+        example: "Tìm độ dài LCS của hai xâu.",
+        pseudo: String.raw`for i from 1 to n:
+    for j from 1 to m:
+        if A[i - 1] = B[j - 1]:
+            dp[i][j] <- dp[i - 1][j - 1] + 1
+        else:
+            dp[i][j] <- max(dp[i - 1][j], dp[i][j - 1])
+print dp[n][m]`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    string a, b;
+    cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= m; ++j) {
+            if (a[i - 1] == b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;
+            else dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+        }
+    }
+
+    cout << dp[n][m] << '\n';
+    return 0;
+}`,
+        notes: [
+          "Dùng bảng n + 1, m + 1 để xử lý tiền tố rỗng dễ hơn.",
+          "Có thể tối ưu bộ nhớ xuống O(m) nếu chỉ cần độ dài.",
+          "Muốn in LCS, truy vết ngược từ dp[n][m]."
+        ],
+        complexity: "O(n * m)",
+        visual: "dp",
+        visualCaption: "Bảng DP hai chiều so sánh từng tiền tố của hai xâu."
+      },
+      {
+        title: "DP Path On Grids",
+        definition: "DP trên lưới mô hình hóa mỗi ô là trạng thái, chuyển từ các ô kề trước đó theo hướng được phép.",
+        theory: [
+          "Nếu chỉ đi xuống và sang phải, số đường tới ô (i, j) thường phụ thuộc (i-1, j) và (i, j-1).",
+          "Ô chặn hoặc vật cản có dp = 0 nếu đếm số đường.",
+          "Có thể thay phép cộng bằng min/max khi bài hỏi chi phí nhỏ nhất hoặc điểm lớn nhất."
+        ],
+        example: "Đếm số đường từ góc trên trái đến góc dưới phải, chỉ đi xuống hoặc sang phải, có chướng ngại.",
+        pseudo: String.raw`dp[1][1] <- 1 if start is free
+for each cell:
+    if blocked: dp[i][j] <- 0
+    else dp[i][j] += dp[i - 1][j] + dp[i][j - 1]
+print dp[n][m]`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+const long long MOD = 1000000007;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    vector<string> grid(n);
+    for (auto &row : grid) cin >> row;
+
+    vector<vector<long long>> dp(n, vector<long long>(m, 0));
+    if (grid[0][0] == '.') dp[0][0] = 1;
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            if (grid[i][j] == '#') {
+                dp[i][j] = 0;
+                continue;
+            }
+            if (i > 0) dp[i][j] = (dp[i][j] + dp[i - 1][j]) % MOD;
+            if (j > 0) dp[i][j] = (dp[i][j] + dp[i][j - 1]) % MOD;
+        }
+    }
+
+    cout << dp[n - 1][m - 1] << '\n';
+    return 0;
+}`,
+        notes: [
+          "Cần xử lý ô xuất phát bị chặn.",
+          "Thứ tự duyệt phải đảm bảo các ô phụ thuộc đã được tính.",
+          "Nếu được đi bốn hướng tự do, bài thường chuyển sang BFS/DFS thay vì DP đơn giản."
+        ],
+        complexity: "O(n * m)",
+        visual: "grid",
+        visualCaption: "Mỗi ô nhận kết quả từ những ô có thể đi tới nó."
+      },
+      {
+        title: "DP Range",
+        definition: "DP Range, hay interval DP, giải bài toán trên đoạn [l, r] bằng cách chia đoạn tại một điểm k.",
+        theory: [
+          "Trạng thái thường là dp[l][r], đáp án tốt nhất cho đoạn từ l đến r.",
+          "Duyệt theo độ dài đoạn tăng dần để các đoạn con đã được tính trước.",
+          "Hay gặp trong bài ghép đoạn, nhân ma trận, xóa chuỗi và tối ưu ngoặc hóa."
+        ],
+        example: "Ghép n đống đá, mỗi lần ghép hai đoạn kề nhau tốn tổng số đá trong đoạn, tìm chi phí nhỏ nhất.",
+        pseudo: String.raw`for len from 2 to n:
+    for l from 1 to n - len + 1:
+        r <- l + len - 1
+        dp[l][r] <- infinity
+        for k from l to r - 1:
+            dp[l][r] <- min(dp[l][r], dp[l][k] + dp[k + 1][r] + sum(l, r))`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<long long> pref(n + 1, 0);
+    for (int i = 1; i <= n; ++i) {
+        long long x;
+        cin >> x;
+        pref[i] = pref[i - 1] + x;
+    }
+
+    const long long INF = 4e18;
+    vector<vector<long long>> dp(n + 2, vector<long long>(n + 2, 0));
+
+    for (int len = 2; len <= n; ++len) {
+        for (int l = 1; l + len - 1 <= n; ++l) {
+            int r = l + len - 1;
+            dp[l][r] = INF;
+            long long sum = pref[r] - pref[l - 1];
+            for (int k = l; k < r; ++k) {
+                dp[l][r] = min(dp[l][r], dp[l][k] + dp[k + 1][r] + sum);
+            }
+        }
+    }
+
+    cout << dp[1][n] << '\n';
+    return 0;
+}`,
+        notes: [
+          "Đoạn độ dài 1 có chi phí 0, nên dp khởi tạo 0 là hợp lý.",
+          "Prefix sum giúp lấy tổng đoạn O(1).",
+          "Interval DP cơ bản thường O(n^3), cần chú ý giới hạn n."
+        ],
+        complexity: "O(n^3)",
+        visual: "range",
+        visualCaption: "Đoạn lớn được tạo từ hai đoạn nhỏ hơn qua điểm chia k."
+      },
+      {
+        title: "Chia căn",
+        definition: "Chia căn, hay sqrt decomposition, chia dữ liệu thành các block kích thước khoảng căn n để cân bằng cập nhật và truy vấn.",
+        theory: [
+          "Mỗi block lưu thông tin gộp như tổng, min hoặc tần suất.",
+          "Truy vấn đoạn xử lý phần dư hai đầu trực tiếp và các block nguyên ở giữa bằng dữ liệu gộp.",
+          "Kỹ thuật này dễ cài hơn segment tree trong một số bài, nhưng độ phức tạp thường O(sqrt n)."
+        ],
+        example: "Cập nhật một phần tử và truy vấn tổng đoạn.",
+        pseudo: String.raw`blockSize <- sqrt(n)
+blockSum[b] stores sum of block b
+update index i:
+    blockSum[block(i)] += newValue - oldValue
+    a[i] <- newValue
+query l, r:
+    add elements until l reaches block boundary
+    add whole block sums
+    add remaining elements`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, q;
+    cin >> n >> q;
+    vector<long long> a(n);
+    int B = sqrt(n) + 1;
+    vector<long long> block(B + 1, 0);
+
+    for (int i = 0; i < n; ++i) {
+        cin >> a[i];
+        block[i / B] += a[i];
+    }
+
+    while (q--) {
+        int type;
+        cin >> type;
+        if (type == 1) {
+            int i;
+            long long value;
+            cin >> i >> value;
+            block[i / B] += value - a[i];
+            a[i] = value;
+        } else {
+            int l, r;
+            cin >> l >> r;
+            long long ans = 0;
+            while (l <= r && l % B != 0) ans += a[l++];
+            while (l + B - 1 <= r) {
+                ans += block[l / B];
+                l += B;
+            }
+            while (l <= r) ans += a[l++];
+            cout << ans << '\n';
+        }
+    }
+    return 0;
+}`,
+        notes: [
+          "Code dùng chỉ số 0-based.",
+          "Kích thước block thường khoảng sqrt(n), nhưng có thể tinh chỉnh theo bài.",
+          "Nếu cần cập nhật đoạn phức tạp, có thể kết hợp lazy theo block."
+        ],
+        complexity: "Update O(1), query O(sqrt n)",
+        visual: "sqrt",
+        visualCaption: "Mảng được chia thành block, mỗi block có tổng riêng."
+      },
+      {
+        title: "Hashing",
+        definition: "Hashing biến xâu hoặc đối tượng thành giá trị số để so sánh nhanh, thường dùng rolling hash cho substring.",
+        theory: [
+          "Rolling hash xem xâu như đa thức theo cơ số base và lấy modulo.",
+          "Hash đoạn con lấy O(1) sau khi có prefix hash và power.",
+          "Có khả năng va chạm hash, nên bài nghiêm ngặt có thể dùng hai modulo hoặc xác minh thêm."
+        ],
+        example: "So sánh nhanh hai substring cùng độ dài trong một xâu.",
+        pseudo: String.raw`precompute power and prefix hash
+hash(l, r) = pref[r] - pref[l - 1] * power[length]
+two substrings are probably equal if hashes are equal`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+const long long MOD = 1000000007;
+const long long BASE = 911382323;
+
+int main() {
+    string s;
+    cin >> s;
+    int n = s.size();
+    vector<long long> pref(n + 1, 0), power(n + 1, 1);
+
+    for (int i = 1; i <= n; ++i) {
+        power[i] = power[i - 1] * BASE % MOD;
+        pref[i] = (pref[i - 1] * BASE + s[i - 1]) % MOD;
+    }
+
+    auto getHash = [&](int l, int r) {
+        long long value = (pref[r] - pref[l - 1] * power[r - l + 1]) % MOD;
+        if (value < 0) value += MOD;
+        return value;
+    };
+
+    int l1, r1, l2, r2;
+    cin >> l1 >> r1 >> l2 >> r2;
+    cout << (getHash(l1, r1) == getHash(l2, r2) ? "Equal" : "Different") << '\n';
+    return 0;
+}`,
+        notes: [
+          "Code dùng chỉ số substring 1-based.",
+          "BASE nên lớn và cố định; có thể random trong bài chống hack.",
+          "Hash bằng một modulo có rủi ro va chạm, dù thường rất thấp."
+        ],
+        complexity: "Tiền xử lý O(n), mỗi truy vấn O(1)",
+        visual: "hash",
+        visualCaption: "Prefix hash giúp lấy fingerprint của đoạn con ngay lập tức."
+      },
+      {
+        title: "Shortest Path",
+        definition: "Shortest path tìm đường đi có tổng trọng số nhỏ nhất trong đồ thị.",
+        theory: [
+          "BFS dùng cho đồ thị không trọng số hoặc mọi cạnh trọng số 1.",
+          "Dijkstra dùng cho trọng số không âm, kết hợp priority_queue để chọn đỉnh có dist nhỏ nhất.",
+          "Bellman-Ford dùng được với cạnh âm và phát hiện chu trình âm, nhưng chậm hơn."
+        ],
+        example: "Tìm khoảng cách ngắn nhất từ đỉnh 1 đến mọi đỉnh trong đồ thị trọng số không âm.",
+        pseudo: String.raw`dist[start] <- 0
+push (0, start) into min-heap
+while heap not empty:
+    pop vertex u with smallest distance
+    if popped distance is stale: skip
+    for edge u -> v with weight w:
+        if dist[v] > dist[u] + w:
+            update dist[v]
+            push new pair into heap`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    vector<vector<pair<int, int>>> adj(n + 1);
+    for (int i = 0; i < m; ++i) {
+        int u, v, w;
+        cin >> u >> v >> w;
+        adj[u].push_back({v, w});
+        adj[v].push_back({u, w});
+    }
+
+    const long long INF = 4e18;
+    vector<long long> dist(n + 1, INF);
+    priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> pq;
+
+    dist[1] = 0;
+    pq.push({0, 1});
+    while (!pq.empty()) {
+        auto [du, u] = pq.top();
+        pq.pop();
+        if (du != dist[u]) continue;
+
+        for (auto [v, w] : adj[u]) {
+            if (dist[v] > du + w) {
+                dist[v] = du + w;
+                pq.push({dist[v], v});
+            }
+        }
+    }
+
+    for (int i = 1; i <= n; ++i) cout << dist[i] << ' ';
+    return 0;
+}`,
+        notes: [
+          "Dijkstra không đúng nếu có cạnh âm.",
+          "Dòng if (du != dist[u]) bỏ qua trạng thái cũ trong priority_queue.",
+          "Dùng long long cho khoảng cách vì tổng trọng số có thể lớn."
+        ],
+        complexity: "O((n + m) log n)",
+        visual: "shortest",
+        visualCaption: "Dijkstra luôn mở rộng đỉnh chưa xử lý có khoảng cách tạm thời nhỏ nhất."
+      },
+      {
+        title: "Tổng hợp cấp tốc",
+        definition: "Tổng hợp Level 3 rèn kỹ năng chọn mô hình nâng cao và kiểm soát lỗi cài đặt trong các bài dài.",
+        theory: [
+          "Nếu bài có quyết định theo thời gian hoặc chỉ số, thử viết trạng thái DP trước.",
+          "Nếu bài hỏi trên đoạn và có cập nhật, nghĩ đến segment tree, Fenwick hoặc chia căn.",
+          "Nếu bài là xâu dài với so khớp nhiều lần, cân nhắc KMP hoặc hashing."
+        ],
+        example: "Khung solve cho bài có nhiều test, mỗi test chọn thuật toán theo dữ liệu đã đọc.",
+        pseudo: String.raw`read t
+for each test:
+    read input
+    build model
+    run chosen algorithm
+    print answer
+    clear per-test data`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+void solve() {
+    int n, m;
+    cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; ++i) {
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    vector<int> visited(n + 1, 0);
+    int components = 0;
+    for (int start = 1; start <= n; ++start) {
+        if (visited[start]) continue;
+        components++;
+        stack<int> st;
+        st.push(start);
+        visited[start] = 1;
+        while (!st.empty()) {
+            int u = st.top();
+            st.pop();
+            for (int v : adj[u]) {
+                if (!visited[v]) {
+                    visited[v] = 1;
+                    st.push(v);
+                }
+            }
+        }
+    }
+    cout << components << '\n';
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int t;
+    cin >> t;
+    while (t--) solve();
+    return 0;
+}`,
+        notes: [
+          "Dữ liệu theo test nên khai báo trong solve để tự giải phóng và tránh sót reset.",
+          "Với Level 3, đặt tên biến rõ giúp giảm lỗi khi công thức dài.",
+          "Sau khi AC test mẫu, tự tạo test biên: đồ thị rỗng, một đỉnh, nhiều thành phần."
+        ],
+        complexity: "O(t * (n + m))",
+        visual: "graph",
+        visualCaption: "Khung tổng hợp Level 3 thường bắt đầu bằng việc dựng mô hình đồ thị, DP hoặc đoạn."
+      }
+    ]
+  }
+];
+
+const visualLibrary = {
+  flow: {
+    type: "flow",
+    items: ["Đọc đề", "Thiết kế biến", "Duyệt dữ liệu", "In đáp án"]
+  },
+  array: {
+    type: "cells",
+    className: "array-visual",
+    items: ["a[0]", "a[1]", "a[2]", "a[3]", "a[4]"]
+  },
+  vector: {
+    type: "cells",
+    className: "array-visual",
+    items: ["push", "sort", "unique", "erase"]
+  },
+  string: {
+    type: "cells",
+    className: "array-visual",
+    items: ["s[0]", "s[1]", "...", "s[n-2]", "s[n-1]"]
+  },
+  grid: {
+    type: "grid",
+    items: [["i,j", "", ""], ["", "x", ""], ["", "", "ans"]]
+  },
+  prefix: {
+    type: "cells",
+    className: "prefix-visual",
+    items: ["0", "p1", "p2", "p3", "p4", "p5"]
+  },
+  map: {
+    type: "pairs",
+    items: [["key", "value"], ["7", "3"], ["cat", "2"]]
+  },
+  set: {
+    type: "cells",
+    className: "set-visual",
+    items: ["2", "5", "8", "13"]
+  },
+  recursion: {
+    type: "stack",
+    items: ["gcd(48,18)", "gcd(18,12)", "gcd(12,6)", "gcd(6,0)"]
+  },
+  tree: {
+    type: "graph",
+    nodes: [
+      ["1", 48, 12],
+      ["2", 20, 82],
+      ["3", 76, 82],
+      ["4", 9, 148],
+      ["5", 37, 148],
+      ["6", 67, 148],
+      ["7", 94, 148]
+    ],
+    edges: [[48, 34, 20, 82], [48, 34, 76, 82], [20, 104, 9, 148], [20, 104, 37, 148], [76, 104, 67, 148], [76, 104, 94, 148]]
+  },
+  struct: {
+    type: "pairs",
+    items: [["name", "score"], ["An", "9"], ["Binh", "8"]]
+  },
+  sort: {
+    type: "cells",
+    className: "array-visual",
+    items: ["9", "4", "4", "1", "7", "→", "1", "4", "7", "9"]
+  },
+  pointers: {
+    type: "cells",
+    className: "array-visual",
+    items: ["L", "4", "6", "9", "R"]
+  },
+  math: {
+    type: "flow",
+    items: ["Chia hết", "GCD/LCM", "Modulo", "Tổ hợp"]
+  },
+  binary: {
+    type: "cells",
+    className: "array-visual",
+    items: ["L", "false", "false", "mid", "true", "R"]
+  },
+  compress: {
+    type: "pairs",
+    items: [["1000000", "2"], ["-5", "0"], ["42", "1"]]
+  },
+  stack: {
+    type: "stack",
+    items: ["top", "x3", "x2", "x1"]
+  },
+  queue: {
+    type: "cells",
+    className: "queue-visual",
+    items: ["front", "7", "5", "3", "back"]
+  },
+  mitm: {
+    type: "flow",
+    items: ["Nửa trái", "Sinh tổng", "Nửa phải", "Ghép bằng sort"]
+  },
+  dp: {
+    type: "cells",
+    className: "dp-visual",
+    items: ["dp0", "dp1", "dp2", "dp3", "dp4"]
+  },
+  graph: {
+    type: "graph",
+    nodes: [
+      ["1", 18, 28],
+      ["2", 78, 38],
+      ["3", 48, 102],
+      ["4", 118, 118],
+      ["5", 156, 62]
+    ],
+    edges: [[39, 49, 78, 58], [78, 58, 48, 123], [48, 123, 118, 139], [99, 58, 156, 83], [118, 139, 156, 83]]
+  },
+  range: {
+    type: "cells",
+    className: "array-visual",
+    items: ["l", "left", "k", "right", "r"]
+  },
+  sqrt: {
+    type: "cells",
+    className: "array-visual",
+    items: ["B0", "B0", "B1", "B1", "B2", "B2"]
+  },
+  hash: {
+    type: "cells",
+    className: "array-visual",
+    items: ["h0", "h1", "h2", "h3", "h4"]
+  },
+  shortest: {
+    type: "graph",
+    nodes: [
+      ["S", 20, 90],
+      ["2", 78, 42],
+      ["3", 90, 142],
+      ["4", 154, 74],
+      ["T", 178, 146]
+    ],
+    edges: [[40, 107, 78, 58], [40, 107, 90, 158], [99, 58, 154, 91], [111, 158, 178, 162], [154, 91, 178, 162]]
+  }
+};
+
+const state = {
+  levelIndex: 0,
+  topicIndex: 0,
+  query: ""
+};
+
+const levelTabs = document.querySelector("#levelTabs");
+const topicList = document.querySelector("#topicList");
+const slide = document.querySelector("#slide");
+const deckTitle = document.querySelector("#deckTitle");
+const levelKicker = document.querySelector("#levelKicker");
+const progressBar = document.querySelector("#progressBar");
+const prevBtn = document.querySelector("#prevBtn");
+const nextBtn = document.querySelector("#nextBtn");
+const searchInput = document.querySelector("#searchInput");
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
+}
+
+function slugify(value) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getTopicId(topic) {
+  return slugify(topic.title);
+}
+
+function getActiveLevel() {
+  return levels[state.levelIndex];
+}
+
+function getActiveTopic() {
+  return getActiveLevel().topics[state.topicIndex];
+}
+
+function topicMatches(topic) {
+  if (!state.query) return true;
+  const haystack = [
+    topic.title,
+    topic.definition,
+    topic.example,
+    topic.complexity,
+    ...topic.theory,
+    ...topic.notes
+  ].join(" ").toLowerCase();
+  return haystack.includes(state.query);
+}
+
+function renderLevelTabs() {
+  levelTabs.innerHTML = levels.map((level, index) => `
+    <button class="level-tab ${index === state.levelIndex ? "is-active" : ""}" type="button" data-level="${index}">
+      ${level.level}
+    </button>
+  `).join("");
+}
+
+function renderTopicList() {
+  const level = getActiveLevel();
+  topicList.innerHTML = level.topics.map((topic, index) => {
+    const hidden = topicMatches(topic) ? "" : "hidden";
+    return `
+      <button class="topic-button ${index === state.topicIndex ? "is-active" : ""}" type="button" data-topic="${index}" ${hidden}>
+        <span class="topic-number">${index + 1}</span>
+        <span>
+          <span class="topic-name">${escapeHtml(topic.title)}</span>
+          <span class="topic-meta">${escapeHtml(topic.complexity)}</span>
+        </span>
+      </button>
+    `;
+  }).join("");
+
+  if (!topicList.querySelector(".topic-button:not([hidden])")) {
+    topicList.innerHTML = `<p class="empty-state">Không có chủ đề khớp.</p>`;
+  }
+}
+
+function listMarkup(items, className) {
+  return `<ul class="${className}">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+function renderVisual(topic) {
+  const visual = visualLibrary[topic.visual] || visualLibrary.flow;
+  let body = "";
+
+  if (visual.type === "flow") {
+    body = `<div class="flow-visual">${visual.items.map((item, index) => `
+      <div class="flow-step">
+        <span>${index + 1}</span>
+        <span>${escapeHtml(item)}</span>
+      </div>
+    `).join("")}</div>`;
+  }
+
+  if (visual.type === "cells") {
+    body = `<div class="${visual.className}">${visual.items.map((item) => `
+      <span class="array-cell">${escapeHtml(item)}</span>
+    `).join("")}</div>`;
+  }
+
+  if (visual.type === "stack") {
+    body = `<div class="stack-visual">${visual.items.map((item) => `
+      <span class="stack-block">${escapeHtml(item)}</span>
+    `).join("")}</div>`;
+  }
+
+  if (visual.type === "pairs") {
+    body = `<div class="flow-visual">${visual.items.map(([left, right], index) => `
+      <div class="flow-step">
+        <span>${index + 1}</span>
+        <span>${escapeHtml(left)} : ${escapeHtml(right)}</span>
+      </div>
+    `).join("")}</div>`;
+  }
+
+  if (visual.type === "grid") {
+    body = `<div class="dp-visual">${visual.items.flat().map((item) => `
+      <span class="dp-cell">${escapeHtml(item || ".")}</span>
+    `).join("")}</div>`;
+  }
+
+  if (visual.type === "graph") {
+    const edges = visual.edges.map(([x1, y1, x2, y2]) => {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const length = Math.sqrt(dx * dx + dy * dy);
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+      return `<span class="edge" style="left:${x1}px;top:${y1}px;width:${length}px;transform:rotate(${angle}deg)"></span>`;
+    }).join("");
+    const nodes = visual.nodes.map(([label, x, y]) => `
+      <span class="node" style="left:${x}px;top:${y}px">${escapeHtml(label)}</span>
+    `).join("");
+    body = `<div class="graph-visual">${edges}${nodes}</div>`;
+  }
+
+  return `
+    <div class="visual-card">
+      <div class="visual-stage">${body}</div>
+      <p class="visual-caption">${escapeHtml(topic.visualCaption)}</p>
+    </div>
+  `;
+}
+
+function renderCodeBlock(label, code, className = "") {
+  return `
+    <div class="code-shell ${className}">
+      <div class="code-head">
+        <span>${escapeHtml(label)}</span>
+        <button class="copy-button" type="button" data-copy="${escapeHtml(label)}">Copy</button>
+      </div>
+      <pre><code></code></pre>
+    </div>
+  `;
+}
+
+function renderSlide() {
+  const level = getActiveLevel();
+  const topic = getActiveTopic();
+  deckTitle.textContent = level.title;
+  levelKicker.textContent = `LEVEL ${level.level} MODULE`;
+
+  const totalTopics = levels.reduce((sum, item) => sum + item.topics.length, 0);
+  const before = levels.slice(0, state.levelIndex).reduce((sum, item) => sum + item.topics.length, 0);
+  const current = before + state.topicIndex + 1;
+  progressBar.style.width = `${current / totalTopics * 100}%`;
+
+  slide.innerHTML = `
+    <header class="slide-head">
+      <div>
+        <p class="eyebrow">Level ${level.level} / ${state.topicIndex + 1} of ${level.topics.length}</p>
+        <h3 class="slide-title">${escapeHtml(topic.title)}</h3>
+        <p class="slide-subtitle">${escapeHtml(level.subtitle)}</p>
+      </div>
+      <div class="badge-stack">
+        <span class="badge accent">Level ${level.level}</span>
+        <span class="badge">${escapeHtml(topic.complexity)}</span>
+      </div>
+    </header>
+
+    <div class="slide-grid">
+      <div class="content-flow">
+        <section>
+          <h4 class="section-title">Định nghĩa</h4>
+          <p class="definition">${escapeHtml(topic.definition)}</p>
+        </section>
+
+        <section>
+          <h4 class="section-title">Lý thuyết trọng tâm</h4>
+          ${listMarkup(topic.theory, "theory-list")}
+        </section>
+
+        <section>
+          <h4 class="section-title">Ví dụ</h4>
+          <p class="example-box"><strong>Bài mẫu:</strong> ${escapeHtml(topic.example)}</p>
+        </section>
+
+        <section>
+          <h4 class="section-title">Ghi nhớ</h4>
+          ${listMarkup(topic.notes, "note-list")}
+        </section>
+      </div>
+
+      <aside class="visual-panel">
+        ${renderVisual(topic)}
+        <section>
+          <h4 class="section-title">Mã giả</h4>
+          ${renderCodeBlock("Pseudo", topic.pseudo, "pseudo")}
+        </section>
+        <section>
+          <h4 class="section-title">Code mẫu C++17</h4>
+          ${renderCodeBlock("C++17", topic.code)}
+        </section>
+      </aside>
+    </div>
+  `;
+
+  const codeBlocks = slide.querySelectorAll(".code-shell code");
+  codeBlocks[0].textContent = topic.pseudo;
+  codeBlocks[1].textContent = topic.code;
+
+  const copyButtons = slide.querySelectorAll(".copy-button");
+  copyButtons[0].addEventListener("click", () => copyText(topic.pseudo, copyButtons[0]));
+  copyButtons[1].addEventListener("click", () => copyText(topic.code, copyButtons[1]));
+
+  prevBtn.disabled = current === 1;
+  nextBtn.disabled = current === totalTopics;
+  renderLevelTabs();
+  renderTopicList();
+  updateHash();
+}
+
+function selectLevel(index) {
+  state.levelIndex = index;
+  state.topicIndex = 0;
+  renderSlide();
+}
+
+function selectTopic(index) {
+  state.topicIndex = index;
+  renderSlide();
+}
+
+function go(delta) {
+  let levelIndex = state.levelIndex;
+  let topicIndex = state.topicIndex + delta;
+
+  while (levelIndex >= 0 && levelIndex < levels.length) {
+    const topics = levels[levelIndex].topics;
+    if (topicIndex >= 0 && topicIndex < topics.length) {
+      state.levelIndex = levelIndex;
+      state.topicIndex = topicIndex;
+      renderSlide();
+      return;
+    }
+    if (delta > 0) {
+      levelIndex++;
+      topicIndex = 0;
+    } else {
+      levelIndex--;
+      topicIndex = levelIndex >= 0 ? levels[levelIndex].topics.length - 1 : -1;
+    }
+  }
+}
+
+async function copyText(text, button) {
+  const original = button.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (error) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.left = "-999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
+  button.textContent = "Đã copy";
+  window.setTimeout(() => {
+    button.textContent = original;
+  }, 1200);
+}
+
+function updateHash() {
+  const level = getActiveLevel();
+  const topic = getActiveTopic();
+  const nextHash = `#${level.id}/${getTopicId(topic)}`;
+  if (window.location.hash !== nextHash) {
+    history.replaceState(null, "", nextHash);
+  }
+}
+
+function hydrateFromHash() {
+  const hash = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+  if (!hash) return;
+  const [levelId, topicId] = hash.split("/");
+  const levelIndex = levels.findIndex((level) => level.id === levelId);
+  if (levelIndex === -1) return;
+  const topicIndex = levels[levelIndex].topics.findIndex((topic) => getTopicId(topic) === topicId);
+  state.levelIndex = levelIndex;
+  state.topicIndex = topicIndex === -1 ? 0 : topicIndex;
+}
+
+levelTabs.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-level]");
+  if (!button) return;
+  selectLevel(Number(button.dataset.level));
+});
+
+topicList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-topic]");
+  if (!button) return;
+  selectTopic(Number(button.dataset.topic));
+});
+
+prevBtn.addEventListener("click", () => go(-1));
+nextBtn.addEventListener("click", () => go(1));
+
+searchInput.addEventListener("input", (event) => {
+  state.query = event.target.value.trim().toLowerCase();
+  renderTopicList();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.target.matches("input, textarea")) return;
+  if (event.key === "ArrowRight" || event.key === "PageDown") go(1);
+  if (event.key === "ArrowLeft" || event.key === "PageUp") go(-1);
+});
+
+window.addEventListener("hashchange", () => {
+  hydrateFromHash();
+  renderSlide();
+});
+
+hydrateFromHash();
+renderSlide();
