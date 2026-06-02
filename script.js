@@ -2182,6 +2182,12 @@ int main() {
   }
 ];
 
+const removedTopicTitles = new Set(["Luyện tập tổng hợp", "Tổng hợp cấp tốc"]);
+
+levels.forEach((level) => {
+  level.topics = level.topics.filter((topic) => !removedTopicTitles.has(topic.title));
+});
+
 const visualLibrary = {
   flow: {
     type: "flow",
@@ -2371,13 +2377,28 @@ function getActiveTopic() {
 
 function topicMatches(topic) {
   if (!state.query) return true;
+  const guide = getLessonGuide(topic);
+  const guideText = [
+    ...(guide.deepTheory || []),
+    ...(guide.why || []),
+    ...(guide.method || []),
+    guide.primaryIdea,
+    guide.primaryMethod,
+    guide.secondExample?.title,
+    guide.secondExample?.statement,
+    guide.secondExample?.idea,
+    guide.secondExample?.method,
+    guide.secondExample?.pseudo,
+    guide.secondExample?.code
+  ].filter(Boolean);
   const haystack = [
     topic.title,
     topic.definition,
     topic.example,
     topic.complexity,
     ...topic.theory,
-    ...topic.notes
+    ...topic.notes,
+    ...guideText
   ].join(" ").toLowerCase();
   return haystack.includes(state.query);
 }
@@ -2412,6 +2433,42 @@ function renderTopicList() {
 
 function listMarkup(items, className) {
   return `<ul class="${className}">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+function getLessonGuide(topic) {
+  return window.lessonGuides?.[topic.title] || {};
+}
+
+function buildExamples(topic, guide) {
+  const first = {
+    title: "Ví dụ 1: Bài mẫu nền tảng",
+    statement: topic.example,
+    idea: guide.primaryIdea || "Dùng đúng cấu trúc dữ liệu hoặc thuật toán của chủ đề để giải bài mẫu.",
+    method: guide.primaryMethod || "Xác định input, trạng thái cần xử lý, sau đó cài đặt theo mã giả.",
+    pseudo: topic.pseudo,
+    code: topic.code
+  };
+
+  const second = guide.secondExample || {
+    title: "Ví dụ 2: Biến thể luyện tập",
+    statement: "Áp dụng cùng kỹ thuật vào một biến thể nhỏ để kiểm tra khả năng nhận dạng dạng bài.",
+    idea: "Giữ nguyên tư duy chính của thuật toán, thay đổi điều kiện xử lý theo đề.",
+    method: "Viết lại trạng thái, công thức hoặc vòng duyệt cho phù hợp biến thể.",
+    pseudo: topic.pseudo,
+    code: topic.code
+  };
+
+  return [first, second];
+}
+
+function detailBlock(title, items, className = "theory-list") {
+  if (!items || !items.length) return "";
+  return `
+    <section>
+      <h4 class="section-title">${escapeHtml(title)}</h4>
+      ${listMarkup(items, className)}
+    </section>
+  `;
 }
 
 function renderVisual(topic) {
@@ -2476,12 +2533,12 @@ function renderVisual(topic) {
   `;
 }
 
-function renderCodeBlock(label, code, className = "") {
+function renderCodeBlock(label, codeIndex, className = "") {
   return `
     <div class="code-shell ${className}">
       <div class="code-head">
         <span>${escapeHtml(label)}</span>
-        <button class="copy-button" type="button" data-copy="${escapeHtml(label)}">Copy</button>
+        <button class="copy-button" type="button" data-code-index="${codeIndex}">Copy</button>
       </div>
       <pre><code></code></pre>
     </div>
@@ -2491,6 +2548,46 @@ function renderCodeBlock(label, code, className = "") {
 function renderSlide() {
   const level = getActiveLevel();
   const topic = getActiveTopic();
+  const guide = getLessonGuide(topic);
+  const detailedTheory = [...topic.theory, ...(guide.deepTheory || [])];
+  const examples = buildExamples(topic, guide);
+  const codePayloads = [];
+  const addCode = (label, code, className = "") => {
+    const codeIndex = codePayloads.push(code) - 1;
+    return renderCodeBlock(label, codeIndex, className);
+  };
+  const examplesMarkup = examples.map((example, index) => `
+    <section class="example-panel">
+      <div class="example-heading">
+        <span class="example-index">${index + 1}</span>
+        <div>
+          <h4>${escapeHtml(example.title)}</h4>
+          <p>${escapeHtml(example.statement)}</p>
+        </div>
+      </div>
+      <div class="example-detail-grid">
+        <div>
+          <h5>Ý tưởng</h5>
+          <p>${escapeHtml(example.idea)}</p>
+        </div>
+        <div>
+          <h5>Phương pháp</h5>
+          <p>${escapeHtml(example.method)}</p>
+        </div>
+      </div>
+      <div class="example-code-grid">
+        <div>
+          <h5>Mã giả</h5>
+          ${addCode(`Mã giả ví dụ ${index + 1}`, example.pseudo, "pseudo")}
+        </div>
+        <div>
+          <h5>Code mẫu C++17</h5>
+          ${addCode(`C++17 ví dụ ${index + 1}`, example.code)}
+        </div>
+      </div>
+    </section>
+  `).join("");
+
   deckTitle.textContent = level.title;
   levelKicker.textContent = `LEVEL ${level.level} MODULE`;
 
@@ -2519,15 +2616,9 @@ function renderSlide() {
           <p class="definition">${escapeHtml(topic.definition)}</p>
         </section>
 
-        <section>
-          <h4 class="section-title">Lý thuyết trọng tâm</h4>
-          ${listMarkup(topic.theory, "theory-list")}
-        </section>
-
-        <section>
-          <h4 class="section-title">Ví dụ</h4>
-          <p class="example-box"><strong>Bài mẫu:</strong> ${escapeHtml(topic.example)}</p>
-        </section>
+        ${detailBlock("Lý thuyết chi tiết", detailedTheory, "theory-list")}
+        ${detailBlock("Vì sao thuật toán hoạt động", guide.why || [], "why-list")}
+        ${detailBlock("Phương pháp sử dụng", guide.method || [], "method-list")}
 
         <section>
           <h4 class="section-title">Ghi nhớ</h4>
@@ -2537,25 +2628,27 @@ function renderSlide() {
 
       <aside class="visual-panel">
         ${renderVisual(topic)}
-        <section>
-          <h4 class="section-title">Mã giả</h4>
-          ${renderCodeBlock("Pseudo", topic.pseudo, "pseudo")}
-        </section>
-        <section>
-          <h4 class="section-title">Code mẫu C++17</h4>
-          ${renderCodeBlock("C++17", topic.code)}
-        </section>
       </aside>
     </div>
+
+    <section class="examples-section">
+      <h4 class="section-title">2 ví dụ áp dụng</h4>
+      <div class="example-stack">
+        ${examplesMarkup}
+      </div>
+    </section>
   `;
 
   const codeBlocks = slide.querySelectorAll(".code-shell code");
-  codeBlocks[0].textContent = topic.pseudo;
-  codeBlocks[1].textContent = topic.code;
+  codeBlocks.forEach((block, index) => {
+    block.textContent = codePayloads[index] || "";
+  });
 
   const copyButtons = slide.querySelectorAll(".copy-button");
-  copyButtons[0].addEventListener("click", () => copyText(topic.pseudo, copyButtons[0]));
-  copyButtons[1].addEventListener("click", () => copyText(topic.code, copyButtons[1]));
+  copyButtons.forEach((button) => {
+    const codeIndex = Number(button.dataset.codeIndex);
+    button.addEventListener("click", () => copyText(codePayloads[codeIndex] || "", button));
+  });
 
   prevBtn.disabled = current === 1;
   nextBtn.disabled = current === totalTopics;
