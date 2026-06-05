@@ -540,11 +540,11 @@ int main() {
       },
       {
         title: "Pair - Struct",
-        definition: "pair lưu hai giá trị đi chung; struct định nghĩa một kiểu dữ liệu mới gồm nhiều trường có ý nghĩa.",
+        definition: "struct là kiểu dữ liệu tự định nghĩa để gom nhiều thuộc tính liên quan thành một bản ghi; pair là phiên bản rất gọn khi chỉ cần đúng hai giá trị.",
         theory: [
-          "pair<int, int> thường dùng cho tọa độ, khoảng, cạnh hoặc cặp giá trị.",
-          "struct giúp code dễ hiểu hơn khi dữ liệu có nhiều thuộc tính như tên, điểm, thời gian.",
-          "Có thể sort vector struct bằng comparator tự viết."
+          "struct phù hợp khi một đối tượng có nhiều trường như học sinh gồm tên, điểm, lớp; cạnh đồ thị gồm u, v, w; đoạn gồm l, r.",
+          "Tên trường trong struct làm code rõ nghĩa hơn pair.first, pair.second, đặc biệt khi bài có nhiều thuộc tính.",
+          "Có thể lưu struct trong vector, truyền vào hàm, sort bằng comparator, hoặc dùng struct để tạo node của linked list."
         ],
         example: "Sắp xếp danh sách học sinh giảm dần theo điểm, nếu bằng điểm thì tăng dần theo tên.",
         pseudo: String.raw`read students
@@ -575,9 +575,9 @@ int main() {
     return 0;
 }`,
         notes: [
-          "Comparator phải tạo thứ tự nhất quán.",
-          "pair so sánh mặc định theo first rồi second.",
-          "Tên trường trong struct làm code rõ nghĩa hơn first/second khi dữ liệu phức tạp."
+          "Dùng pair cho dữ liệu hai trường thật đơn giản; dùng struct khi cần đặt tên rõ nghĩa.",
+          "Comparator phải tạo thứ tự nhất quán, nếu không sort có thể cho kết quả khó đoán.",
+          "Struct cũng là cách tự mô tả dữ liệu, đúng tinh thần VNOI nhấn mạnh: tổ chức dữ liệu phù hợp giúp bài toán dễ xử lý hơn."
         ],
         complexity: "O(n log n)",
         visual: "struct",
@@ -637,11 +637,11 @@ int main() {
       },
       {
         title: "Map",
-        definition: "map là cấu trúc key-value, cho phép lưu và truy vấn giá trị theo khóa.",
+        definition: "map là container lưu các cặp key-value, trong đó mỗi key là duy nhất và các key luôn được duy trì theo thứ tự tăng dần.",
         theory: [
-          "map trong C++ được sắp xếp theo key, thao tác cơ bản O(log n).",
-          "unordered_map dùng bảng băm, trung bình O(1), nhưng không giữ thứ tự.",
-          "Ứng dụng phổ biến: đếm tần suất, ánh xạ tên sang điểm, lưu vị trí xuất hiện."
+          "map thuộc nhóm associative container: ta không truy cập bằng vị trí 0, 1, 2 mà truy cập bằng key.",
+          "Các thao tác insert, erase, find, lower_bound thường O(log n) vì map được tổ chức như cây tìm kiếm cân bằng.",
+          "map giữ thứ tự key nên rất hữu ích khi vừa cần tra cứu, vừa cần duyệt dữ liệu theo thứ tự."
         ],
         example: "Đếm số lần xuất hiện của từng từ trong văn bản.",
         pseudo: String.raw`read n
@@ -670,21 +670,73 @@ int main() {
     return 0;
 }`,
         notes: [
-          "freq[x] tự tạo key x với giá trị 0 nếu chưa tồn tại.",
-          "Dùng count hoặc find để kiểm tra key có tồn tại mà không bắt buộc tạo mới.",
-          "map hữu ích khi key là string hoặc số rất lớn không thể dùng mảng tần suất."
+          "freq[x] sẽ tự tạo key x với giá trị mặc định nếu key chưa tồn tại.",
+          "Dùng find khi chỉ muốn kiểm tra tồn tại mà không vô tình tạo key mới.",
+          "Chọn map thay vì unordered_map khi cần lower_bound, duyệt tăng dần hoặc kết quả ổn định theo thứ tự key."
         ],
         complexity: "O(n log n)",
         visual: "map",
         visualCaption: "Map nối mỗi khóa với một giá trị, ví dụ từ với số lần xuất hiện."
       },
       {
-        title: "Set",
-        definition: "set lưu các giá trị không trùng và tự sắp xếp; unordered_set lưu không trùng nhưng không có thứ tự.",
+        title: "unordered_map",
+        definition: "unordered_map là container key-value dựa trên bảng băm, cho phép tra cứu, thêm và xóa theo key với độ phức tạp trung bình O(1).",
         theory: [
-          "insert thêm phần tử, erase xóa phần tử, count/find kiểm tra tồn tại.",
-          "set phù hợp khi cần tập giá trị duy nhất hoặc cần truy vấn theo thứ tự.",
-          "Các thao tác của set thường O(log n)."
+          "unordered_map không giữ thứ tự key; thứ tự duyệt phụ thuộc vào bucket và hàm băm.",
+          "Hash biến key thành một giá trị số để quyết định bucket lưu trữ, tương tự ý tưởng bảng băm trong VNOI.",
+          "Nếu hash phân bố đều và load factor hợp lý, mỗi bucket có ít phần tử nên thao tác rất nhanh; nếu va chạm nhiều, hiệu năng có thể xấu đi."
+        ],
+        example: "Cho n số và q truy vấn x, trả lời x xuất hiện bao nhiêu lần trong dãy.",
+        pseudo: String.raw`read n
+create unordered_map freq
+for each x:
+    freq[x] <- freq[x] + 1
+read q
+for each query x:
+    print freq[x]`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+    unordered_map<long long, int> freq;
+    freq.reserve(n * 2);
+
+    for (int i = 0; i < n; ++i) {
+        long long x;
+        cin >> x;
+        freq[x]++;
+    }
+
+    int q;
+    cin >> q;
+    while (q--) {
+        long long x;
+        cin >> x;
+        cout << freq[x] << '\n';
+    }
+    return 0;
+}`,
+        notes: [
+          "Dùng unordered_map khi cần tra cứu nhanh và không cần thứ tự key.",
+          "Có thể dùng reserve để giảm số lần rehash khi biết trước số phần tử.",
+          "Không dùng unordered_map nếu bài cần lower_bound hoặc duyệt key tăng dần."
+        ],
+        complexity: "Trung bình O(n + q)",
+        visual: "map",
+        visualCaption: "unordered_map dùng hash để đưa key vào các bucket."
+      },
+      {
+        title: "Set",
+        definition: "set là container lưu các giá trị duy nhất và luôn duy trì chúng theo thứ tự tăng dần.",
+        theory: [
+          "set có thể xem như map chỉ có key mà không có value: mỗi giá trị vừa là dữ liệu, vừa là khóa tìm kiếm.",
+          "Các thao tác insert, erase, find, count, lower_bound thường O(log n) nhờ cây tìm kiếm cân bằng.",
+          "set đặc biệt hợp khi cần loại trùng, kiểm tra tồn tại, hoặc tìm phần tử nhỏ nhất không nhỏ hơn x."
         ],
         example: "Đếm số giá trị phân biệt trong dãy.",
         pseudo: String.raw`read n
@@ -710,13 +762,53 @@ int main() {
     return 0;
 }`,
         notes: [
-          "Nếu chỉ cần đếm phân biệt và không cần thứ tự, unordered_set thường nhanh.",
+          "Nếu chỉ cần đếm phân biệt và không cần thứ tự, unordered_set thường nhanh hơn trung bình.",
           "set không lưu hai phần tử bằng nhau.",
-          "lower_bound trong set tìm phần tử đầu tiên không nhỏ hơn x."
+          "lower_bound trong set tìm phần tử đầu tiên không nhỏ hơn x; đây là điểm unordered_set không làm được."
         ],
         complexity: "O(n log n)",
         visual: "set",
         visualCaption: "Set tự loại trùng, mỗi giá trị chỉ xuất hiện một lần."
+      },
+      {
+        title: "List",
+        definition: "list trong C++ STL là danh sách liên kết đôi, lưu phần tử bằng các node nối với nhau thay vì nằm liên tiếp như vector.",
+        theory: [
+          "list cho phép thêm hoặc xóa ở đầu, cuối, hoặc tại vị trí iterator đã biết trong O(1).",
+          "list không hỗ trợ truy cập ngẫu nhiên bằng chỉ số O(1); muốn tới phần tử thứ i phải duyệt tuần tự.",
+          "Theo tinh thần bài VNOI về mảng và danh sách liên kết, list hợp khi kích thước thay đổi nhiều, còn vector hợp khi cần truy cập chỉ số nhanh."
+        ],
+        example: "Mô phỏng danh sách công việc, thêm việc mới vào đầu hoặc cuối rồi xóa việc đầu tiên.",
+        pseudo: String.raw`create empty list tasks
+push_back first tasks
+push_front urgent task
+if tasks not empty:
+    remove front task
+print remaining tasks`,
+        code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    list<string> tasks;
+    tasks.push_back("learn_map");
+    tasks.push_back("solve_set");
+    tasks.push_front("urgent_struct");
+
+    if (!tasks.empty()) tasks.pop_front();
+
+    for (const string &task : tasks) {
+        cout << task << '\n';
+    }
+    return 0;
+}`,
+        notes: [
+          "Dùng list khi cần chèn/xóa nhiều tại vị trí đã có iterator.",
+          "Không dùng list cho bài cần a[i], sort bằng std::sort, hoặc duyệt chỉ số liên tục.",
+          "Trong thi đấu, vector/deque thường gặp hơn list; list chỉ thật sự đáng dùng khi thao tác node là trọng tâm."
+        ],
+        complexity: "Thêm/xóa tại iterator O(1), tìm kiếm O(n)",
+        visual: "queue",
+        visualCaption: "List nối các node bằng con trỏ, không nằm liên tiếp như mảng."
       },
       {
         title: "Sortings, Counting",

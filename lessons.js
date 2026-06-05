@@ -417,41 +417,61 @@ int main() {
   },
   "Pair - Struct": {
     deepTheory: [
-      "pair gom đúng hai giá trị, còn struct tạo kiểu dữ liệu có nhiều trường được đặt tên.",
-      "Khi dữ liệu có ý nghĩa rõ, struct giúp code tự giải thích tốt hơn first/second.",
-      "Comparator cho sort quyết định thứ tự ưu tiên giữa các trường."
+      "struct là kiểu dữ liệu do mình tự định nghĩa, dùng để gom nhiều thuộc tính thuộc cùng một đối tượng vào một nơi. Ví dụ một học sinh có name, score, className; một cạnh đồ thị có u, v, w.",
+      "pair chỉ có first và second, rất nhanh gọn cho dữ liệu đúng hai trường như tọa độ (x, y), đoạn (l, r), cạnh không trọng số (u, v). Khi dữ liệu có từ ba trường hoặc tên trường có ý nghĩa, struct rõ ràng hơn.",
+      "Theo tinh thần VNOI về cấu trúc dữ liệu, tổ chức dữ liệu đúng giúp chương trình dễ vận hành hơn: thay vì để nhiều mảng rời nhau name[i], score[i], id[i], ta gom chúng thành vector<Student>.",
+      "struct có thể nằm trong vector, map, set; có thể truyền vào hàm; có thể sort bằng comparator lambda hoặc overload operator<.",
+      "Nếu struct dùng trong set/map làm key, cần định nghĩa thứ tự nghiêm ngặt bằng operator< hoặc comparator."
     ],
     why: [
-      "Nhiều bài cần lưu một thực thể gồm nhiều thuộc tính: tọa độ, đoạn, học sinh, cạnh đồ thị.",
-      "Gom dữ liệu liên quan vào một object giúp truyền qua hàm và sắp xếp dễ hơn."
+      "Máy tính chỉ lưu giá trị, còn người đọc code cần hiểu ý nghĩa của giá trị. struct đặt tên cho từng trường nên giảm nhầm lẫn giữa các thuộc tính.",
+      "Khi sort vector struct, comparator quyết định thứ tự. sort chỉ cần biết phần tử nào đứng trước phần tử nào, nên ta có thể ưu tiên score, rồi name, rồi id tùy đề.",
+      "Gom dữ liệu liên quan vào một object giúp tránh lỗi lệch chỉ số giữa nhiều mảng song song."
     ],
     method: [
-      "Dùng pair khi chỉ có hai trường đơn giản, ví dụ {l, r}.",
-      "Dùng struct khi số trường nhiều hoặc cần tên rõ nghĩa.",
-      "Viết comparator theo thứ tự ưu tiên của đề.",
-      "Kiểm tra trường hợp bằng nhau để tránh thứ tự không ổn định ngoài ý muốn."
+      "Bước 1: xác định một đối tượng trong đề gồm những thuộc tính nào.",
+      "Bước 2: tạo struct với tên trường rõ nghĩa, ví dụ Student, Edge, Segment.",
+      "Bước 3: đọc dữ liệu vào vector<StructName> thay vì nhiều mảng rời.",
+      "Bước 4: nếu cần sort, viết comparator theo đúng thứ tự ưu tiên của đề.",
+      "Bước 5: nếu dùng trong set/map, đảm bảo comparator không mâu thuẫn và xử lý trường hợp bằng nhau."
     ],
     primaryIdea: "Ví dụ 1 sort danh sách học sinh theo điểm giảm rồi tên tăng.",
     primaryMethod: "Comparator so sánh score trước; nếu bằng nhau mới so sánh name.",
     secondExample: {
-      title: "Ví dụ 2: Sắp xếp đoạn theo điểm bắt đầu",
-      statement: "Đọc n đoạn [l, r], in các đoạn theo l tăng, nếu bằng thì r tăng.",
-      idea: "Dùng pair để lưu hai đầu đoạn.",
-      method: "pair mặc định sort theo first rồi second, đúng với yêu cầu.",
-      pseudo: String.raw`read intervals
-sort intervals
-for each interval:
-    print l, r`,
+      title: "Ví dụ 2: Sắp xếp cạnh theo trọng số",
+      statement: "Đọc n cạnh gồm u, v, w. In các cạnh theo trọng số w tăng dần; nếu bằng w thì u tăng, nếu vẫn bằng thì v tăng.",
+      idea: "Mỗi cạnh có ba thuộc tính nên struct Edge rõ nghĩa hơn pair lồng pair.",
+      method: "Tạo struct Edge {u, v, w}; sort vector<Edge> bằng comparator ưu tiên w, rồi u, rồi v.",
+      pseudo: String.raw`read n
+for each edge:
+    read u, v, w
+sort edges by:
+    smaller w first
+    if same w, smaller u first
+    if same u, smaller v first
+print edges`,
       code: String.raw`#include <bits/stdc++.h>
 using namespace std;
+
+struct Edge {
+    int u, v, w;
+};
 
 int main() {
     int n;
     cin >> n;
-    vector<pair<int, int>> seg(n);
-    for (auto &p : seg) cin >> p.first >> p.second;
-    sort(seg.begin(), seg.end());
-    for (auto [l, r] : seg) cout << l << ' ' << r << '\n';
+    vector<Edge> edges(n);
+    for (auto &e : edges) cin >> e.u >> e.v >> e.w;
+
+    sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
+        if (a.w != b.w) return a.w < b.w;
+        if (a.u != b.u) return a.u < b.u;
+        return a.v < b.v;
+    });
+
+    for (const Edge &e : edges) {
+        cout << e.u << ' ' << e.v << ' ' << e.w << '\n';
+    }
     return 0;
 }`
     }
@@ -505,19 +525,23 @@ int main() {
   },
   "Map": {
     deepTheory: [
-      "map lưu cặp key-value và tự duy trì key theo thứ tự tăng.",
-      "Mỗi thao tác insert, erase, find của map thường O(log n) vì bên trong là cây cân bằng.",
-      "unordered_map dùng hash nên nhanh trung bình O(1), nhưng không có thứ tự và có rủi ro va chạm."
+      "map lưu dữ liệu dạng key-value: key dùng để tìm, value là thông tin gắn với key. Ví dụ key là tên học sinh, value là điểm; key là số, value là tần suất.",
+      "Mỗi key trong map là duy nhất. Gán mp[key] = value sẽ tạo key nếu chưa có hoặc cập nhật value nếu key đã tồn tại.",
+      "map luôn duy trì key theo thứ tự tăng dần bằng comparator. Vì vậy khi duyệt map, dữ liệu xuất hiện theo thứ tự key chứ không theo thứ tự nhập.",
+      "Về bản chất cấu trúc dữ liệu, map liên quan tới cây tìm kiếm cân bằng. VNOI nêu rằng cây cân bằng giữ được thao tác O(log n), khác với cây tìm kiếm thường có thể suy biến thành O(n).",
+      "map có các thao tác quan trọng: find, count, insert, erase, lower_bound, upper_bound."
     ],
     why: [
-      "Khi miền giá trị lớn hoặc key là string, không thể dùng mảng tần suất trực tiếp.",
-      "Map cho phép biến một giá trị bất kỳ thành chỉ số logic để đếm, gom nhóm hoặc tra cứu."
+      "Nếu key là string hoặc số rất lớn như 10^18, ta không thể tạo mảng đánh dấu trực tiếp theo key. map giải quyết bằng cách lưu chỉ những key thật sự xuất hiện.",
+      "map hoạt động như một từ điển có thứ tự: tìm key bằng cây tìm kiếm, mỗi bước loại bỏ một phần dữ liệu nên chi phí là O(log n).",
+      "Vì key có thứ tự, map làm được các truy vấn như tìm key đầu tiên >= x bằng lower_bound."
     ],
     method: [
-      "Chọn map nếu cần thứ tự key, chọn unordered_map nếu chỉ cần nhanh trung bình.",
-      "Dùng freq[x]++ để đếm tần suất.",
-      "Dùng find khi chỉ muốn kiểm tra tồn tại mà không tạo key mới.",
-      "Duyệt map bằng for (auto [key, value] : mp)."
+      "Dùng map<K, V> khi cần ánh xạ key K sang value V và cần thứ tự key.",
+      "Đếm tần suất: map<T, int> freq; freq[x]++.",
+      "Tra cứu an toàn: auto it = mp.find(key); nếu it != mp.end() thì key tồn tại.",
+      "Không dùng mp[key] chỉ để kiểm tra tồn tại, vì thao tác này có thể tự tạo key mới.",
+      "Dùng lower_bound/upper_bound khi cần tìm phần tử gần một mốc."
     ],
     primaryIdea: "Ví dụ 1 đếm số lần xuất hiện của từng từ.",
     primaryMethod: "Mỗi lần đọc word thì tăng freq[word].",
@@ -558,21 +582,84 @@ int main() {
 }`
     }
   },
-  "Set": {
+  "unordered_map": {
     deepTheory: [
-      "set lưu các phần tử không trùng và luôn giữ thứ tự.",
-      "Vì mỗi giá trị chỉ tồn tại một lần, set rất hợp để kiểm tra đã gặp hay chưa.",
-      "Các hàm lower_bound và upper_bound trên set giúp tìm phần tử gần một giá trị."
+      "unordered_map cũng lưu key-value như map, nhưng không dùng cây có thứ tự mà dùng bảng băm.",
+      "Theo VNOI, bảng băm xem key giống như chỉ số logic và dùng hàm hash để đưa key vào bucket. Nếu hash phân bố đều, mỗi bucket chỉ có ít phần tử nên tra cứu rất nhanh.",
+      "Load factor là tỉ lệ giữa số phần tử và số bucket. Load factor nhỏ và hash tốt giúp thao tác trung bình O(1).",
+      "Hash collision xảy ra khi nhiều key rơi vào cùng bucket. Khi collision nhiều, unordered_map có thể chậm hơn rất nhiều so với kỳ vọng trung bình.",
+      "unordered_map không giữ thứ tự key, không có lower_bound, upper_bound."
     ],
     why: [
-      "Set thay thế mảng đánh dấu khi miền giá trị lớn hoặc không liên tiếp.",
-      "Tự loại trùng giúp code gọn cho bài đếm giá trị phân biệt."
+      "Thay vì đi theo cây như map, unordered_map tính hash(key) để nhảy gần như trực tiếp tới bucket cần tìm.",
+      "Nếu mỗi bucket ít phần tử, việc tìm trong bucket gần như hằng số thời gian.",
+      "Đổi lại, thứ tự duyệt không có ý nghĩa và phụ thuộc vào cách chia bucket nội bộ."
     ],
     method: [
-      "Dùng insert để thêm, count/find để kiểm tra.",
-      "Dùng size để lấy số phần tử phân biệt.",
-      "Dùng lower_bound(x) để tìm phần tử đầu tiên >= x.",
-      "Nếu cần lưu trùng, dùng multiset."
+      "Dùng unordered_map khi chỉ cần thêm, xóa, kiểm tra, đếm hoặc tra cứu key nhanh và không cần thứ tự.",
+      "Nên gọi reserve khi biết trước số phần tử lớn để giảm rehash.",
+      "Dùng find để kiểm tra tồn tại; dùng operator[] khi muốn tạo/cập nhật value.",
+      "Nếu bị TLE bất thường do hack hash hoặc dữ liệu xấu, chuyển sang map hoặc dùng custom hash.",
+      "Không dùng unordered_map cho bài cần duyệt tăng dần, lower_bound hoặc so sánh thứ tự key."
+    ],
+    primaryIdea: "Ví dụ 1 đếm tần suất rồi trả lời q truy vấn số lần xuất hiện. Vì không cần thứ tự key, unordered_map cho trung bình O(1) mỗi truy vấn.",
+    primaryMethod: "reserve trước khoảng 2n bucket, đọc x thì freq[x]++, mỗi truy vấn in freq[x].",
+    secondExample: {
+      title: "Ví dụ 2: Two sum bằng unordered_map",
+      statement: "Cho n số và S, kiểm tra có hai phần tử khác vị trí có tổng bằng S không.",
+      idea: "Khi đang xét x, ta cần biết S - x đã xuất hiện trước đó chưa. Đây là tra cứu tồn tại theo key.",
+      method: "Duyệt từ trái sang phải; nếu need = S - x đã có trong seen thì in YES, ngược lại lưu x vào seen.",
+      pseudo: String.raw`seen <- empty unordered_map
+for x in array:
+    need <- S - x
+    if seen[need] exists:
+        print YES and stop
+    seen[x] <- seen[x] + 1
+print NO`,
+      code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    long long S;
+    cin >> n >> S;
+    unordered_map<long long, int> seen;
+    seen.reserve(n * 2);
+
+    for (int i = 0; i < n; ++i) {
+        long long x;
+        cin >> x;
+        long long need = S - x;
+        if (seen.find(need) != seen.end()) {
+            cout << "YES\n";
+            return 0;
+        }
+        seen[x]++;
+    }
+    cout << "NO\n";
+    return 0;
+}`
+    }
+  },
+  "Set": {
+    deepTheory: [
+      "set lưu một tập hợp giá trị duy nhất. Nếu insert một giá trị đã tồn tại, set không tạo bản sao thứ hai.",
+      "set luôn duy trì thứ tự tăng dần, nên khi duyệt set ta nhận được dãy đã sắp xếp và loại trùng.",
+      "Có thể xem set là trường hợp chỉ có key của map. Nếu map lưu key -> value, thì set chỉ lưu key.",
+      "Tương tự map, set thường được cài bằng cây tìm kiếm cân bằng nên insert, erase, find, lower_bound có độ phức tạp O(log n).",
+      "Nếu cần lưu nhiều giá trị bằng nhau, dùng multiset; nếu chỉ cần tồn tại và không cần thứ tự, dùng unordered_set."
+    ],
+    why: [
+      "set thay thế mảng đánh dấu khi miền giá trị quá lớn hoặc key không liên tiếp.",
+      "Tính duy nhất giúp bài loại trùng rất gọn: chỉ cần insert toàn bộ phần tử.",
+      "Tính có thứ tự giúp set trả lời được truy vấn phần tử gần x bằng lower_bound."
+    ],
+    method: [
+      "Dùng set<T> s để lưu tập giá trị duy nhất có thứ tự.",
+      "Thêm phần tử bằng insert, xóa bằng erase.",
+      "Kiểm tra tồn tại bằng find hoặc count.",
+      "Lấy số giá trị phân biệt bằng s.size().",
+      "Dùng lower_bound(x) để tìm phần tử đầu tiên >= x, nhớ kiểm tra iterator != end()."
     ],
     primaryIdea: "Ví dụ 1 đếm số giá trị phân biệt bằng cách insert tất cả vào set.",
     primaryMethod: "Sau khi đọc xong, size của set chính là số giá trị khác nhau.",
@@ -603,6 +690,65 @@ int main() {
         seen.insert(x);
     }
     cout << (duplicate ? "YES" : "NO") << '\n';
+    return 0;
+}`
+    }
+  },
+  "List": {
+    deepTheory: [
+      "list trong C++ STL là danh sách liên kết đôi: mỗi phần tử là một node và node biết node trước/sau của nó.",
+      "VNOI giải thích danh sách liên kết phù hợp khi chưa biết trước số lượng phần tử hoặc dữ liệu thường xuyên thay đổi kích thước.",
+      "Khác vector, list không lưu liên tiếp trong bộ nhớ nên không có truy cập ngẫu nhiên O(1). Muốn tới phần tử thứ i phải duyệt từ đầu hoặc cuối.",
+      "Nếu đã có iterator trỏ tới vị trí cần thao tác, chèn/xóa tại đó là O(1). Nhưng tìm iterator đó thường vẫn O(n).",
+      "list có các thao tác hay dùng: push_front, push_back, pop_front, pop_back, insert, erase, splice, remove."
+    ],
+    why: [
+      "Mảng/vector truy cập chỉ số rất nhanh vì các phần tử nằm liên tiếp trong bộ nhớ, nhưng chèn/xóa giữa mảng phải dời nhiều phần tử.",
+      "list chèn/xóa node bằng cách đổi liên kết con trỏ, nên không phải dời toàn bộ phần tử còn lại.",
+      "Đổi lại, list tốn thêm bộ nhớ cho con trỏ và duyệt tuần tự chậm hơn do cache locality kém."
+    ],
+    method: [
+      "Dùng list khi bài có nhiều thao tác chèn/xóa ở đầu/cuối hoặc tại iterator đã biết.",
+      "Không dùng list nếu cần truy cập a[i], binary search, sort bằng std::sort hoặc duyệt chỉ số liên tục.",
+      "Duyệt list bằng iterator hoặc range-for.",
+      "erase trả về iterator kế tiếp, rất tiện khi vừa duyệt vừa xóa.",
+      "Trong thi đấu, luôn cân nhắc vector/deque trước; chọn list khi thao tác node thật sự là trọng tâm."
+    ],
+    primaryIdea: "Ví dụ 1 mô phỏng danh sách công việc: thêm việc khẩn cấp vào đầu, việc thường vào cuối, xử lý việc đầu tiên.",
+    primaryMethod: "Dùng push_front/push_back để thêm hai đầu và pop_front để xóa đầu, tất cả O(1).",
+    secondExample: {
+      title: "Ví dụ 2: Xóa tất cả số âm khỏi list",
+      statement: "Đọc n số vào list, xóa mọi số âm và in các số còn lại.",
+      idea: "list cho phép erase tại iterator hiện tại mà không cần dời các phần tử phía sau.",
+      method: "Duyệt bằng iterator; nếu *it < 0 thì it = a.erase(it), ngược lại ++it.",
+      pseudo: String.raw`read n
+list a <- input values
+it <- begin(a)
+while it != end(a):
+    if value at it < 0:
+        it <- erase(it)
+    else:
+        move it to next
+print a`,
+      code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    list<int> a;
+    for (int i = 0; i < n; ++i) {
+        int x;
+        cin >> x;
+        a.push_back(x);
+    }
+
+    for (auto it = a.begin(); it != a.end(); ) {
+        if (*it < 0) it = a.erase(it);
+        else ++it;
+    }
+
+    for (int x : a) cout << x << ' ';
     return 0;
 }`
     }
