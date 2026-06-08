@@ -362,6 +362,9 @@ int main() {
   },
   "Brute Force - Backtracking": {
     deepTheory: [
+      "Thuật toán sinh là cách tạo ra lần lượt tất cả cấu hình thuộc một không gian hữu hạn: xâu nhị phân, tổ hợp, hoán vị, tập con, cách đặt quân, đường đi trong mê cung. Mục tiêu là sinh đủ, đúng và hạn chế trùng.",
+      "Có hai hướng sinh hay gặp: sinh tuần tự theo quy luật kế tiếp, ví dụ next_permutation; và sinh bằng đệ quy/backtracking, tức xây cấu hình từng phần rồi quay lui.",
+      "Với người mới, backtracking là cách sinh dễ hiểu nhất vì ta chỉ cần trả lời ở mỗi vị trí: hiện tại được chọn những giá trị nào, chọn xong thì đi đâu tiếp, khi nào dừng.",
       "VNOI định nghĩa backtracking là thuật toán dùng để liệt kê các cấu hình. Một cấu hình được xây từng phần tử; tại mỗi phần tử, ta thử tất cả khả năng có thể.",
       "Backtracking dựa trên đệ quy. Một hàm backtrack luôn cần trường hợp cơ sở để dừng và phần đệ quy để thử lựa chọn tiếp theo.",
       "Trạng thái thường gồm vị trí đang xây, cấu hình tạm thời, các đánh dấu đã dùng và thông tin phụ như tổng hiện tại hoặc số quân đã đặt.",
@@ -370,17 +373,21 @@ int main() {
       "VNOI cũng đưa nhánh cận như một mở rộng: nếu mọi bước tiếp theo đều không thể làm đáp án tốt hơn đáp án hiện có, ta bỏ qua nhánh đó."
     ],
     why: [
+      "Thuật toán sinh đúng vì nó biến mỗi cấu hình cần liệt kê thành một đường đi trong cây quyết định. Nếu tại mỗi nút ta thử đủ mọi lựa chọn hợp lệ, mọi lá hợp lệ đều được sinh ra.",
+      "Để không trùng, ta đặt quy tắc sinh. Ví dụ tổ hợp phải chọn số sau lớn hơn số trước; hoán vị dùng used để một số chỉ xuất hiện một lần; phân tích tổng có thể yêu cầu dãy không giảm.",
       "Cây trạng thái của bài toán gồm nhiều nhánh lựa chọn. Đệ quy giúp đi xuống một nhánh, còn thao tác hoàn tác giúp quay về nút cha để thử nhánh khác.",
       "Vì mỗi cấu hình hợp lệ đều tương ứng với một đường đi từ gốc tới lá trong cây trạng thái, duyệt hết các nhánh hợp lệ sẽ không bỏ sót đáp án.",
       "Điều kiện hợp lệ và điều kiện cắt nhánh làm thuật toán nhanh hơn vì không cần đợi xây xong một cấu hình sai mới loại bỏ."
     ],
     method: [
-      "Bước 1: xác định cấu hình cần xây là xâu, dãy, tập con, hoán vị, cách đặt quân, đường đi hay cách chọn đồ.",
-      "Bước 2: xác định trạng thái của hàm backtrack, thường là pos hoặc row, kèm cấu hình hiện tại.",
-      "Bước 3: viết trường hợp cơ sở: khi cấu hình đủ dài, đủ k phần tử, đạt tổng S, hoặc đặt xong n quân.",
-      "Bước 4: liệt kê các lựa chọn có thể ở trạng thái hiện tại.",
-      "Bước 5: trước khi đi sâu, kiểm tra lựa chọn có hợp lệ không; sau khi gọi đệ quy, hoàn tác đúng trạng thái.",
-      "Bước 6: nếu là bài tối ưu, thêm cận để bỏ nhánh chắc chắn không tốt hơn đáp án hiện tại."
+      "Bước 1: xác định cấu hình cần sinh: độ dài bao nhiêu, gồm loại phần tử nào, có được lặp không, thứ tự có quan trọng không.",
+      "Bước 2: chọn trạng thái hàm backtrack. Thường dùng pos cho vị trí đang điền, start cho tổ hợp, row cho xếp hậu, sum cho bài tổng.",
+      "Bước 3: xác định cấu hình tạm thời lưu ở đâu: string cur, vector<int> cur, mảng board, hoặc các mảng used/mark.",
+      "Bước 4: viết điều kiện dừng. Khi cấu hình đủ dài hoặc đạt mục tiêu, in/cập nhật đáp án rồi return.",
+      "Bước 5: liệt kê choices. Với xâu nhị phân là {0,1}; với hoán vị là các số chưa dùng; với tổ hợp là các số từ start trở đi.",
+      "Bước 6: kiểm tra hợp lệ trước khi chọn. Ví dụ không trùng số, không trùng cột/đường chéo, tổng không vượt S.",
+      "Bước 7: thực hiện chọn - gọi đệ quy - bỏ chọn. Đây là lõi của backtracking.",
+      "Bước 8: nếu bài tối ưu, thêm cận. Ví dụ số bước hiện tại đã lớn hơn đáp án tốt nhất thì dừng nhánh."
     ],
     primaryIdea: "Ví dụ 1 theo VNOI: sinh xâu nhị phân độ dài n. Mỗi vị trí có đúng hai lựa chọn là 0 hoặc 1, nên cây trạng thái có 2^n lá.",
     primaryMethod: "Dùng string cur để lưu xâu đang xây. Ở vị trí pos, thử thêm '0' rồi '1', gọi backtrack(pos + 1), sau đó pop_back để quay lui.",
@@ -528,33 +535,41 @@ int main() {
   },
   "Greedy": {
     deepTheory: [
-      "Greedy đưa ra lựa chọn tốt nhất ở hiện tại và không quay lại sửa lựa chọn đó.",
-      "Một thuật toán greedy chỉ đúng khi có tính chất lựa chọn tham lam: luôn tồn tại nghiệm tối ưu chứa lựa chọn hiện tại.",
-      "Chứng minh greedy thường dùng lập luận trao đổi: thay một phần của nghiệm tối ưu bằng lựa chọn greedy mà không làm tệ hơn."
+      "Greedy là tư tưởng giải bài toán bằng các lựa chọn cục bộ. Ở mỗi bước, ta chọn phương án tốt nhất hiện tại theo tiêu chí đã đặt ra và không quay lại sửa lựa chọn đó.",
+      "Theo VNOI, tham lam thường xuất hiện trong bài tối ưu hóa. Việc code thường ngắn, nhưng phần khó là tìm và chứng minh quy luật chọn.",
+      "Nguyên lý cực hạn là cách nghĩ quan trọng: nghiệm tối ưu thường có thể bắt đầu bằng một lựa chọn ở biên như kết thúc sớm nhất, nhỏ nhất, lớn nhất, rẻ nhất, hoặc tạo nhiều không gian nhất cho phần còn lại.",
+      "VNOI nhấn mạnh việc tự phản biện. Với Movie Festival, chọn phim bắt đầu sớm nhất hoặc phim ngắn nhất nghe hợp lý nhưng có phản ví dụ; chọn phim kết thúc sớm nhất mới đúng.",
+      "Một greedy đúng thường có cấu trúc con tối ưu: sau khi chọn bước tham lam, phần còn lại của bài toán vẫn là một bài toán cùng dạng nhỏ hơn.",
+      "Không phải hệ tiền nào cũng đổi tiền bằng tham lam được. VNOI gọi các hệ mà chọn mệnh giá lớn nhất luôn tối ưu là hệ chuẩn tắc; nếu không chuẩn tắc thì thường phải dùng DP."
     ],
     why: [
-      "Greedy thường nhanh, dễ cài, độ phức tạp hay là O(n) hoặc O(n log n) do bước sắp xếp.",
-      "Nhiều bài tối ưu có cấu trúc đơn điệu hoặc chọn theo hạn chót/kết thúc/số nhỏ nhất."
+      "Greedy hoạt động khi có thể chứng minh rằng luôn tồn tại một nghiệm tối ưu chứa lựa chọn tham lam đầu tiên.",
+      "Cách chứng minh phổ biến là trao đổi: lấy một nghiệm tối ưu bất kỳ, nếu nó không dùng lựa chọn greedy thì thay phần đầu bằng lựa chọn greedy mà đáp án không tệ hơn.",
+      "Một cách khác là chứng minh bằng cận: tìm một cận trên/cận dưới cho đáp án, rồi chỉ ra greedy đạt đúng cận đó.",
+      "Nếu không chứng minh được, hãy thử tìm phản ví dụ nhỏ. Phản ví dụ là công cụ rất mạnh để loại bỏ tiêu chí greedy sai."
     ],
     method: [
-      "Xác định mục tiêu tối ưu và ràng buộc.",
-      "Tìm tiêu chí chọn cục bộ, thường bằng cách sort.",
-      "Thử phản ví dụ nhỏ để loại greedy sai.",
-      "Chứng minh bằng trao đổi hoặc bất biến trước khi tin lời giải."
+      "Bước 1: xác định bài toán tối ưu gì: lớn nhất, nhỏ nhất, ít thao tác nhất, nhiều phần tử nhất.",
+      "Bước 2: liệt kê vài tiêu chí tham lam có vẻ hợp lý: nhỏ nhất trước, lớn nhất trước, kết thúc sớm nhất, deadline sớm nhất, chi phí thấp nhất.",
+      "Bước 3: tự tạo phản ví dụ nhỏ cho từng tiêu chí. Nếu một tiêu chí sai, bỏ ngay.",
+      "Bước 4: với tiêu chí còn lại, thử chứng minh bằng trao đổi, cận hoặc bất biến.",
+      "Bước 5: cài đặt. Greedy thường cần sort trước, rồi duyệt một lần và cập nhật trạng thái hiện tại.",
+      "Bước 6: kiểm tra biên: không chọn được phần tử nào, các phần tử bằng nhau, thời điểm chạm nhau, số âm hoặc dữ liệu đã sắp xếp ngược."
     ],
     primaryIdea: "Ví dụ 1 chọn đoạn kết thúc sớm nhất để còn nhiều chỗ nhất cho đoạn sau.",
     primaryMethod: "Sort theo r tăng, chọn đoạn đầu tiên không giao với đoạn đã chọn gần nhất.",
     secondExample: {
-      title: "Ví dụ 2: Đổi tiền ít đồng nhất",
-      statement: "Với mệnh giá chuẩn 1, 5, 10, 20, 50, đếm ít đồng nhất để tạo số tiền n.",
-      idea: "Với hệ tiền chuẩn này, luôn lấy mệnh giá lớn nhất có thể là tối ưu.",
-      method: "Duyệt mệnh giá giảm dần, lấy n / coin đồng rồi giảm n %= coin.",
-      pseudo: String.raw`coins <- [50, 20, 10, 5, 1]
-read n
+      title: "Ví dụ 2: Tasks and Deadlines",
+      statement: "Có n công việc, công việc i có thời lượng t[i] và hạn d[i]. Nếu hoàn thành tại thời điểm f[i], điểm nhận được là d[i] - f[i]. Hãy sắp xếp thứ tự làm để tổng điểm lớn nhất.",
+      idea: "Theo VNOI, quy luật đúng là làm công việc có thời lượng ngắn hơn trước. Hạn chót không ảnh hưởng tới thứ tự tối ưu trong bài này.",
+      method: "Sort các công việc theo t tăng dần. Duyệt theo thứ tự đó, cộng thời gian hoàn thành vào currentTime và cộng d - currentTime vào đáp án.",
+      pseudo: String.raw`read jobs
+sort jobs by duration increasing
+currentTime <- 0
 answer <- 0
-for coin in coins:
-    answer <- answer + n / coin
-    n <- n mod coin
+for job in jobs:
+    currentTime <- currentTime + job.duration
+    answer <- answer + job.deadline - currentTime
 print answer`,
       code: String.raw`#include <bits/stdc++.h>
 using namespace std;
@@ -562,16 +577,46 @@ using namespace std;
 int main() {
     int n;
     cin >> n;
-    vector<int> coins = {50, 20, 10, 5, 1};
-    int ans = 0;
-    for (int coin : coins) {
-        ans += n / coin;
-        n %= coin;
+    vector<pair<long long, long long>> jobs(n);
+    for (auto &[duration, deadline] : jobs) {
+        cin >> duration >> deadline;
     }
-    cout << ans << '\n';
+
+    sort(jobs.begin(), jobs.end());
+
+    long long currentTime = 0;
+    long long answer = 0;
+    for (auto [duration, deadline] : jobs) {
+        currentTime += duration;
+        answer += deadline - currentTime;
+    }
+
+    cout << answer << '\n';
     return 0;
 }`
-    }
+    },
+    practice: [
+      {
+        title: "Movie Festival - CSES",
+        focus: "Chọn nhiều đoạn không giao nhau nhất.",
+        hint: "Thử phản ví dụ cho bắt đầu sớm nhất và độ dài ngắn nhất; quy tắc đúng là chọn phim kết thúc sớm nhất."
+      },
+      {
+        title: "Missing Coin Sum - CSES",
+        focus: "Tìm tổng nhỏ nhất không tạo được từ tập con các đồng xu.",
+        hint: "Sort coin tăng dần. Nếu đã tạo được mọi tổng trong [1, reach], coin tiếp theo <= reach + 1 thì mở rộng reach."
+      },
+      {
+        title: "Đổi tiền với hệ chuẩn tắc",
+        focus: "Ít đồng xu nhất bằng cách chọn mệnh giá lớn nhất.",
+        hint: "Chỉ đúng với một số hệ tiền chuẩn. Với hệ không chuẩn, hãy tìm phản ví dụ và chuyển sang DP."
+      },
+      {
+        title: "Tasks and Deadlines - CSES",
+        focus: "Chứng minh bằng trao đổi thứ tự hai công việc kề nhau.",
+        hint: "Nếu a > b mà a đứng trước b, đổi chỗ hai việc sẽ làm tổng điểm tăng thêm a - b."
+      }
+    ]
   },
   "Map": {
     deepTheory: [

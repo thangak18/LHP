@@ -484,9 +484,10 @@ int main() {
       },
       {
         title: "Brute Force - Backtracking",
-        definition: "Backtracking là kỹ thuật xây cấu hình từng phần: thử một lựa chọn, đi sâu bằng đệ quy, rồi hoàn tác lựa chọn để thử nhánh khác.",
+        definition: "Thuật toán sinh là nhóm kỹ thuật liệt kê có hệ thống mọi cấu hình thỏa dạng bài; backtracking là cách sinh bằng đệ quy, thử lựa chọn rồi quay lui để thử nhánh khác.",
         theory: [
           "Theo VNOI, backtracking dùng để liệt kê cấu hình; mỗi cấu hình được xây bằng cách xét lần lượt các phần tử và thử mọi khả năng cho phần tử đó.",
+          "Thuật toán sinh trả lời câu hỏi: làm sao tạo ra tất cả xâu, dãy, tổ hợp, hoán vị hoặc cách xếp mà không bỏ sót và hạn chế trùng lặp.",
           "Mẫu cốt lõi gồm: kiểm tra trường hợp cơ sở, duyệt các lựa chọn hợp lệ, thêm lựa chọn, gọi đệ quy, sau đó bỏ lựa chọn.",
           "Nếu tại một trạng thái chắc chắn không thể tạo nghiệm hợp lệ hoặc không thể tốt hơn đáp án hiện tại, ta cắt nhánh để không duyệt tiếp."
         ],
@@ -578,11 +579,11 @@ int main() {
       },
       {
         title: "Greedy",
-        definition: "Greedy chọn phương án tốt nhất tại thời điểm hiện tại với hy vọng dẫn đến đáp án tối ưu toàn cục.",
+        definition: "Greedy, hay thuật toán tham lam, giải bài toán bằng cách lặp lại lựa chọn tốt nhất ở thời điểm hiện tại theo một tiêu chí đã chứng minh đúng.",
         theory: [
-          "Greedy cần chứng minh bằng trao đổi, bất biến hoặc lập luận rằng lựa chọn hiện tại không làm mất đáp án tối ưu.",
-          "Nhiều bài greedy bắt đầu bằng sắp xếp theo một tiêu chí quan trọng.",
-          "Không phải lựa chọn trông hợp lý nào cũng đúng; luôn thử phản ví dụ nhỏ."
+          "Theo VNOI, tham lam chủ yếu xuất hiện trong bài tối ưu hóa; khó nhất không phải code mà là chứng minh quy luật chọn cục bộ dẫn tới tối ưu toàn cục.",
+          "Một quy tắc tham lam thường xuất phát từ nguyên lý cực hạn: chọn phần tử kết thúc sớm nhất, nhỏ nhất, lớn nhất, rẻ nhất, hoặc gây ít ảnh hưởng nhất.",
+          "Không phải quy tắc nghe hợp lý nào cũng đúng. Cần tự tìm phản ví dụ cho các quy tắc sai trước khi tin vào quy tắc cuối cùng."
         ],
         example: "Chọn nhiều đoạn không giao nhau nhất bằng cách sắp xếp theo thời điểm kết thúc tăng dần.",
         pseudo: String.raw`sort intervals by end time
