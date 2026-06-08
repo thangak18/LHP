@@ -362,58 +362,108 @@ int main() {
   },
   "Brute Force - Backtracking": {
     deepTheory: [
-      "Brute force duyệt toàn bộ không gian lời giải nên dễ đúng nhưng thường chậm.",
-      "Backtracking xây nghiệm từng phần, đánh dấu lựa chọn, đi sâu, rồi hoàn tác để thử nhánh khác.",
-      "Cắt nhánh là phần làm backtracking mạnh hơn brute force thuần: bỏ nhánh chắc chắn không thể tạo đáp án tốt."
+      "VNOI định nghĩa backtracking là thuật toán dùng để liệt kê các cấu hình. Một cấu hình được xây từng phần tử; tại mỗi phần tử, ta thử tất cả khả năng có thể.",
+      "Backtracking dựa trên đệ quy. Một hàm backtrack luôn cần trường hợp cơ sở để dừng và phần đệ quy để thử lựa chọn tiếp theo.",
+      "Trạng thái thường gồm vị trí đang xây, cấu hình tạm thời, các đánh dấu đã dùng và thông tin phụ như tổng hiện tại hoặc số quân đã đặt.",
+      "Mẫu thao tác quan trọng là chọn - đi sâu - bỏ chọn. Nếu chọn bằng push_back thì bỏ chọn bằng pop_back; nếu chọn bằng used[x] = true thì bỏ chọn bằng used[x] = false.",
+      "Backtracking khác brute force thuần ở chỗ ta có thể kiểm tra tính hợp lệ ngay khi đang xây cấu hình. Nhờ vậy các nhánh sai bị dừng sớm.",
+      "VNOI cũng đưa nhánh cận như một mở rộng: nếu mọi bước tiếp theo đều không thể làm đáp án tốt hơn đáp án hiện có, ta bỏ qua nhánh đó."
     ],
     why: [
-      "Khi n nhỏ, thử hết có thể là lời giải tốt nhất vì đơn giản và ít rủi ro.",
-      "Backtracking phù hợp với bài chọn, xếp, sinh cấu hình, mê cung và ràng buộc tổ hợp."
+      "Cây trạng thái của bài toán gồm nhiều nhánh lựa chọn. Đệ quy giúp đi xuống một nhánh, còn thao tác hoàn tác giúp quay về nút cha để thử nhánh khác.",
+      "Vì mỗi cấu hình hợp lệ đều tương ứng với một đường đi từ gốc tới lá trong cây trạng thái, duyệt hết các nhánh hợp lệ sẽ không bỏ sót đáp án.",
+      "Điều kiện hợp lệ và điều kiện cắt nhánh làm thuật toán nhanh hơn vì không cần đợi xây xong một cấu hình sai mới loại bỏ."
     ],
     method: [
-      "Mô tả trạng thái hiện tại gồm vị trí, lựa chọn đã dùng và đáp án tạm.",
-      "Nếu trạng thái hoàn chỉnh, cập nhật hoặc in đáp án.",
-      "Duyệt từng lựa chọn hợp lệ, chọn, gọi đệ quy, rồi bỏ chọn.",
-      "Thêm điều kiện cắt nhánh nếu có giới hạn hoặc mục tiêu tối ưu."
+      "Bước 1: xác định cấu hình cần xây là xâu, dãy, tập con, hoán vị, cách đặt quân, đường đi hay cách chọn đồ.",
+      "Bước 2: xác định trạng thái của hàm backtrack, thường là pos hoặc row, kèm cấu hình hiện tại.",
+      "Bước 3: viết trường hợp cơ sở: khi cấu hình đủ dài, đủ k phần tử, đạt tổng S, hoặc đặt xong n quân.",
+      "Bước 4: liệt kê các lựa chọn có thể ở trạng thái hiện tại.",
+      "Bước 5: trước khi đi sâu, kiểm tra lựa chọn có hợp lệ không; sau khi gọi đệ quy, hoàn tác đúng trạng thái.",
+      "Bước 6: nếu là bài tối ưu, thêm cận để bỏ nhánh chắc chắn không tốt hơn đáp án hiện tại."
     ],
-    primaryIdea: "Ví dụ 1 sinh hoán vị bằng cách chọn lần lượt số chưa dùng.",
-    primaryMethod: "Mảng used ngăn chọn trùng, pop_back và reset used để quay lui.",
+    primaryIdea: "Ví dụ 1 theo VNOI: sinh xâu nhị phân độ dài n. Mỗi vị trí có đúng hai lựa chọn là 0 hoặc 1, nên cây trạng thái có 2^n lá.",
+    primaryMethod: "Dùng string cur để lưu xâu đang xây. Ở vị trí pos, thử thêm '0' rồi '1', gọi backtrack(pos + 1), sau đó pop_back để quay lui.",
     secondExample: {
-      title: "Ví dụ 2: Sinh xâu nhị phân độ dài n",
-      statement: "In tất cả xâu chỉ gồm 0 và 1 có độ dài n.",
-      idea: "Mỗi vị trí có hai lựa chọn, thử 0 rồi thử 1.",
-      method: "Dùng đệ quy theo vị trí pos, khi pos == n thì in xâu hiện tại.",
-      pseudo: String.raw`backtrack(pos):
-    if pos = n:
-        print s
+      title: "Ví dụ 2: Xếp n quân hậu",
+      statement: "Đếm số cách xếp n quân hậu lên bàn cờ n x n sao cho không có hai quân hậu nào ăn nhau.",
+      idea: "Đặt mỗi hàng đúng một quân hậu. Khi xét hàng row, thử từng cột col và chỉ đặt nếu cột, đường chéo chính, đường chéo phụ chưa bị chiếm.",
+      method: "Dùng ba mảng đánh dấu: usedCol[col], usedDiag1[row - col + n - 1], usedDiag2[row + col]. Sau khi đặt quân thì đánh dấu, gọi đệ quy hàng tiếp theo, rồi bỏ đánh dấu để thử cột khác.",
+      pseudo: String.raw`place(row):
+    if row = n:
+        answer <- answer + 1
         return
-    for bit in {0, 1}:
-        s[pos] <- bit
-        backtrack(pos + 1)`,
+    for col from 0 to n - 1:
+        if column and two diagonals are free:
+            mark column and diagonals
+            place(row + 1)
+            unmark column and diagonals
+
+read n
+place(0)
+print answer`,
       code: String.raw`#include <bits/stdc++.h>
 using namespace std;
 
 int n;
-string s;
+long long answer = 0;
+vector<int> usedCol, usedDiag1, usedDiag2;
 
-void backtrack(int pos) {
-    if (pos == n) {
-        cout << s << '\n';
+void placeQueen(int row) {
+    if (row == n) {
+        answer++;
         return;
     }
-    for (char bit : {'0', '1'}) {
-        s[pos] = bit;
-        backtrack(pos + 1);
+
+    for (int col = 0; col < n; ++col) {
+        int d1 = row - col + n - 1;
+        int d2 = row + col;
+        if (usedCol[col] || usedDiag1[d1] || usedDiag2[d2]) continue;
+
+        usedCol[col] = usedDiag1[d1] = usedDiag2[d2] = 1;
+        placeQueen(row + 1);
+        usedCol[col] = usedDiag1[d1] = usedDiag2[d2] = 0;
     }
 }
 
 int main() {
     cin >> n;
-    s.assign(n, '0');
-    backtrack(0);
+    usedCol.assign(n, 0);
+    usedDiag1.assign(2 * n - 1, 0);
+    usedDiag2.assign(2 * n - 1, 0);
+
+    placeQueen(0);
+    cout << answer << '\n';
     return 0;
 }`
-    }
+    },
+    practice: [
+      {
+        title: "Sinh tổ hợp k phần tử",
+        focus: "Liệt kê tập con không tính hoán vị trùng.",
+        hint: "Dùng vector cur; mỗi lần chọn số mới lớn hơn số vừa chọn, dừng khi cur.size() == k."
+      },
+      {
+        title: "Phân tích số / đổi tiền tổng S",
+        focus: "Liệt kê các cách chọn mệnh giá có tổng bằng S.",
+        hint: "Giữ curSum và chỉ chọn mệnh giá không nhỏ hơn mệnh giá trước để tránh hoán vị trùng."
+      },
+      {
+        title: "Nhánh cận tối ưu số tờ tiền",
+        focus: "Tìm cách đạt tổng S với số tờ ít nhất.",
+        hint: "Lưu bestSet; nếu số tờ hiện tại đã không thể tốt hơn bestSet thì không gọi đệ quy tiếp."
+      },
+      {
+        title: "MNS, Bridge Crossing, Weird Rooks",
+        focus: "Các bài luyện backtracking được VNOI gợi ý.",
+        hint: "Bắt đầu bằng việc mô tả trạng thái, lựa chọn hợp lệ và điều kiện dừng trước khi code."
+      },
+      {
+        title: "Giải Sudoku",
+        focus: "Backtracking trên bảng 9 x 9 với nhiều ràng buộc.",
+        hint: "Chọn ô trống, thử số 1..9 hợp lệ theo hàng, cột, ô 3 x 3; đặt số rồi quay lui."
+      }
+    ]
   },
   "Pair - Struct": {
     deepTheory: [

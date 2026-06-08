@@ -9,7 +9,7 @@ Web tĩnh HTML/CSS/JS thuần, trình bày các module lý thuyết trong roadma
 
 Mỗi chủ đề có định nghĩa, lý thuyết chi tiết, giải thích vì sao thuật toán hoạt động, phương pháp sử dụng, 2 ví dụ áp dụng, mã giả và code C++17 mẫu.
 
-Một số phần cấu trúc dữ liệu được tham khảo và diễn giải lại từ VNOI Wiki, đặc biệt là các bài về tổng quan cấu trúc dữ liệu, mảng và danh sách liên kết, bảng băm.
+Một số phần được tham khảo và diễn giải lại từ VNOI Wiki, đặc biệt là các bài về đệ quy và quay lui, tổng quan cấu trúc dữ liệu, mảng và danh sách liên kết, bảng băm.
 
 ## Chạy local
 

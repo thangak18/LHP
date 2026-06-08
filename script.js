@@ -484,57 +484,50 @@ int main() {
       },
       {
         title: "Brute Force - Backtracking",
-        definition: "Brute force thử tất cả khả năng; backtracking là brute force có quay lui và thường kèm cắt nhánh để bỏ trạng thái vô ích.",
+        definition: "Backtracking là kỹ thuật xây cấu hình từng phần: thử một lựa chọn, đi sâu bằng đệ quy, rồi hoàn tác lựa chọn để thử nhánh khác.",
         theory: [
-          "Brute force phù hợp khi không gian tìm kiếm nhỏ hoặc dùng để kiểm chứng lời giải tối ưu.",
-          "Backtracking xây đáp án từng bước, thử một lựa chọn, đi sâu, rồi hoàn tác lựa chọn đó.",
-          "Cắt nhánh dựa trên ràng buộc giúp giảm số trạng thái phải duyệt."
+          "Theo VNOI, backtracking dùng để liệt kê cấu hình; mỗi cấu hình được xây bằng cách xét lần lượt các phần tử và thử mọi khả năng cho phần tử đó.",
+          "Mẫu cốt lõi gồm: kiểm tra trường hợp cơ sở, duyệt các lựa chọn hợp lệ, thêm lựa chọn, gọi đệ quy, sau đó bỏ lựa chọn.",
+          "Nếu tại một trạng thái chắc chắn không thể tạo nghiệm hợp lệ hoặc không thể tốt hơn đáp án hiện tại, ta cắt nhánh để không duyệt tiếp."
         ],
-        example: "Sinh tất cả hoán vị của các số từ 1 đến n.",
+        example: "Liệt kê tất cả các xâu nhị phân độ dài n.",
         pseudo: String.raw`backtrack(pos):
-    if pos > n:
-        print permutation
+    if pos = n:
+        print current string
         return
-    for value from 1 to n:
-        if value not used:
-            choose value
-            backtrack(pos + 1)
-            unchoose value`,
+    for bit in {0, 1}:
+        append bit to current string
+        backtrack(pos + 1)
+        remove last bit`,
         code: String.raw`#include <bits/stdc++.h>
 using namespace std;
 
 int n;
-vector<int> perm, used;
+string cur;
 
 void backtrack(int pos) {
     if (pos == n) {
-        for (int x : perm) cout << x << ' ';
-        cout << '\n';
+        cout << cur << '\n';
         return;
     }
-    for (int x = 1; x <= n; ++x) {
-        if (!used[x]) {
-            used[x] = 1;
-            perm.push_back(x);
-            backtrack(pos + 1);
-            perm.pop_back();
-            used[x] = 0;
-        }
+    for (char bit : {'0', '1'}) {
+        cur.push_back(bit);
+        backtrack(pos + 1);
+        cur.pop_back();
     }
 }
 
 int main() {
     cin >> n;
-    used.assign(n + 1, 0);
     backtrack(0);
     return 0;
 }`,
         notes: [
-          "Số hoán vị là n!, chỉ dùng cho n nhỏ.",
-          "Phần hoàn tác phải đảo đúng những gì đã chọn.",
-          "Nên in hoặc debug trạng thái với n nhỏ trước."
+          "Backtracking thường có độ phức tạp hàm mũ hoặc giai thừa, nên dữ liệu đầu vào thường nhỏ.",
+          "Phần hoàn tác phải đảo đúng những gì phần chọn đã làm: push thì pop, đánh dấu thì bỏ đánh dấu.",
+          "Trước khi code, hãy xác định rõ trạng thái, lựa chọn, điều kiện dừng và điều kiện cắt nhánh."
         ],
-        complexity: "O(n!)",
+        complexity: "Thường O(số trạng thái), ví dụ sinh nhị phân O(2^n)",
         visual: "tree",
         visualCaption: "Backtracking duyệt cây lựa chọn, mỗi nhánh là một quyết định."
       },
@@ -2481,7 +2474,8 @@ function topicMatches(topic) {
     guide.secondExample?.idea,
     guide.secondExample?.method,
     guide.secondExample?.pseudo,
-    guide.secondExample?.code
+    guide.secondExample?.code,
+    ...(guide.practice || []).map((item) => `${item.title} ${item.focus} ${item.hint}`)
   ].filter(Boolean);
   const haystack = [
     topic.title,
@@ -2559,6 +2553,24 @@ function detailBlock(title, items, className = "theory-list") {
     <section>
       <h4 class="section-title">${escapeHtml(title)}</h4>
       ${listMarkup(items, className)}
+    </section>
+  `;
+}
+
+function practiceMarkup(items) {
+  if (!items || !items.length) return "";
+  return `
+    <section class="practice-section">
+      <h4 class="section-title">Bài tập gợi ý</h4>
+      <div class="practice-grid">
+        ${items.map((item) => `
+          <article class="practice-card">
+            <h5>${escapeHtml(item.title)}</h5>
+            <p><strong>Trọng tâm:</strong> ${escapeHtml(item.focus)}</p>
+            <p><strong>Gợi ý:</strong> ${escapeHtml(item.hint)}</p>
+          </article>
+        `).join("")}
+      </div>
     </section>
   `;
 }
@@ -2729,6 +2741,8 @@ function renderSlide() {
         ${examplesMarkup}
       </div>
     </section>
+
+    ${practiceMarkup(guide.practice || [])}
   `;
 
   const codeBlocks = slide.querySelectorAll(".code-shell code");
