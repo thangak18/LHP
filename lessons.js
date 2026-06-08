@@ -389,6 +389,30 @@ int main() {
       "Bước 7: thực hiện chọn - gọi đệ quy - bỏ chọn. Đây là lõi của backtracking.",
       "Bước 8: nếu bài tối ưu, thêm cận. Ví dụ số bước hiện tại đã lớn hơn đáp án tốt nhất thì dừng nhánh."
     ],
+    quickExamples: [
+      {
+        title: "Sinh xâu nhị phân n = 3",
+        problem: "Cần sinh mọi xâu gồm 0/1 có độ dài 3.",
+        steps: [
+          "Ở pos = 0, thử 0 rồi đi tiếp; sau đó quay lại thử 1.",
+          "Nếu đã chọn prefix 0, pos = 1 lại thử 0 và 1, tạo các prefix 00, 01.",
+          "Khi pos = 3 thì xâu đủ dài, in ra rồi pop ký tự cuối để quay lui.",
+          "Thứ tự sinh: 000, 001, 010, 011, 100, 101, 110, 111."
+        ],
+        result: "Mỗi lá của cây lựa chọn là một xâu nhị phân; tổng cộng có 2^3 cấu hình."
+      },
+      {
+        title: "Sinh tổ hợp chọn 2 từ {1,2,3,4}",
+        problem: "Cần liệt kê các tập con 2 phần tử, không phân biệt thứ tự.",
+        steps: [
+          "Giữ vector cur và biến start là số nhỏ nhất được phép chọn tiếp.",
+          "Chọn 1 thì lần sau chỉ thử 2,3,4 để tránh sinh lại {2,1}.",
+          "Khi cur có 2 phần tử thì in tổ hợp và quay lui.",
+          "Các tổ hợp sinh ra: {1,2}, {1,3}, {1,4}, {2,3}, {2,4}, {3,4}."
+        ],
+        result: "Quy tắc chọn số sau lớn hơn số trước giúp sinh đủ nhưng không trùng."
+      }
+    ],
     primaryIdea: "Ví dụ 1 theo VNOI: sinh xâu nhị phân độ dài n. Mỗi vị trí có đúng hai lựa chọn là 0 hoặc 1, nên cây trạng thái có 2^n lá.",
     primaryMethod: "Dùng string cur để lưu xâu đang xây. Ở vị trí pos, thử thêm '0' rồi '1', gọi backtrack(pos + 1), sau đó pop_back để quay lui.",
     secondExample: {
@@ -555,6 +579,30 @@ int main() {
       "Bước 4: với tiêu chí còn lại, thử chứng minh bằng trao đổi, cận hoặc bất biến.",
       "Bước 5: cài đặt. Greedy thường cần sort trước, rồi duyệt một lần và cập nhật trạng thái hiện tại.",
       "Bước 6: kiểm tra biên: không chọn được phần tử nào, các phần tử bằng nhau, thời điểm chạm nhau, số âm hoặc dữ liệu đã sắp xếp ngược."
+    ],
+    quickExamples: [
+      {
+        title: "Movie Festival nhìn nhanh",
+        problem: "Có các phim [1,4], [2,3], [3,5]. Muốn xem nhiều phim nhất, phim chạm thời điểm kết thúc/bắt đầu vẫn xem được.",
+        steps: [
+          "Nếu chọn phim bắt đầu sớm nhất [1,4], chỉ xem được 1 phim.",
+          "Nếu sort theo thời điểm kết thúc, thứ tự là [2,3], [1,4], [3,5].",
+          "Chọn [2,3] trước vì kết thúc sớm nhất, sau đó chọn được [3,5].",
+          "Đáp án là 2 phim, tốt hơn quy tắc bắt đầu sớm nhất."
+        ],
+        result: "Chọn kết thúc sớm nhất để để lại nhiều thời gian nhất cho phần còn lại."
+      },
+      {
+        title: "Missing Coin Sum nhìn nhanh",
+        problem: "Có coin đã sort: 1, 1, 3, 4. Tìm tổng nhỏ nhất không tạo được.",
+        steps: [
+          "Ban đầu tạo được mọi tổng trong [1,0], nên reach = 0.",
+          "Coin 1 <= reach + 1, mở rộng tạo được [1,1]. Coin 1 tiếp theo mở rộng thành [1,2].",
+          "Coin 3 <= reach + 1 = 3, mở rộng thành [1,5]. Coin 4 mở rộng thành [1,9].",
+          "Không còn coin, tổng nhỏ nhất chưa tạo được là reach + 1 = 10."
+        ],
+        result: "Greedy đúng vì nếu coin tiếp theo lớn hơn reach + 1 thì không có cách nào tạo reach + 1."
+      }
     ],
     primaryIdea: "Ví dụ 1 chọn đoạn kết thúc sớm nhất để còn nhiều chỗ nhất cho đoạn sau.",
     primaryMethod: "Sort theo r tăng, chọn đoạn đầu tiên không giao với đoạn đã chọn gần nhất.",

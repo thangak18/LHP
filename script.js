@@ -2476,6 +2476,7 @@ function topicMatches(topic) {
     guide.secondExample?.method,
     guide.secondExample?.pseudo,
     guide.secondExample?.code,
+    ...(guide.quickExamples || []).map((item) => `${item.title} ${item.problem} ${item.steps?.join(" ")} ${item.result}`),
     ...(guide.practice || []).map((item) => `${item.title} ${item.focus} ${item.hint}`)
   ].filter(Boolean);
   const haystack = [
@@ -2554,6 +2555,27 @@ function detailBlock(title, items, className = "theory-list") {
     <section>
       <h4 class="section-title">${escapeHtml(title)}</h4>
       ${listMarkup(items, className)}
+    </section>
+  `;
+}
+
+function quickExamplesMarkup(items) {
+  if (!items || !items.length) return "";
+  return `
+    <section class="quick-example-section">
+      <h4 class="section-title">Ví dụ nhìn nhanh</h4>
+      <div class="quick-example-grid">
+        ${items.map((item) => `
+          <article class="quick-example-card">
+            <h5>${escapeHtml(item.title)}</h5>
+            <p class="quick-problem">${escapeHtml(item.problem)}</p>
+            <ol>
+              ${(item.steps || []).map((step) => `<li>${escapeHtml(step)}</li>`).join("")}
+            </ol>
+            <p class="quick-result"><strong>Kết luận:</strong> ${escapeHtml(item.result)}</p>
+          </article>
+        `).join("")}
+      </div>
     </section>
   `;
 }
@@ -2722,6 +2744,7 @@ function renderSlide() {
         </section>
 
         ${detailBlock("Lý thuyết chi tiết", detailedTheory, "theory-list")}
+        ${quickExamplesMarkup(guide.quickExamples || [])}
         ${detailBlock("Vì sao thuật toán hoạt động", guide.why || [], "why-list")}
         ${detailBlock("Phương pháp sử dụng", guide.method || [], "method-list")}
 

@@ -464,9 +464,58 @@ pre {
   margin-top: 28px;
 }
 
+.quick-example-section {
+  margin-top: 2px;
+}
+
 .example-stack {
   display: grid;
   gap: 24px;
+}
+
+.quick-example-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.quick-example-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(39, 122, 118, 0.08), transparent 45%),
+    #ffffff;
+}
+
+.quick-example-card h5 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.quick-problem,
+.quick-result {
+  margin: 8px 0 0;
+  color: #37322c;
+}
+
+.quick-example-card ol {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding-left: 22px;
+  color: #37322c;
+}
+
+.quick-example-card li::marker {
+  color: var(--amber);
+  font-weight: 900;
+}
+
+.quick-result strong {
+  color: var(--rose);
 }
 
 .practice-grid {
@@ -789,6 +838,7 @@ code {
   .slide-head,
   .example-detail-grid,
   .example-code-grid,
+  .quick-example-grid,
   .practice-grid {
     grid-template-columns: 1fr;
   }
