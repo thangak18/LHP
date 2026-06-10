@@ -175,7 +175,8 @@ int main() {
         title: "Mảng - Array",
         definition: "Mảng là cấu trúc lưu nhiều phần tử cùng kiểu, cho phép truy cập nhanh bằng chỉ số.",
         theory: [
-          "Mảng tĩnh có kích thước cố định, vector linh hoạt hơn và thường tiện trong bài thi.",
+          "Mảng tĩnh có kích thước cố định, phù hợp khi giới hạn n đã rõ và cần mảng đếm tần suất.",
+          "Vector là mảng động của C++ STL, cấp phát theo n hoặc thêm phần tử bằng push_back.",
           "Truy cập a[i] là O(1), nhưng phải đảm bảo i nằm trong đoạn hợp lệ.",
           "Các thao tác cơ bản: nhập mảng, duyệt mảng, tìm min/max, tính tổng và đếm tần suất."
         ],
@@ -211,7 +212,9 @@ int main() {
 }`,
         notes: [
           "Không truy cập a[0] nếu n có thể bằng 0.",
+          "Mảng tĩnh nên khai báo đủ lớn theo giới hạn đề, ví dụ int a[MAXN].",
           "vector<int> a(n) tự tạo n phần tử được gán giá trị mặc định 0.",
+          "Dùng vector khi số phần tử phụ thuộc input hoặc cần tạo danh sách kết quả mới.",
           "Dùng long long cho tổng, ngay cả khi từng phần tử là int."
         ],
         complexity: "O(n)",
@@ -2477,6 +2480,17 @@ function topicMatches(topic) {
     guide.secondExample?.pseudo,
     guide.secondExample?.code,
     ...(guide.quickExamples || []).map((item) => `${item.title} ${item.problem} ${item.steps?.join(" ")} ${item.result}`),
+    ...(guide.conceptSections || []).map((item) => [
+      item.title,
+      ...(item.theory || []),
+      item.example?.title,
+      item.example?.statement,
+      item.example?.idea,
+      item.example?.method,
+      item.example?.pseudo,
+      item.example?.code,
+      ...(item.practice || [])
+    ].join(" ")),
     ...(guide.practice || []).map((item) => `${item.title} ${item.focus} ${item.hint}`)
   ].filter(Boolean);
   const haystack = [
@@ -2555,6 +2569,67 @@ function detailBlock(title, items, className = "theory-list") {
     <section>
       <h4 class="section-title">${escapeHtml(title)}</h4>
       ${listMarkup(items, className)}
+    </section>
+  `;
+}
+
+function conceptSectionsMarkup(items, addCode) {
+  if (!items || !items.length) return "";
+  return `
+    <section class="concept-section">
+      <h4 class="section-title">Mục riêng cần nắm</h4>
+      <div class="concept-grid">
+        ${items.map((item) => {
+          const example = item.example || {};
+          const hasExample = example.title || example.statement || example.idea || example.method || example.pseudo || example.code;
+          return `
+            <article class="concept-card">
+              <h5>${escapeHtml(item.title)}</h5>
+              ${listMarkup(item.theory || [], "concept-theory")}
+              ${hasExample ? `
+                <div class="concept-example">
+                  <h6>${escapeHtml(example.title || "Ví dụ minh họa")}</h6>
+                  ${example.statement ? `<p>${escapeHtml(example.statement)}</p>` : ""}
+                  <div class="concept-detail-grid">
+                    ${example.idea ? `
+                      <div>
+                        <strong>Ý tưởng</strong>
+                        <p>${escapeHtml(example.idea)}</p>
+                      </div>
+                    ` : ""}
+                    ${example.method ? `
+                      <div>
+                        <strong>Phương pháp</strong>
+                        <p>${escapeHtml(example.method)}</p>
+                      </div>
+                    ` : ""}
+                  </div>
+                  <div class="concept-code-grid">
+                    ${example.pseudo ? `
+                      <div>
+                        <strong>Mã giả</strong>
+                        ${addCode(`Mã giả ${item.title}`, example.pseudo, "pseudo")}
+                      </div>
+                    ` : ""}
+                    ${example.code ? `
+                      <div>
+                        <strong>Code mẫu C++17</strong>
+                        ${addCode(`C++17 ${item.title}`, example.code)}
+                      </div>
+                    ` : ""}
+                  </div>
+                </div>
+              ` : ""}
+              ${(item.practice || []).length ? `
+                <div class="concept-practice-wrap">
+                  <h6>Bài tập luyện riêng</h6>
+                  ${listMarkup(item.practice, "concept-practice")}
+                </div>
+              ` : ""}
+            </article>
+          `;
+        }).join("")}
+      </div>
     </section>
   `;
 }
@@ -2683,6 +2758,7 @@ function renderSlide() {
     const codeIndex = codePayloads.push(code) - 1;
     return renderCodeBlock(label, codeIndex, className);
   };
+  const conceptsMarkup = conceptSectionsMarkup(guide.conceptSections || [], addCode);
   const examplesMarkup = examples.map((example, index) => `
     <section class="example-panel">
       <div class="example-heading">
@@ -2744,6 +2820,7 @@ function renderSlide() {
         </section>
 
         ${detailBlock("Lý thuyết chi tiết", detailedTheory, "theory-list")}
+        ${conceptsMarkup}
         ${quickExamplesMarkup(guide.quickExamples || [])}
         ${detailBlock("Vì sao thuật toán hoạt động", guide.why || [], "why-list")}
         ${detailBlock("Phương pháp sử dụng", guide.method || [], "method-list")}

@@ -129,17 +129,116 @@ int main() {
     deepTheory: [
       "Mảng lưu các phần tử cùng kiểu trên vùng chỉ số liên tiếp, nên truy cập theo chỉ số là rất nhanh.",
       "Đổi lại, người lập trình phải kiểm soát chỉ số hợp lệ. Truy cập vượt biên có thể gây sai ngẫu nhiên hoặc crash.",
-      "Mảng là nền cho rất nhiều kỹ thuật sau này như prefix sum, two pointer, DP và segment tree."
+      "Mảng là nền cho rất nhiều kỹ thuật sau này như prefix sum, two pointer, DP và segment tree.",
+      "Trong C++, hai cách dùng thường gặp nhất ở Level 0 là mảng tĩnh và vector. Mảng tĩnh hợp khi giới hạn rõ ràng, vector hợp khi kích thước phụ thuộc input hoặc cần thêm bớt phần tử."
     ],
     why: [
       "Khi cần dùng lại dữ liệu nhiều lần, mảng giúp lưu toàn bộ dãy thay vì xử lý xong rồi mất.",
-      "Truy cập O(1) cho phép so sánh, cập nhật, duyệt và xây các cấu trúc dữ liệu nhanh."
+      "Truy cập O(1) cho phép so sánh, cập nhật, duyệt và xây các cấu trúc dữ liệu nhanh.",
+      "Dãy phần tử nằm liên tiếp về mặt chỉ số, nên một vòng for có thể đi qua toàn bộ dữ liệu theo đúng thứ tự đề bài."
     ],
     method: [
-      "Đọc n trước, cấp phát vector có n phần tử.",
+      "Đọc n trước, sau đó chọn kiểu lưu: mảng tĩnh nếu n không vượt quá một hằng MAXN, vector nếu muốn cấp phát đúng n phần tử.",
       "Duyệt để nhập từng phần tử.",
       "Chọn phép xử lý: tổng, min/max, đếm, tìm vị trí, hoặc biến đổi mảng.",
-      "Luôn thống nhất 0-based hoặc 1-based trong toàn bài."
+      "Luôn thống nhất 0-based hoặc 1-based trong toàn bài.",
+      "Với bài đếm tần suất giá trị nhỏ, có thể dùng mảng tĩnh cnt[value]. Với bài cần tạo danh sách kết quả mới, vector thường gọn hơn."
+    ],
+    conceptSections: [
+      {
+        title: "Mảng tĩnh",
+        theory: [
+          "Mảng tĩnh được khai báo với kích thước cố định, ví dụ int a[1000] hoặc int a[MAXN]. Kích thước này không thay đổi trong lúc chương trình chạy.",
+          "Mảng tĩnh phù hợp khi đề cho giới hạn n rõ ràng như n <= 10^5. Ta thường khai báo const int MAXN = 100000 + 5 để có thêm một ít biên an toàn.",
+          "Ưu điểm là truy cập nhanh, cú pháp đơn giản và có thể dùng cho mảng đếm tần suất. Nhược điểm là phải tự đảm bảo không dùng vượt kích thước đã khai báo.",
+          "Nếu khai báo mảng lớn trong hàm main, có thể bị tràn stack. Khi cần mảng rất lớn, nên khai báo global hoặc dùng vector."
+        ],
+        example: {
+          title: "Ví dụ: Đếm tần suất điểm 0..10",
+          statement: "Cho n điểm số, mỗi điểm nằm trong đoạn 0 đến 10. Hãy in số lần xuất hiện của từng điểm.",
+          idea: "Miền giá trị chỉ có 11 khả năng, nên dùng mảng tĩnh cnt[11]. Mỗi khi đọc điểm x, tăng cnt[x].",
+          method: "Khởi tạo cnt bằng 0, duyệt input một lần để đếm, rồi duyệt điểm từ 0 đến 10 để in kết quả.",
+          pseudo: String.raw`read n
+cnt[0..10] <- 0
+repeat n times:
+    read x
+    cnt[x] <- cnt[x] + 1
+for score from 0 to 10:
+    print score, cnt[score]`,
+          code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    int cnt[11] = {};
+    for (int i = 0; i < n; ++i) {
+        int x;
+        cin >> x;
+        cnt[x]++;
+    }
+
+    for (int score = 0; score <= 10; ++score) {
+        cout << score << ": " << cnt[score] << '\n';
+    }
+    return 0;
+}`
+        },
+        practice: [
+          "Nhập n số vào mảng tĩnh, in giá trị nhỏ nhất và lớn nhất.",
+          "Nhập n chữ số 0..9, đếm tần suất từng chữ số bằng cnt[10].",
+          "Cho n điểm 0..10, tìm điểm xuất hiện nhiều nhất.",
+          "Nhập mảng a, đếm số phần tử lớn hơn trung bình cộng của mảng."
+        ]
+      },
+      {
+        title: "Vector",
+        theory: [
+          "vector là mảng động trong C++ STL. Ta có thể tạo vector<int> a(n) khi biết n, hoặc tạo vector rỗng rồi thêm phần tử bằng push_back.",
+          "vector vẫn cho phép truy cập a[i] trong O(1), duyệt bằng for chỉ số hoặc range-based for giống mảng thường.",
+          "Ưu điểm lớn nhất là linh hoạt: kích thước lấy từ input, dễ truyền vào hàm, dễ sort, reverse, push_back, pop_back, clear.",
+          "Khi dùng push_back nhiều lần, vector tự mở rộng bộ nhớ. Thao tác này trung bình vẫn nhanh, nhưng nếu biết trước số lượng phần tử có thể dùng reserve để giảm số lần cấp phát lại."
+        ],
+        example: {
+          title: "Ví dụ: Lọc số chẵn",
+          statement: "Cho n số nguyên. Hãy lưu các số chẵn vào một dãy mới và in dãy đó.",
+          idea: "Không biết trước có bao nhiêu số chẵn, nên dùng vector even và thêm từng số chẵn bằng push_back.",
+          method: "Duyệt n số, nếu x chia hết cho 2 thì đưa vào even. Cuối cùng duyệt vector even để in kết quả.",
+          pseudo: String.raw`read n
+even <- empty list
+repeat n times:
+    read x
+    if x mod 2 = 0:
+        append x to even
+for each x in even:
+    print x`,
+          code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    vector<int> even;
+    even.reserve(n);
+    for (int i = 0; i < n; ++i) {
+        int x;
+        cin >> x;
+        if (x % 2 == 0) even.push_back(x);
+    }
+
+    for (int x : even) cout << x << ' ';
+    return 0;
+}`
+        },
+        practice: [
+          "Đọc n số vào vector, in dãy theo thứ tự ngược lại.",
+          "Lọc các số dương sang vector mới rồi tính tổng vector mới.",
+          "Sắp xếp vector tăng dần, sau đó in phần tử đầu và cuối.",
+          "Sắp xếp vector rồi xóa các giá trị trùng nhau bằng unique."
+        ]
+      }
     ],
     primaryIdea: "Ví dụ 1 duyệt mảng một lần để lấy min, max và tổng.",
     primaryMethod: "Khởi tạo min/max bằng phần tử đầu, sau đó cập nhật khi duyệt từng x.",
@@ -163,7 +262,29 @@ int main() {
     for (int i = n - 1; i >= 0; --i) cout << a[i] << ' ';
     return 0;
 }`
-    }
+    },
+    practice: [
+      {
+        title: "Mảng tĩnh: Đếm giá trị",
+        focus: "Dùng mảng cnt có kích thước theo miền giá trị.",
+        hint: "Nếu giá trị chỉ nằm trong 0..100, khai báo int cnt[101] = {} rồi tăng cnt[x]."
+      },
+      {
+        title: "Mảng tĩnh: Min, max, tổng",
+        focus: "Duyệt một lần qua dãy đã lưu.",
+        hint: "Khởi tạo mn và mx bằng a[0], tổng nên dùng long long."
+      },
+      {
+        title: "Vector: Lọc phần tử",
+        focus: "Tạo một vector kết quả bằng push_back.",
+        hint: "Duyệt input, gặp phần tử thỏa điều kiện thì result.push_back(x)."
+      },
+      {
+        title: "Vector: Sắp xếp và xóa trùng",
+        focus: "Kết hợp sort, unique và erase.",
+        hint: "sort(a.begin(), a.end()); a.erase(unique(a.begin(), a.end()), a.end());"
+      }
+    ]
   },
   "Xâu cơ bản": {
     deepTheory: [

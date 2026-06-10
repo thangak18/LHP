@@ -359,6 +359,11 @@ button {
 .visual-panel,
 .content-flow section,
 .visual-panel section,
+.concept-section,
+.concept-card,
+.concept-detail-grid > *,
+.concept-code-grid > *,
+.concept-example,
 .examples-section,
 .example-panel,
 .example-code-grid > *,
@@ -399,7 +404,9 @@ pre {
 .theory-list,
 .note-list,
 .why-list,
-.method-list {
+.method-list,
+.concept-theory,
+.concept-practice {
   display: grid;
   gap: 8px;
   margin: 0;
@@ -410,7 +417,9 @@ pre {
 .theory-list li,
 .note-list li,
 .why-list li,
-.method-list li {
+.method-list li,
+.concept-theory li,
+.concept-practice li {
   position: relative;
   padding-left: 18px;
   color: #37322c;
@@ -419,7 +428,9 @@ pre {
 .theory-list li::before,
 .note-list li::before,
 .why-list li::before,
-.method-list li::before {
+.method-list li::before,
+.concept-theory li::before,
+.concept-practice li::before {
   content: "";
   position: absolute;
   left: 0;
@@ -468,9 +479,100 @@ pre {
   margin-top: 2px;
 }
 
+.concept-section {
+  margin-top: 2px;
+}
+
 .example-stack {
   display: grid;
   gap: 24px;
+}
+
+.concept-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.concept-card {
+  display: grid;
+  gap: 15px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(79, 98, 146, 0.08), transparent 42%),
+    #ffffff;
+}
+
+.concept-card > h5 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.12rem;
+}
+
+.concept-theory li::before {
+  background: var(--indigo);
+}
+
+.concept-practice li::before {
+  background: var(--amber);
+}
+
+.concept-example,
+.concept-practice-wrap {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: rgba(255, 253, 248, 0.82);
+}
+
+.concept-example {
+  border-left: 4px solid var(--teal);
+}
+
+.concept-practice-wrap {
+  border-left: 4px solid var(--amber);
+}
+
+.concept-example h6,
+.concept-practice-wrap h6 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.98rem;
+}
+
+.concept-example p {
+  margin: 0;
+  color: #37322c;
+}
+
+.concept-detail-grid,
+.concept-code-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.concept-detail-grid > div {
+  padding: 12px;
+  border-radius: var(--radius);
+  background: rgba(39, 122, 118, 0.06);
+}
+
+.concept-detail-grid > div:nth-child(2) {
+  background: rgba(199, 111, 66, 0.07);
+}
+
+.concept-detail-grid strong,
+.concept-code-grid strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .quick-example-grid {
@@ -836,6 +938,8 @@ code {
 
   .slide-grid,
   .slide-head,
+  .concept-detail-grid,
+  .concept-code-grid,
   .example-detail-grid,
   .example-code-grid,
   .quick-example-grid,
