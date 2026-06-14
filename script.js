@@ -808,45 +808,49 @@ int main() {
         visualCaption: "List nối các node bằng con trỏ, không nằm liên tiếp như mảng."
       },
       {
-        title: "Sortings, Counting",
-        definition: "Sắp xếp đưa dữ liệu về thứ tự mong muốn; counting dùng tần suất khi miền giá trị nhỏ để xử lý nhanh hơn sort thông thường.",
+        title: "Sorting, Counting",
+        definition: "Sorting đưa dữ liệu về thứ tự mong muốn; counting dùng mảng tần suất khi miền giá trị nhỏ để xử lý nhanh hơn sort so sánh.",
         theory: [
-          "sort trong C++ dùng introsort, độ phức tạp O(n log n).",
-          "Counting sort phù hợp khi giá trị nằm trong đoạn nhỏ 0..K.",
-          "Sau khi sắp xếp, nhiều bài trở nên dễ hơn: tìm cặp, loại trùng, greedy, two pointer."
+          "std::sort là lựa chọn chính trong C++ cho đa số bài thi, trung bình và tệ nhất đều O(n log n).",
+          "Các thuật toán cơ bản như bubble, insertion, merge, quick, heap giúp hiểu cách dữ liệu được hoán đổi, chia nhỏ và gộp lại.",
+          "Counting sort phù hợp khi giá trị nằm trong đoạn nhỏ 0..K hoặc có thể dịch chỉ số bằng offset.",
+          "Sau khi sắp xếp, nhiều bài trở nên dễ hơn: tìm cặp, loại trùng, greedy, two pointer và tối ưu theo thứ tự."
         ],
-        example: "Sắp xếp dãy số không âm có giá trị từ 0 đến K bằng counting.",
-        pseudo: String.raw`read n, K
-count each value
-for value from 0 to K:
-    print value count[value] times`,
+        example: "Sắp xếp danh sách thí sinh theo điểm giảm dần, nếu bằng điểm thì tên tăng dần.",
+        pseudo: String.raw`read n
+read list of (name, score)
+sort by:
+    higher score first
+    if scores are equal, lexicographically smaller name first
+print list`,
         code: String.raw`#include <bits/stdc++.h>
 using namespace std;
 
 int main() {
-    int n, k;
-    cin >> n >> k;
-    vector<int> cnt(k + 1, 0);
+    int n;
+    cin >> n;
+    vector<pair<string, int>> a(n);
+    for (auto &[name, score] : a) cin >> name >> score;
 
-    for (int i = 0; i < n; ++i) {
-        int x;
-        cin >> x;
-        cnt[x]++;
-    }
+    sort(a.begin(), a.end(), [](const auto &left, const auto &right) {
+        if (left.second != right.second) return left.second > right.second;
+        return left.first < right.first;
+    });
 
-    for (int value = 0; value <= k; ++value) {
-        while (cnt[value]--) cout << value << ' ';
+    for (auto [name, score] : a) {
+        cout << name << ' ' << score << '\n';
     }
     return 0;
 }`,
         notes: [
-          "Counting sort không hợp khi K quá lớn so với n.",
-          "Comparator của sort trả về true nếu phần tử trái đứng trước phần tử phải.",
-          "Nếu cần ổn định thứ tự của phần tử bằng nhau, tìm hiểu stable_sort."
+          "Comparator của sort phải trả về true khi phần tử trái cần đứng trước phần tử phải.",
+          "Không viết comparator kiểu <= vì có thể phá tính thứ tự nghiêm ngặt của sort.",
+          "Counting sort không hợp khi K quá lớn so với n hoặc miền giá trị thưa.",
+          "Nếu cần giữ thứ tự tương đối của phần tử bằng nhau, dùng stable_sort hoặc counting sort ổn định."
         ],
-        complexity: "O(n + K)",
+        complexity: "std::sort O(n log n), counting O(n + K)",
         visual: "sort",
-        visualCaption: "Counting gom dữ liệu theo tần suất rồi trải lại theo thứ tự."
+        visualCaption: "Sort tạo thứ tự để các phần tử liên quan đứng gần nhau; counting gom theo tần suất."
       },
       {
         title: "PrefixSum, Difference array",
@@ -955,47 +959,47 @@ int main() {
         title: "Math",
         definition: "Nhóm toán cơ bản gồm chia hết, gcd/lcm, số nguyên tố, modulo và công thức đếm đơn giản.",
         theory: [
-          "gcd hỗ trợ rút gọn phân số, tính lcm và giải nhiều bài chia hết.",
-          "Sàng Eratosthenes tìm số nguyên tố đến n trong O(n log log n).",
-          "Khi đáp án lớn, đề thường yêu cầu lấy modulo, cần modulo sau mỗi phép cộng hoặc nhân."
+          "Chia hết và số dư giúp biến điều kiện số học thành các phép kiểm tra bằng %, gcd hoặc modulo.",
+          "Thuật toán Euclid tính gcd nhanh trong O(log min(a,b)), là nền cho lcm và rút gọn phân số.",
+          "Số nguyên tố có đúng hai ước dương; kiểm tra đến sqrt(n) hoặc dùng sàng Eratosthenes nếu có nhiều truy vấn.",
+          "Khi đáp án lớn, đề thường yêu cầu lấy modulo, cần modulo sau mỗi phép cộng hoặc nhân để tránh tràn."
         ],
-        example: "In tất cả số nguyên tố không vượt quá n.",
-        pseudo: String.raw`isPrime[0] <- false, isPrime[1] <- false
-for p from 2 to sqrt(n):
-    if isPrime[p]:
-        mark multiples of p as composite
-print all i with isPrime[i] = true`,
+        example: "Rút gọn phân số a/b bằng gcd.",
+        pseudo: String.raw`read a, b
+g <- gcd(abs(a), abs(b))
+a <- a / g
+b <- b / g
+if b < 0:
+    a <- -a
+    b <- -b
+print a, b`,
         code: String.raw`#include <bits/stdc++.h>
 using namespace std;
 
 int main() {
-    int n;
-    cin >> n;
-    vector<bool> prime(n + 1, true);
-    if (n >= 0) prime[0] = false;
-    if (n >= 1) prime[1] = false;
+    long long a, b;
+    cin >> a >> b;
 
-    for (long long p = 2; p * p <= n; ++p) {
-        if (prime[p]) {
-            for (long long x = p * p; x <= n; x += p) {
-                prime[x] = false;
-            }
-        }
+    long long g = gcd(abs(a), abs(b));
+    a /= g;
+    b /= g;
+    if (b < 0) {
+        a = -a;
+        b = -b;
     }
 
-    for (int i = 2; i <= n; ++i) {
-        if (prime[i]) cout << i << ' ';
-    }
+    cout << a << '/' << b << '\n';
     return 0;
 }`,
         notes: [
-          "Bắt đầu đánh dấu từ p * p vì bội nhỏ hơn đã bị đánh dấu bởi số nguyên tố nhỏ hơn.",
-          "p * p nên dùng long long để tránh tràn khi n lớn.",
-          "lcm(a, b) = a / gcd(a, b) * b giúp giảm nguy cơ tràn hơn a * b / gcd."
+          "gcd(a, b) = gcd(b, a % b), dừng khi b = 0.",
+          "lcm(a, b) = a / gcd(a, b) * b giúp giảm nguy cơ tràn hơn a * b / gcd.",
+          "Bắt đầu sàng từ p * p vì các bội nhỏ hơn đã bị đánh dấu bởi số nguyên tố nhỏ hơn.",
+          "Với modulo, cộng/nhân xong nên lấy % MOD ngay; với trừ cần cộng MOD trước khi %."
         ],
-        complexity: "O(n log log n)",
+        complexity: "GCD O(log min(a,b)), sàng O(n log log n)",
         visual: "math",
-        visualCaption: "Sàng loại dần các bội số để giữ lại số nguyên tố."
+        visualCaption: "Toán số học biến điều kiện chia hết, số dư và ước số thành phép tính nhanh."
       },
       {
         title: "Tổng hợp cấp tốc",
@@ -2491,7 +2495,8 @@ function topicMatches(topic) {
       item.example?.code,
       ...(item.practice || [])
     ].join(" ")),
-    ...(guide.practice || []).map((item) => `${item.title} ${item.focus} ${item.hint}`)
+    ...(guide.practice || []).map((item) => `${item.title} ${item.focus} ${item.hint}`),
+    ...(guide.references || []).map((item) => `${item.title} ${item.url}`)
   ].filter(Boolean);
   const haystack = [
     topic.title,
@@ -2673,6 +2678,22 @@ function practiceMarkup(items) {
   `;
 }
 
+function referencesMarkup(items) {
+  if (!items || !items.length) return "";
+  return `
+    <section class="reference-section">
+      <h4 class="section-title">Nguồn VNOI tham khảo</h4>
+      <div class="reference-list">
+        ${items.map((item) => `
+          <a class="reference-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+            ${escapeHtml(item.title)}
+          </a>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function renderVisual(topic) {
   const visual = visualLibrary[topic.visual] || visualLibrary.flow;
   let body = "";
@@ -2824,6 +2845,7 @@ function renderSlide() {
         ${quickExamplesMarkup(guide.quickExamples || [])}
         ${detailBlock("Vì sao thuật toán hoạt động", guide.why || [], "why-list")}
         ${detailBlock("Phương pháp sử dụng", guide.method || [], "method-list")}
+        ${referencesMarkup(guide.references || [])}
 
         <section>
           <h4 class="section-title">Ghi nhớ</h4>

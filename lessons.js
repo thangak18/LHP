@@ -1017,24 +1017,311 @@ int main() {
 }`
     }
   },
-  "Sortings, Counting": {
+  "Sorting, Counting": {
     deepTheory: [
-      "Sắp xếp đưa dữ liệu về trật tự có cấu trúc, giúp các phần tử liên quan nằm gần nhau.",
-      "Counting tận dụng miền giá trị nhỏ để thay so sánh bằng đếm tần suất.",
-      "Sau sort, nhiều bài từ khó thành dễ vì có thể dùng two pointer, greedy hoặc loại trùng."
+      "Theo VNOI Wiki, sắp xếp xuất hiện ở rất nhiều nơi và thường được dùng như bước tiền xử lý cho tìm kiếm nhị phân, greedy, two pointer hoặc các bài đồ thị như Kruskal.",
+      "Khi học sort, không chỉ học cách gọi std::sort mà còn học các ý tưởng: đổi chỗ cặp kề nhau, chèn vào đoạn đã sort, chia để trị, heap và sort không so sánh.",
+      "Cần quan tâm bốn yếu tố: độ phức tạp thời gian, bộ nhớ phụ, tính ổn định và cách định nghĩa thứ tự so sánh.",
+      "Counting là nhóm kỹ thuật dùng mảng tần suất. Nếu giá trị nằm trong miền nhỏ, ta có thể thay việc so sánh O(n log n) bằng đếm O(n + K).",
+      "Trong bài thi chuyên bổ sung lớp 11 chuyên Tin LHP TP.HCM, nhóm dạng hay gặp là sort theo nhiều tiêu chí, đếm tần suất, loại trùng, tìm cặp sau sort và tối ưu bằng thứ tự."
     ],
     why: [
-      "Sort O(n log n) thường đủ nhanh với n khoảng 10^5 đến 10^6 trong C++.",
-      "Counting O(n + K) tốt hơn sort khi K nhỏ, nhưng tốn bộ nhớ theo K."
+      "Sắp xếp làm dữ liệu có cấu trúc: phần tử nhỏ đứng trước phần tử lớn, phần tử bằng nhau đứng gần nhau, nên ta dễ phát hiện trùng, khoảng cách nhỏ nhất hoặc ghép cặp.",
+      "std::sort O(n log n) thường đủ nhanh với n khoảng 10^5 đến 10^6 trong C++, còn các sort O(n^2) chỉ phù hợp để hiểu ý tưởng hoặc dùng cho n nhỏ.",
+      "Counting O(n + K) tốt hơn sort khi K nhỏ vì mỗi giá trị được xử lý qua chỉ số cnt[value], nhưng đổi lại bộ nhớ phụ phụ thuộc K.",
+      "Tính ổn định quan trọng khi ta sort nhiều tiêu chí theo nhiều lượt: stable_sort giữ nguyên thứ tự tương đối của các phần tử bằng nhau."
     ],
     method: [
-      "Nếu cần thứ tự tùy chỉnh, viết comparator.",
-      "Nếu giá trị nằm trong 0..K nhỏ, dùng mảng cnt.",
-      "Sau khi sort, kiểm tra phần tử kề nhau để tìm trùng hoặc khoảng cách nhỏ nhất.",
-      "Không dùng counting nếu K quá lớn so với n."
+      "Bước 1: đọc đề và xác định cần sort tăng, giảm hay sort theo nhiều khóa như điểm giảm dần, tên tăng dần.",
+      "Bước 2: nếu n lớn, ưu tiên std::sort hoặc stable_sort; chỉ tự cài bubble/insertion/merge/quick khi đề yêu cầu hoặc để học.",
+      "Bước 3: nếu miền giá trị nhỏ, ví dụ điểm 0..10 hoặc số 0..10^6, cân nhắc mảng cnt thay vì sort so sánh.",
+      "Bước 4: sau sort, khai thác tính kề nhau: loại trùng, đếm nhóm bằng nhau, tìm hiệu nhỏ nhất, dùng two pointer cho tổng/cặp.",
+      "Bước 5: với comparator, luôn trả về true khi left đứng trước right; không dùng <= hoặc >= vì sort cần thứ tự nghiêm ngặt."
     ],
-    primaryIdea: "Ví dụ 1 counting sort bằng cách đếm mỗi giá trị rồi in theo thứ tự.",
-    primaryMethod: "cnt[value] cho biết cần in value bao nhiêu lần.",
+    conceptSections: [
+      {
+        title: "std::sort, stable_sort và comparator",
+        theory: [
+          "std::sort là công cụ chính trong C++ để sort vector, mảng hoặc đoạn iterator. Trong thi đấu, đây là lựa chọn mặc định cho hầu hết bài cần sắp xếp.",
+          "Comparator là hàm quy định phần tử nào đứng trước. Ví dụ điểm cao đứng trước, nếu bằng điểm thì tên nhỏ hơn theo từ điển đứng trước.",
+          "stable_sort giữ thứ tự tương đối của các phần tử bằng nhau. Điều này hữu ích khi sort nhiều lượt, ví dụ sort tên trước rồi stable_sort theo điểm.",
+          "Sai lầm hay gặp là viết return a <= b. Comparator phải là thứ tự nghiêm ngặt, nghĩa là nếu hai phần tử bằng nhau thì phải trả về false."
+        ],
+        example: {
+          title: "Ví dụ: Xếp hạng thí sinh",
+          statement: "Cho tên và điểm. In danh sách theo điểm giảm dần, nếu bằng điểm thì tên tăng dần.",
+          idea: "Dùng pair hoặc struct để lưu dữ liệu, sau đó viết comparator hai tiêu chí.",
+          method: "So sánh điểm trước. Nếu điểm khác nhau, điểm lớn hơn đứng trước. Nếu điểm bằng nhau, tên nhỏ hơn đứng trước.",
+          pseudo: String.raw`sort students by:
+    if score differs:
+        higher score first
+    otherwise:
+        smaller name first`,
+          code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+struct Student {
+    string name;
+    int score;
+};
+
+int main() {
+    int n;
+    cin >> n;
+    vector<Student> a(n);
+    for (auto &x : a) cin >> x.name >> x.score;
+
+    sort(a.begin(), a.end(), [](const Student &u, const Student &v) {
+        if (u.score != v.score) return u.score > v.score;
+        return u.name < v.name;
+    });
+
+    for (const Student &x : a) {
+        cout << x.name << ' ' << x.score << '\n';
+    }
+    return 0;
+}`
+        },
+        practice: [
+          "Sort danh sách học sinh theo tổng điểm giảm dần, nếu bằng tổng thì mã học sinh tăng dần.",
+          "Sort các cặp (x, y) theo x tăng, nếu x bằng nhau thì y giảm.",
+          "Dùng stable_sort để sort tên tăng dần trước, rồi sort ổn định theo điểm giảm dần."
+        ]
+      },
+      {
+        title: "Bubble sort",
+        theory: [
+          "Bubble sort xét các cặp kề nhau. Nếu cặp đang ngược thứ tự thì đổi chỗ.",
+          "Sau mỗi lượt quét, một phần tử lớn nhất sẽ bị đẩy dần về cuối dãy. Lặp nhiều lượt thì toàn bộ dãy được sắp xếp.",
+          "Ưu điểm là dễ hiểu và không cần bộ nhớ phụ. Nhược điểm là O(n^2), không phù hợp khi n lớn.",
+          "Bubble sort giúp người mới hiểu invariant: sau lượt i, đoạn cuối đã đúng thứ tự và không cần đụng tới nữa."
+        ],
+        example: {
+          title: "Ví dụ: Tự cài bubble sort tăng dần",
+          statement: "Sắp xếp n số nguyên tăng dần bằng cách đổi chỗ cặp kề nhau.",
+          idea: "Nếu a[j] > a[j + 1], hai phần tử này đang sai thứ tự nên swap.",
+          method: "Quét j từ 0 đến n - 2 - i. Sau mỗi lượt i, phần tử lớn nhất còn lại nằm đúng ở cuối.",
+          pseudo: String.raw`for i from 0 to n - 1:
+    for j from 0 to n - 2 - i:
+        if a[j] > a[j + 1]:
+            swap a[j], a[j + 1]`,
+          code: String.raw`for (int i = 0; i < n; ++i) {
+    bool changed = false;
+    for (int j = 0; j + 1 < n - i; ++j) {
+        if (a[j] > a[j + 1]) {
+            swap(a[j], a[j + 1]);
+            changed = true;
+        }
+    }
+    if (!changed) break;
+}`
+        },
+        practice: [
+          "In số lần swap của bubble sort trên một mảng nhỏ.",
+          "Dừng sớm khi mảng đã được sort và so sánh số lượt chạy với bản không dừng sớm.",
+          "Dùng bubble sort để kiểm tra ý tưởng trên n <= 100."
+        ]
+      },
+      {
+        title: "Insertion sort",
+        theory: [
+          "Insertion sort duy trì đoạn đầu đã sắp xếp. Khi thêm phần tử mới, ta tìm vị trí đúng trong đoạn đầu và chèn vào.",
+          "Thuật toán này rất nhanh với dữ liệu gần như đã có thứ tự vì mỗi phần tử chỉ phải dịch ít vị trí.",
+          "Độ phức tạp tệ nhất là O(n^2), nhưng bộ nhớ phụ O(1) và cài đặt ngắn.",
+          "Tư duy insertion sort xuất hiện lại trong nhiều bài cần chèn phần tử vào cấu trúc đã có thứ tự."
+        ],
+        example: {
+          title: "Ví dụ: Sắp xếp bằng cách chèn",
+          statement: "Tự cài insertion sort tăng dần.",
+          idea: "Phần tử a[i] được giữ lại trong key, các phần tử lớn hơn key bị dời sang phải.",
+          method: "Duyệt i từ 1. Với mỗi i, kéo key về trái đến khi đứng sau phần tử <= key.",
+          pseudo: String.raw`for i from 1 to n - 1:
+    key <- a[i]
+    j <- i - 1
+    while j >= 0 and a[j] > key:
+        a[j + 1] <- a[j]
+        j <- j - 1
+    a[j + 1] <- key`,
+          code: String.raw`for (int i = 1; i < n; ++i) {
+    int key = a[i];
+    int j = i - 1;
+    while (j >= 0 && a[j] > key) {
+        a[j + 1] = a[j];
+        --j;
+    }
+    a[j + 1] = key;
+}`
+        },
+        practice: [
+          "Đếm số lần dịch phần tử trong insertion sort.",
+          "Kiểm tra insertion sort trên mảng đã tăng, đã giảm và gần tăng.",
+          "Dùng insertion sort cho n nhỏ trong một thuật toán lai."
+        ]
+      },
+      {
+        title: "Merge sort",
+        theory: [
+          "Merge sort là thuật toán chia để trị: chia mảng thành hai nửa, sort từng nửa, rồi trộn hai nửa đã sort.",
+          "Bước merge hoạt động bằng hai con trỏ, luôn lấy phần tử nhỏ hơn ở đầu hai nửa để đưa vào mảng tạm.",
+          "Độ phức tạp luôn O(n log n), ổn định nếu khi bằng nhau ta lấy phần tử bên trái trước.",
+          "Nhược điểm chính là cần mảng phụ O(n). Bù lại, merge sort dễ chứng minh và rất hợp để đếm nghịch thế."
+        ],
+        example: {
+          title: "Ví dụ: Merge hai nửa đã sắp xếp",
+          statement: "Cài merge sort tăng dần.",
+          idea: "Nếu hai nửa đã sort, phần tử nhỏ nhất còn lại chắc chắn nằm ở đầu một trong hai nửa.",
+          method: "Đệ quy đến đoạn một phần tử, sau đó merge ngược lên bằng mảng tạm.",
+          pseudo: String.raw`mergeSort(l, r):
+    if l = r: return
+    mid <- (l + r) / 2
+    mergeSort(l, mid)
+    mergeSort(mid + 1, r)
+    merge two sorted halves`,
+          code: String.raw`void mergeSort(vector<int> &a, int l, int r, vector<int> &tmp) {
+    if (l >= r) return;
+    int mid = (l + r) / 2;
+    mergeSort(a, l, mid, tmp);
+    mergeSort(a, mid + 1, r, tmp);
+
+    int i = l, j = mid + 1, k = l;
+    while (i <= mid && j <= r) {
+        if (a[i] <= a[j]) tmp[k++] = a[i++];
+        else tmp[k++] = a[j++];
+    }
+    while (i <= mid) tmp[k++] = a[i++];
+    while (j <= r) tmp[k++] = a[j++];
+    for (int p = l; p <= r; ++p) a[p] = tmp[p];
+}`
+        },
+        practice: [
+          "Dùng merge sort để đếm số cặp nghịch thế i < j nhưng a[i] > a[j].",
+          "Trộn hai mảng đã sắp xếp thành một mảng tăng dần.",
+          "So sánh bộ nhớ phụ của merge sort với std::sort."
+        ]
+      },
+      {
+        title: "Quick sort",
+        theory: [
+          "Quick sort chọn một pivot, đưa phần tử nhỏ hơn pivot về một phía và lớn hơn pivot về phía còn lại, rồi đệ quy hai phía.",
+          "Trung bình O(n log n), nhưng nếu chọn pivot xấu liên tục có thể thành O(n^2). Vì vậy thường chọn pivot ngẫu nhiên hoặc dùng thư viện.",
+          "Quick sort thường chạy nhanh trong thực tế vì thao tác tại chỗ và cache tốt.",
+          "Khi tự cài, cần cẩn thận vòng while để không kẹt với nhiều phần tử bằng pivot."
+        ],
+        example: {
+          title: "Ví dụ: Partition bằng hai con trỏ",
+          statement: "Cài quick sort tăng dần với pivot giữa đoạn.",
+          idea: "Dịch i đến phần tử >= pivot, dịch j đến phần tử <= pivot, nếu i <= j thì swap để đưa về đúng phía.",
+          method: "Sau partition, đệ quy [l, j] và [i, r].",
+          pseudo: String.raw`quickSort(l, r):
+    i <- l, j <- r, pivot <- a[(l + r) / 2]
+    while i <= j:
+        while a[i] < pivot: i++
+        while a[j] > pivot: j--
+        if i <= j:
+            swap a[i], a[j]
+            i++, j--
+    quickSort(l, j)
+    quickSort(i, r)`,
+          code: String.raw`void quickSort(vector<int> &a, int l, int r) {
+    int i = l, j = r;
+    int pivot = a[l + (r - l) / 2];
+    while (i <= j) {
+        while (a[i] < pivot) ++i;
+        while (a[j] > pivot) --j;
+        if (i <= j) {
+            swap(a[i], a[j]);
+            ++i;
+            --j;
+        }
+    }
+    if (l < j) quickSort(a, l, j);
+    if (i < r) quickSort(a, i, r);
+}`
+        },
+        practice: [
+          "Thử quick sort trên mảng đã tăng và mảng nhiều phần tử bằng nhau.",
+          "Random pivot để giảm rủi ro rơi vào O(n^2).",
+          "Giải thích vì sao partition xong không nhất thiết pivot nằm đúng một vị trí cố định trong bản hai con trỏ."
+        ]
+      },
+      {
+        title: "Heap sort và priority_queue",
+        theory: [
+          "Heap sort đưa các phần tử vào heap, sau đó liên tục lấy phần tử nhỏ nhất hoặc lớn nhất để tạo dãy đã sort.",
+          "Độ phức tạp O(n log n), bộ nhớ có thể O(1) nếu cài heap tại chỗ; dùng priority_queue thì code ngắn nhưng có bộ nhớ phụ.",
+          "Trong thi đấu, heap thường xuất hiện dưới dạng priority_queue cho bài lấy min/max động hơn là yêu cầu tự cài heap sort.",
+          "So với std::sort, heap có cùng bậc O(n log n) nhưng thường chậm hơn nếu chỉ cần sort một lần."
+        ],
+        example: {
+          title: "Ví dụ: Sort bằng min-heap",
+          statement: "Đọc n số, in tăng dần bằng priority_queue min-heap.",
+          idea: "Min-heap luôn đưa phần tử nhỏ nhất còn lại lên đầu.",
+          method: "Đẩy toàn bộ số vào heap, rồi pop từng phần tử để in.",
+          pseudo: String.raw`push all values into min heap
+while heap is not empty:
+    print heap minimum
+    pop heap minimum`,
+          code: String.raw`priority_queue<int, vector<int>, greater<int>> pq;
+for (int x : a) pq.push(x);
+while (!pq.empty()) {
+    cout << pq.top() << ' ';
+    pq.pop();
+}`
+        },
+        practice: [
+          "Dùng priority_queue để in k số lớn nhất.",
+          "So sánh sort toàn bộ với heap khi chỉ cần top k.",
+          "Cài max-heap bằng priority_queue<int> và min-heap bằng greater<int>."
+        ]
+      },
+      {
+        title: "Counting sort và đếm tần suất",
+        theory: [
+          "Counting sort không so sánh hai phần tử. Nó đếm mỗi giá trị xuất hiện bao nhiêu lần rồi trải lại theo thứ tự giá trị.",
+          "Nếu giá trị nằm trong [0, K], dùng cnt[K + 1]. Nếu có số âm nhưng miền nhỏ, dùng offset: cnt[x - minValue].",
+          "Bản đơn giản chỉ in lại theo tần suất. Bản ổn định dùng prefix count để tính vị trí cuối cùng của từng giá trị.",
+          "Counting hiệu quả khi K không quá lớn so với n; nếu K rất lớn và dữ liệu thưa, nên dùng sort hoặc nén số."
+        ],
+        example: {
+          title: "Ví dụ: Sắp xếp điểm 0..10",
+          statement: "Cho n điểm trong đoạn 0..10, in dãy điểm tăng dần.",
+          idea: "Miền giá trị chỉ có 11 số, nên cnt[score] là đủ.",
+          method: "Đếm điểm, rồi duyệt score từ 0 đến 10 và in score cnt[score] lần.",
+          pseudo: String.raw`cnt[0..10] <- 0
+for each score:
+    cnt[score]++
+for score from 0 to 10:
+    repeat cnt[score] times:
+        print score`,
+          code: String.raw`int cnt[11] = {};
+for (int i = 0; i < n; ++i) {
+    int score;
+    cin >> score;
+    cnt[score]++;
+}
+for (int score = 0; score <= 10; ++score) {
+    while (cnt[score]--) cout << score << ' ';
+}`
+        },
+        practice: [
+          "Đếm tần suất chữ số 0..9 trong một dãy.",
+          "Tìm giá trị xuất hiện nhiều nhất khi mọi a[i] nằm trong 0..10^6.",
+          "Sắp xếp các số trong đoạn [-1000, 1000] bằng offset."
+        ]
+      }
+    ],
+    references: [
+      {
+        title: "VNOI Wiki - Thuật toán sắp xếp",
+        url: "https://wiki.vnoi.info/algo/basic/sorting"
+      },
+      {
+        title: "VNOI Wiki - Độ phức tạp thời gian",
+        url: "https://wiki.vnoi.info/algo/basic/computational-complexity.md"
+      }
+    ],
+    primaryIdea: "Ví dụ 1 sort danh sách thí sinh bằng comparator hai tiêu chí: điểm giảm dần, tên tăng dần.",
+    primaryMethod: "Comparator so sánh khóa quan trọng nhất trước; nếu điểm bằng nhau mới so sánh tên.",
     secondExample: {
       title: "Ví dụ 2: Khoảng cách nhỏ nhất giữa hai số",
       statement: "Đọc n số, tìm giá trị nhỏ nhất của |a[i] - a[j]| với i != j.",
@@ -1060,7 +1347,29 @@ int main() {
     cout << ans << '\n';
     return 0;
 }`
-    }
+    },
+    practice: [
+      {
+        title: "Ôn thi LHP 11: Sort nhiều tiêu chí",
+        focus: "Comparator, thứ tự giảm/tăng xen kẽ, xử lý tie-break.",
+        hint: "Viết rõ khóa 1, khóa 2, khóa 3; khóa nào quan trọng hơn thì so sánh trước."
+      },
+      {
+        title: "Ôn thi LHP 11: Đếm tần suất",
+        focus: "Counting với miền nhỏ, tìm mode, tìm số thiếu hoặc số lặp.",
+        hint: "Nếu min/max của giá trị nhỏ, dùng cnt; nếu giá trị lớn nhưng ít phần tử, dùng map hoặc sort rồi đếm nhóm."
+      },
+      {
+        title: "Ôn thi LHP 11: Sort rồi two pointer",
+        focus: "Tìm cặp có tổng S, đếm số cặp thỏa điều kiện.",
+        hint: "Sort tăng dần, đặt l ở đầu và r ở cuối, di chuyển theo tổng hiện tại."
+      },
+      {
+        title: "Ôn thi LHP 11: Loại trùng",
+        focus: "sort + unique hoặc đếm nhóm bằng nhau.",
+        hint: "Sau sort, các phần tử bằng nhau nằm liên tiếp nên chỉ cần duyệt một lần."
+      }
+    ]
   },
   "PrefixSum, Difference array": {
     deepTheory: [
@@ -1167,22 +1476,286 @@ int main() {
   },
   "Math": {
     deepTheory: [
-      "Toán cơ bản trong lập trình gồm chia hết, ước chung, bội chung, nguyên tố và modulo.",
-      "Các tính chất số học giúp thay thử từng khả năng bằng công thức hoặc thuật toán nhanh.",
-      "Modulo giữ số không quá lớn và bảo toàn phép cộng, trừ, nhân theo mod."
+      "Theo VNOI Wiki, nhóm Math ở mức cơ bản thường xoay quanh chia hết, gcd/lcm, số nguyên tố, sàng, phân tích thừa số và modulo.",
+      "Điểm quan trọng là biến một điều kiện tưởng như phải thử rất nhiều khả năng thành công thức hoặc thuật toán nhanh: Euclid O(log n), sàng O(n log log n), phân tích thừa số O(sqrt n).",
+      "GCD là nền cho rút gọn phân số, LCM, kiểm tra nguyên tố cùng nhau và nhiều bài đếm theo chu kỳ.",
+      "Modulo giúp giữ số nhỏ khi tính tổng, tích, lũy thừa hoặc quy hoạch động có đáp án lớn. Các phép cộng, trừ, nhân bảo toàn được theo modulo.",
+      "Trong bài thi chuyên bổ sung lớp 11 chuyên Tin LHP TP.HCM, Math thường xuất hiện dưới dạng kiểm tra chia hết, đếm ước, nguyên tố, gcd của dãy, lcm an toàn và biểu thức lấy modulo."
     ],
     why: [
-      "Nhiều bài có giới hạn lớn nhưng bản chất là tính chất chia hết hoặc đếm theo công thức.",
-      "Hiểu gcd, lcm và prime giúp xử lý phân số, chu kỳ, tối giản và sàng."
+      "Nếu kiểm tra ước bằng cách duyệt 1..n thì rất chậm; nhận ra ước đi theo cặp d và n/d giúp giảm còn O(sqrt n).",
+      "Thuật toán Euclid hoạt động vì tập ước chung của (a, b) giống tập ước chung của (b, a mod b), nên mỗi bước làm số nhỏ đi rất nhanh.",
+      "Sàng Eratosthenes hiệu quả vì mỗi hợp số bị loại bởi một ước nguyên tố nhỏ; ta không cần kiểm tra từng số bằng phép chia đến sqrt.",
+      "Modulo đúng vì nếu hai số có cùng số dư khi chia cho m, các phép cộng, trừ, nhân với chúng cũng cho cùng số dư theo m."
     ],
     method: [
-      "Dùng gcd Euclid thay vì thử ước.",
-      "Dùng sàng khi cần nhiều số nguyên tố đến n.",
-      "Lấy modulo sau mỗi phép cộng hoặc nhân lớn.",
-      "Kiểm tra tràn số khi tính lcm hoặc tích."
+      "Nếu bài hỏi gcd/lcm của hai số hoặc nhiều số, dùng gcd Euclid hoặc std::gcd trong C++17.",
+      "Nếu chỉ kiểm tra một số có nguyên tố không, thử ước đến sqrt(n). Nếu cần nhiều số nguyên tố đến n, dùng sàng.",
+      "Nếu cần phân tích thừa số, chia thử các p từ 2 đến sqrt(n), mỗi khi chia được thì đếm số mũ của p.",
+      "Nếu đề yêu cầu modulo, lấy modulo sau mỗi phép cộng hoặc nhân, và chuẩn hóa phép trừ bằng (x - y + MOD) % MOD.",
+      "Khi tính lcm, dùng a / gcd(a,b) * b thay vì a * b / gcd(a,b) để giảm nguy cơ tràn."
     ],
-    primaryIdea: "Ví dụ 1 dùng sàng Eratosthenes để loại bội số của các số nguyên tố.",
-    primaryMethod: "Nếu p còn prime, đánh dấu các bội từ p * p.",
+    conceptSections: [
+      {
+        title: "Chia hết, ước số và cặp ước",
+        theory: [
+          "b là ước của a khi a chia hết cho b, tức a % b == 0. Đây là phép kiểm tra nền tảng của hầu hết bài số học cơ bản.",
+          "Nếu d là ước của n thì n / d cũng là ước của n. Vì vậy chỉ cần duyệt d đến sqrt(n), ta đã tìm được cả cặp ước.",
+          "Khi d * d == n, chỉ cộng một ước vì d và n / d trùng nhau.",
+          "Cặp ước giúp giảm duyệt 1..n xuống O(sqrt n), rất quan trọng trong bài thi có n lớn."
+        ],
+        example: {
+          title: "Ví dụ: Đếm số ước của n",
+          statement: "Đọc n, in số lượng ước dương của n.",
+          idea: "Duyệt d từ 1 đến sqrt(n). Nếu d chia hết n, ta có cặp d và n / d.",
+          method: "Cộng 2 cho mỗi cặp khác nhau, cộng 1 nếu d * d == n.",
+          pseudo: String.raw`read n
+answer <- 0
+for d from 1 while d * d <= n:
+    if n mod d = 0:
+        if d * d = n: answer <- answer + 1
+        else: answer <- answer + 2
+print answer`,
+          code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    long long n;
+    cin >> n;
+    long long ans = 0;
+    for (long long d = 1; d * d <= n; ++d) {
+        if (n % d == 0) {
+            ans += (d * d == n ? 1 : 2);
+        }
+    }
+    cout << ans << '\n';
+    return 0;
+}`
+        },
+        practice: [
+          "In tất cả ước của n theo thứ tự tăng dần.",
+          "Kiểm tra n có đúng 3 ước hay không.",
+          "Tìm ước lớn nhất nhỏ hơn n."
+        ]
+      },
+      {
+        title: "GCD, LCM và thuật toán Euclid",
+        theory: [
+          "GCD của a và b là ước dương lớn nhất chia hết cả hai số.",
+          "Thuật toán Euclid dùng công thức gcd(a,b)=gcd(b,a mod b) và dừng khi b = 0.",
+          "Độ phức tạp O(log min(a,b)), nhanh hơn rất nhiều so với thử mọi ước.",
+          "LCM liên hệ với GCD qua công thức lcm(a,b)=a/gcd(a,b)*b. Nên chia trước rồi nhân để tránh tràn."
+        ],
+        example: {
+          title: "Ví dụ: GCD của cả dãy",
+          statement: "Cho n số, tìm gcd của toàn bộ dãy.",
+          idea: "gcd có tính kết hợp: gcd(a,b,c)=gcd(gcd(a,b),c).",
+          method: "Khởi tạo g = 0, lần lượt cập nhật g = gcd(g, x).",
+          pseudo: String.raw`g <- 0
+for each x in array:
+    g <- gcd(g, x)
+print g`,
+          code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    long long g = 0;
+    for (int i = 0; i < n; ++i) {
+        long long x;
+        cin >> x;
+        g = gcd(g, x);
+    }
+    cout << g << '\n';
+    return 0;
+}`
+        },
+        practice: [
+          "Rút gọn phân số a/b.",
+          "Tìm lcm của hai số bằng a / gcd(a,b) * b.",
+          "Cho dãy n số, kiểm tra gcd của cả dãy có lớn hơn 1 không."
+        ]
+      },
+      {
+        title: "Kiểm tra số nguyên tố",
+        theory: [
+          "Số nguyên tố là số tự nhiên có đúng hai ước dương: 1 và chính nó.",
+          "Nếu n có một ước khác 1 và n, thì n có ít nhất một ước không vượt sqrt(n). Do đó chỉ cần thử d * d <= n.",
+          "Cần loại n < 2 trước, vì 0 và 1 không phải số nguyên tố.",
+          "Kiểm tra từng số bằng O(sqrt n) hợp khi số lượng truy vấn ít. Nếu có nhiều truy vấn, nên dùng sàng."
+        ],
+        example: {
+          title: "Ví dụ: Hàm isPrime",
+          statement: "Đọc n, in YES nếu n là số nguyên tố.",
+          idea: "Không cần thử đến n - 1, chỉ thử đến sqrt(n).",
+          method: "Nếu n < 2 trả false. Duyệt d từ 2, nếu n % d == 0 thì không nguyên tố.",
+          pseudo: String.raw`isPrime(n):
+    if n < 2: return false
+    for d from 2 while d * d <= n:
+        if n mod d = 0: return false
+    return true`,
+          code: String.raw`bool isPrime(long long n) {
+    if (n < 2) return false;
+    for (long long d = 2; d * d <= n; ++d) {
+        if (n % d == 0) return false;
+    }
+    return true;
+}`
+        },
+        practice: [
+          "Đếm số nguyên tố trong n số đã nhập.",
+          "Tìm số nguyên tố nhỏ nhất lớn hơn hoặc bằng x.",
+          "Kiểm tra một số có đúng 3 ước hay không bằng căn bậc hai và isPrime."
+        ]
+      },
+      {
+        title: "Sàng Eratosthenes",
+        theory: [
+          "Sàng dùng mảng isPrime để đánh dấu số nào còn là nguyên tố trong đoạn 0..n.",
+          "Ban đầu coi mọi số từ 2 trở lên là nguyên tố. Với mỗi p còn nguyên tố, đánh dấu các bội của p là hợp số.",
+          "Bắt đầu đánh dấu từ p * p vì các bội nhỏ hơn đã có ước nguyên tố nhỏ hơn p xử lý trước đó.",
+          "Độ phức tạp thường dùng là O(n log log n), rất phù hợp khi cần trả lời nhiều truy vấn nguyên tố."
+        ],
+        example: {
+          title: "Ví dụ: In số nguyên tố đến n",
+          statement: "Đọc n, in mọi số nguyên tố không vượt quá n.",
+          idea: "Sàng trước toàn bộ đoạn 0..n, sau đó duyệt in các vị trí còn true.",
+          method: "Đánh dấu 0 và 1 là false, rồi với mỗi p từ 2 đến sqrt(n), đánh dấu bội từ p * p.",
+          pseudo: String.raw`isPrime[0] <- false, isPrime[1] <- false
+for p from 2 while p * p <= n:
+    if isPrime[p]:
+        for x from p * p to n step p:
+            isPrime[x] <- false
+print all i where isPrime[i] is true`,
+          code: String.raw`vector<bool> isPrime(n + 1, true);
+if (n >= 0) isPrime[0] = false;
+if (n >= 1) isPrime[1] = false;
+
+for (long long p = 2; p * p <= n; ++p) {
+    if (isPrime[p]) {
+        for (long long x = p * p; x <= n; x += p) {
+            isPrime[x] = false;
+        }
+    }
+}`
+        },
+        practice: [
+          "Có q truy vấn x, trả lời x có nguyên tố không.",
+          "Đếm số nguyên tố trong đoạn [l, r] bằng prefix trên isPrime.",
+          "Tìm tổng các số nguyên tố không vượt n."
+        ]
+      },
+      {
+        title: "Modulo cơ bản",
+        theory: [
+          "a mod m là số dư của a khi chia cho m. Hai số đồng dư modulo m nếu chúng có cùng số dư khi chia cho m.",
+          "Nếu a và b được thay bằng số dư của chúng, phép cộng, trừ, nhân vẫn cho cùng kết quả modulo m.",
+          "Với biểu thức lớn, nên lấy modulo sau từng phép toán để tránh tràn số và giữ giá trị nhỏ.",
+          "Phép trừ cần chuẩn hóa: (a - b + MOD) % MOD để không bị số âm trong C++."
+        ],
+        example: {
+          title: "Ví dụ: Tính tổng bình phương modulo",
+          statement: "Cho n số, tính tổng x^2 modulo 1e9+7.",
+          idea: "Mỗi x có thể lớn, nên lấy x %= MOD rồi nhân bằng long long.",
+          method: "Cộng từng x*x vào ans và lấy modulo sau mỗi lần cộng.",
+          pseudo: String.raw`MOD <- 1000000007
+answer <- 0
+for each x:
+    x <- x mod MOD
+    answer <- (answer + x * x) mod MOD
+print answer`,
+          code: String.raw`const long long MOD = 1000000007;
+long long ans = 0;
+for (int i = 0; i < n; ++i) {
+    long long x;
+    cin >> x;
+    x %= MOD;
+    ans = (ans + x * x) % MOD;
+}
+cout << ans << '\n';`
+        },
+        practice: [
+          "Tính tổng n số modulo MOD.",
+          "Tính tích n số modulo MOD.",
+          "Tính biểu thức (a - b + c) modulo MOD, chú ý kết quả không âm."
+        ]
+      },
+      {
+        title: "Phân tích thừa số nguyên tố",
+        theory: [
+          "Phân tích thừa số nguyên tố viết n thành tích p1^e1 * p2^e2 * ... với các p là nguyên tố.",
+          "Cách cơ bản là thử chia p từ 2 đến sqrt(n). Khi n chia hết cho p, chia liên tục để đếm số mũ.",
+          "Sau vòng lặp, nếu n > 1 thì phần còn lại là một thừa số nguyên tố.",
+          "Từ phân tích thừa số, số ước của n là tích (ei + 1)."
+        ],
+        example: {
+          title: "Ví dụ: Tính số ước bằng phân tích thừa số",
+          statement: "Đọc n, in số lượng ước dương của n.",
+          idea: "Nếu n = p1^e1 * p2^e2 * ... thì mỗi ước chọn số mũ từ 0..ei, nên có tích (ei + 1) cách.",
+          method: "Phân tích n, nhân đáp án với exp + 1 cho từng thừa số.",
+          pseudo: String.raw`answer <- 1
+for p from 2 while p * p <= n:
+    if n mod p = 0:
+        exp <- 0
+        while n mod p = 0:
+            n <- n / p
+            exp <- exp + 1
+        answer <- answer * (exp + 1)
+if n > 1:
+    answer <- answer * 2
+print answer`,
+          code: String.raw`long long countDivisors(long long n) {
+    long long ans = 1;
+    for (long long p = 2; p * p <= n; ++p) {
+        if (n % p == 0) {
+            int exp = 0;
+            while (n % p == 0) {
+                n /= p;
+                exp++;
+            }
+            ans *= (exp + 1);
+        }
+    }
+    if (n > 1) ans *= 2;
+    return ans;
+}`
+        },
+        practice: [
+          "Phân tích n và in từng cặp p^e.",
+          "Tính số ước của từng số trong một danh sách nhỏ.",
+          "Kiểm tra n có phải số chính phương bằng số mũ trong phân tích thừa số."
+        ]
+      }
+    ],
+    references: [
+      {
+        title: "VNOI Wiki - Thuật toán Euclid",
+        url: "https://wiki.vnoi.info/algo/algebra/euclid"
+      },
+      {
+        title: "VNOI Wiki - Modulo cơ bản",
+        url: "https://wiki.vnoi.info/algo/math/modulo"
+      },
+      {
+        title: "VNOI Wiki - Kiểm tra số nguyên tố",
+        url: "https://wiki.vnoi.info/algo/algebra/primality_check.md"
+      },
+      {
+        title: "VNOI Wiki - Sàng nguyên tố",
+        url: "https://wiki.vnoi.info/algo/algebra/prime_sieve.md"
+      },
+      {
+        title: "VNOI Wiki - Phân tích thừa số nguyên tố",
+        url: "https://wiki.vnoi.info/algo/math/integer-factorization"
+      },
+      {
+        title: "VNOI Wiki - Số các ước và Tổng các ước",
+        url: "https://wiki.vnoi.info/algo/math/divisors"
+      }
+    ],
+    primaryIdea: "Ví dụ 1 dùng gcd để rút gọn phân số a/b, vì chia cả tử và mẫu cho cùng ƯCLN sẽ giữ giá trị phân số.",
+    primaryMethod: "Tính g = gcd(abs(a), abs(b)), chia cả a và b cho g, sau đó chuẩn hóa mẫu dương.",
     secondExample: {
       title: "Ví dụ 2: Tính LCM",
       statement: "Đọc a, b, in bội chung nhỏ nhất của hai số.",
@@ -1202,7 +1775,29 @@ int main() {
     cout << a / g * b << '\n';
     return 0;
 }`
-    }
+    },
+    practice: [
+      {
+        title: "Ôn thi LHP 11: GCD của dãy",
+        focus: "Dùng gcd kết hợp, rút gọn hoặc kiểm tra chia hết chung.",
+        hint: "Khởi tạo g = 0, với mỗi x cập nhật g = gcd(g, x)."
+      },
+      {
+        title: "Ôn thi LHP 11: Nguyên tố và sàng",
+        focus: "Kiểm tra nhiều số có nguyên tố không, đếm số nguyên tố trong đoạn.",
+        hint: "Nếu có nhiều truy vấn đến cùng giới hạn n, sàng một lần rồi trả lời O(1)."
+      },
+      {
+        title: "Ôn thi LHP 11: Số ước",
+        focus: "Duyệt cặp ước hoặc phân tích thừa số nguyên tố.",
+        hint: "Với một n đơn lẻ, duyệt d*d <= n là đủ; với nhiều số, cân nhắc sàng ước nhỏ nhất."
+      },
+      {
+        title: "Ôn thi LHP 11: Biểu thức modulo",
+        focus: "Cộng, trừ, nhân và chuẩn hóa số dư.",
+        hint: "Sau phép trừ dùng (x - y + MOD) % MOD để tránh kết quả âm."
+      }
+    ]
   },
   "Binary Search": {
     deepTheory: [

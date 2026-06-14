@@ -475,6 +475,10 @@ pre {
   margin-top: 28px;
 }
 
+.reference-section {
+  margin-top: 2px;
+}
+
 .quick-example-section {
   margin-top: 2px;
 }
@@ -647,6 +651,31 @@ pre {
 
 .practice-card strong {
   color: var(--rose);
+}
+
+.reference-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reference-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--teal);
+  background: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.reference-link:hover {
+  border-color: var(--teal);
+  background: rgba(39, 122, 118, 0.06);
 }
 
 .example-panel {
