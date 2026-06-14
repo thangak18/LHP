@@ -2780,6 +2780,21 @@ function renderSlide() {
     return renderCodeBlock(label, codeIndex, className);
   };
   const conceptsMarkup = conceptSectionsMarkup(guide.conceptSections || [], addCode);
+  const theoryMarkup = `
+    <div class="full-flow">
+      ${detailBlock("Lý thuyết chi tiết", detailedTheory, "theory-list")}
+      ${conceptsMarkup}
+      ${quickExamplesMarkup(guide.quickExamples || [])}
+      ${detailBlock("Vì sao thuật toán hoạt động", guide.why || [], "why-list")}
+      ${detailBlock("Phương pháp sử dụng", guide.method || [], "method-list")}
+      ${referencesMarkup(guide.references || [])}
+
+      <section>
+        <h4 class="section-title">Ghi nhớ</h4>
+        ${listMarkup(topic.notes, "note-list")}
+      </section>
+    </div>
+  `;
   const examplesMarkup = examples.map((example, index) => `
     <section class="example-panel">
       <div class="example-heading">
@@ -2839,24 +2854,14 @@ function renderSlide() {
           <h4 class="section-title">Định nghĩa</h4>
           <p class="definition">${escapeHtml(topic.definition)}</p>
         </section>
-
-        ${detailBlock("Lý thuyết chi tiết", detailedTheory, "theory-list")}
-        ${conceptsMarkup}
-        ${quickExamplesMarkup(guide.quickExamples || [])}
-        ${detailBlock("Vì sao thuật toán hoạt động", guide.why || [], "why-list")}
-        ${detailBlock("Phương pháp sử dụng", guide.method || [], "method-list")}
-        ${referencesMarkup(guide.references || [])}
-
-        <section>
-          <h4 class="section-title">Ghi nhớ</h4>
-          ${listMarkup(topic.notes, "note-list")}
-        </section>
       </div>
 
       <aside class="visual-panel">
         ${renderVisual(topic)}
       </aside>
     </div>
+
+    ${theoryMarkup}
 
     <section class="examples-section">
       <h4 class="section-title">2 ví dụ áp dụng</h4>

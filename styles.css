@@ -356,8 +356,10 @@ button {
 
 .slide-grid > *,
 .content-flow,
+.full-flow,
 .visual-panel,
 .content-flow section,
+.full-flow section,
 .visual-panel section,
 .concept-section,
 .concept-card,
@@ -375,6 +377,12 @@ pre {
 .content-flow {
   display: grid;
   gap: 22px;
+}
+
+.full-flow {
+  display: grid;
+  gap: 22px;
+  margin-top: 26px;
 }
 
 .section-title {
