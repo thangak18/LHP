@@ -369,6 +369,10 @@ button {
 .examples-section,
 .example-panel,
 .example-code-grid > *,
+.practice-card,
+.practice-detail-grid > *,
+.practice-sample-grid > *,
+.practice-code-grid > *,
 .code-shell,
 pre {
   min-width: 0;
@@ -638,27 +642,67 @@ pre {
   gap: 14px;
 }
 
+.practice-grid.has-solved {
+  grid-template-columns: 1fr;
+}
+
 .practice-card {
   min-width: 0;
-  padding: 14px;
+  display: grid;
+  gap: 12px;
+  padding: 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #ffffff;
 }
 
 .practice-card h5 {
-  margin: 0 0 8px;
+  margin: 0;
   color: var(--ink);
   font-size: 1rem;
 }
 
 .practice-card p {
-  margin: 6px 0 0;
+  margin: 0;
   color: #37322c;
 }
 
 .practice-card strong {
   color: var(--rose);
+}
+
+.practice-statement {
+  padding-left: 12px;
+  border-left: 3px solid var(--teal);
+}
+
+.practice-detail-grid,
+.practice-sample-grid,
+.practice-code-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.practice-detail-grid > div {
+  padding: 12px;
+  border-radius: var(--radius);
+  background: rgba(39, 122, 118, 0.06);
+}
+
+.practice-detail-grid > div:nth-child(2) {
+  background: rgba(199, 111, 66, 0.07);
+}
+
+.practice-detail-grid strong,
+.practice-sample-grid strong,
+.practice-code-grid strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .reference-list {
@@ -980,7 +1024,10 @@ code {
   .example-detail-grid,
   .example-code-grid,
   .quick-example-grid,
-  .practice-grid {
+  .practice-grid,
+  .practice-detail-grid,
+  .practice-sample-grid,
+  .practice-code-grid {
     grid-template-columns: 1fr;
   }
 

@@ -2495,7 +2495,19 @@ function topicMatches(topic) {
       item.example?.code,
       ...(item.practice || [])
     ].join(" ")),
-    ...(guide.practice || []).map((item) => `${item.title} ${item.focus} ${item.hint}`),
+    ...(guide.practice || []).map((item) => [
+      item.title,
+      item.focus,
+      item.hint,
+      item.statement,
+      item.idea,
+      item.method,
+      item.explanation,
+      item.sampleInput,
+      item.sampleOutput,
+      item.pseudo,
+      item.code
+    ].join(" ")),
     ...(guide.references || []).map((item) => `${item.title} ${item.url}`)
   ].filter(Boolean);
   const haystack = [
@@ -2660,17 +2672,68 @@ function quickExamplesMarkup(items) {
   `;
 }
 
-function practiceMarkup(items) {
+function practiceMarkup(items, addCode) {
   if (!items || !items.length) return "";
+  const hasSolvedItems = items.some((item) => item.statement || item.idea || item.method || item.explanation || item.sampleInput || item.sampleOutput || item.pseudo || item.code);
   return `
     <section class="practice-section">
-      <h4 class="section-title">Bài tập gợi ý</h4>
-      <div class="practice-grid">
+      <h4 class="section-title">${hasSolvedItems ? "Bài tập giải mẫu" : "Bài tập gợi ý"}</h4>
+      <div class="practice-grid ${hasSolvedItems ? "has-solved" : ""}">
         ${items.map((item) => `
           <article class="practice-card">
             <h5>${escapeHtml(item.title)}</h5>
-            <p><strong>Trọng tâm:</strong> ${escapeHtml(item.focus)}</p>
-            <p><strong>Gợi ý:</strong> ${escapeHtml(item.hint)}</p>
+            ${item.statement ? `<p class="practice-statement">${escapeHtml(item.statement)}</p>` : ""}
+            ${item.focus ? `<p><strong>Trọng tâm:</strong> ${escapeHtml(item.focus)}</p>` : ""}
+            ${item.hint ? `<p><strong>Gợi ý:</strong> ${escapeHtml(item.hint)}</p>` : ""}
+            ${item.idea || item.method ? `
+              <div class="practice-detail-grid">
+                ${item.idea ? `
+                  <div>
+                    <strong>Ý tưởng</strong>
+                    <p>${escapeHtml(item.idea)}</p>
+                  </div>
+                ` : ""}
+                ${item.method ? `
+                  <div>
+                    <strong>Phương pháp</strong>
+                    <p>${escapeHtml(item.method)}</p>
+                  </div>
+                ` : ""}
+              </div>
+            ` : ""}
+            ${item.sampleInput || item.sampleOutput ? `
+              <div class="practice-sample-grid">
+                ${item.sampleInput ? `
+                  <div>
+                    <strong>Input mẫu</strong>
+                    ${addCode(`Input mẫu ${item.title}`, item.sampleInput, "sample")}
+                  </div>
+                ` : ""}
+                ${item.sampleOutput ? `
+                  <div>
+                    <strong>Output mẫu</strong>
+                    ${addCode(`Output mẫu ${item.title}`, item.sampleOutput, "sample")}
+                  </div>
+                ` : ""}
+              </div>
+            ` : ""}
+            ${item.explanation ? `<p><strong>Giải thích mẫu:</strong> ${escapeHtml(item.explanation)}</p>` : ""}
+            ${item.pseudo || item.code ? `
+              <div class="practice-code-grid">
+                ${item.pseudo ? `
+                  <div>
+                    <strong>Mã giả</strong>
+                    ${addCode(`Mã giả ${item.title}`, item.pseudo, "pseudo")}
+                  </div>
+                ` : ""}
+                ${item.code ? `
+                  <div>
+                    <strong>Code mẫu C++17</strong>
+                    ${addCode(`C++17 ${item.title}`, item.code)}
+                  </div>
+                ` : ""}
+              </div>
+            ` : ""}
           </article>
         `).join("")}
       </div>
@@ -2870,7 +2933,7 @@ function renderSlide() {
       </div>
     </section>
 
-    ${practiceMarkup(guide.practice || [])}
+    ${practiceMarkup(guide.practice || [], addCode)}
   `;
 
   const codeBlocks = slide.querySelectorAll(".code-shell code");
