@@ -7,7 +7,7 @@ Web tĩnh HTML/CSS/JS thuần, trình bày các module lý thuyết trong roadma
 - Level 2: 8 chủ đề thuật toán quan trọng, kèm danh sách OJ Level 2.
 - Level 3: 13 chủ đề thuật toán cao cấp.
 
-Mỗi chủ đề có định nghĩa, lý thuyết chi tiết, giải thích vì sao thuật toán hoạt động, phương pháp sử dụng, 2 ví dụ áp dụng, mã giả và code C++17 mẫu. Riêng Level 2 có thêm danh sách 202 bài duy nhất từ roadmap OJ, bộ lọc theo dạng bài và code mẫu theo nhóm thuật toán.
+Mỗi chủ đề có định nghĩa, lý thuyết chi tiết, giải thích vì sao thuật toán hoạt động, phương pháp sử dụng, 2 ví dụ áp dụng, mã giả và code C++17 mẫu. Riêng Level 2 có thêm danh sách 202 bài duy nhất từ roadmap OJ, bộ lọc theo dạng bài, code mẫu theo nhóm thuật toán, và hướng dẫn từng bài cho hai mô-đun luyện tập tổng hợp/tổng hợp cấp tốc.
 
 Một số phần được tham khảo và diễn giải lại từ VNOI Wiki, đặc biệt là các bài về đệ quy và quay lui, tham lam, tổng quan cấu trúc dữ liệu, mảng và danh sách liên kết, bảng băm.
 

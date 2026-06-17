@@ -1228,7 +1228,7 @@ code {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
-  align-items: center;
+  align-items: start;
   min-width: 0;
   padding: 12px;
   border: 1px solid var(--line-soft);
@@ -1290,6 +1290,76 @@ code {
   background: rgba(79, 98, 146, 0.1);
   font-size: 0.78rem;
   font-weight: 850;
+}
+
+.oj-problem-solution {
+  grid-column: 1 / -1;
+  min-width: 0;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 10px;
+}
+
+.oj-problem-solution summary {
+  cursor: pointer;
+  color: var(--rose);
+  font-weight: 900;
+}
+
+.oj-solution-body {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.oj-solution-block {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.oj-solution-block > strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.oj-solution-block p {
+  margin: 0;
+  color: #37322c;
+}
+
+.oj-solution-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.oj-solution-list li {
+  position: relative;
+  padding-left: 18px;
+  color: #37322c;
+}
+
+.oj-solution-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+}
+
+.oj-solution-block .code-shell {
+  margin-top: 8px;
 }
 
 @media (max-width: 980px) {

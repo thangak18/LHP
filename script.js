@@ -3216,6 +3216,168 @@ function inferLevel2OjPattern(problem, moduleTitle) {
   return "general";
 }
 
+function shouldShowLevel2OjProblemSolution(moduleTitle) {
+  const title = normalizeOjText(moduleTitle);
+  return title.includes("luyen tap tong hop") || title.includes("tong hop cap toc");
+}
+
+function getLevel2OjProblemSolution(problem, patternKey) {
+  const cleanTitle = problem.title.replace(/^\s*\d+\.\s*/, "");
+  const templates = {
+    binary: {
+      idea: `Với bài ${cleanTitle}, trước hết hãy tìm xem đề đang hỏi vị trí, số lượng hay một giá trị tối ưu. Nếu khi tăng đáp án thử mà điều kiện chuyển một chiều, dùng binary search on answer; nếu dữ liệu đã sort, dùng lower_bound/upper_bound.`,
+      steps: [
+        "Đọc giới hạn để quyết định O(log n), O(n log n) hay O(n log V).",
+        "Xác định miền tìm kiếm: chỉ số trong mảng, giá trị đáp án, hoặc khoảng cách/chi phí.",
+        "Viết hàm kiểm tra can(mid) thật rõ nếu tìm trên đáp án.",
+        "Chạy binary search, sau đó tự kiểm tra lại đáp án ở biên trái/phải."
+      ],
+      testAnalysis: [
+        "Test nhỏ nhất: n = 1 hoặc chỉ có một đáp án hợp lệ.",
+        "Test biên: đáp án nằm đúng ở l hoặc r.",
+        "Test lặp giá trị: nếu dùng lower_bound/upper_bound, kiểm tra phần tử trùng nhau.",
+        "Với sample của đề, ghi lại từng lần mid và kết quả can(mid) để xem hướng thu hẹp biên có đúng không."
+      ]
+    },
+    compression: {
+      idea: `Bài ${cleanTitle} có dấu hiệu giá trị lớn, tọa độ rời rạc hoặc cần đếm theo đoạn. Ta giữ thứ tự bằng cách nén giá trị về rank nhỏ rồi xử lý bằng mảng, prefix, Fenwick hoặc map.`,
+      steps: [
+        "Gom tất cả giá trị xuất hiện trong mảng, truy vấn và các mốc biên quan trọng.",
+        "Sort, unique để tạo danh sách giá trị phân biệt.",
+        "Đổi mỗi giá trị gốc sang rank bằng lower_bound.",
+        "Xử lý bài toán trên rank, nhưng khi cần độ dài thật thì dùng lại giá trị gốc trong mảng values."
+      ],
+      testAnalysis: [
+        "Test có số âm, số rất lớn và giá trị trùng nhau.",
+        "Test chỉ có một giá trị phân biệt.",
+        "Test đoạn chạm nhau ở biên để kiểm tra có cần thêm l - 1 hoặc r + 1 không.",
+        "Với sample của đề, tự lập bảng value -> rank rồi so sánh từng thao tác sau nén."
+      ]
+    },
+    stack: {
+      idea: `Bài ${cleanTitle} nên nghĩ theo trạng thái mới nhất chưa xử lý. Nếu bài có thao tác cuối dãy, ngoặc, undo hoặc phần tử gần nhất, stack thường giúp thay vòng lặp lồng nhau bằng O(n).`,
+      steps: [
+        "Xác định stack lưu giá trị hay chỉ số.",
+        "Trước mỗi top/pop phải kiểm tra stack có rỗng không.",
+        "Nếu là monotonic stack, chọn stack tăng hay giảm theo yêu cầu gần nhất lớn hơn/nhỏ hơn.",
+        "Mỗi phần tử chỉ push một lần và pop tối đa một lần."
+      ],
+      testAnalysis: [
+        "Test stack rỗng rồi pop/top để tránh runtime error.",
+        "Test dãy tăng hẳn và giảm hẳn để kiểm tra monotonic stack.",
+        "Test ngoặc lồng nhau hoặc sai ngay từ ký tự đầu.",
+        "Với sample của đề, vẽ cột stack sau từng thao tác push/pop."
+      ]
+    },
+    queue: {
+      idea: `Bài ${cleanTitle} có thể cần xử lý theo thứ tự đến trước, cửa sổ trượt hoặc chọn phần tử ưu tiên nhất. Queue, deque và priority_queue giúp giữ đúng thứ tự động trong lúc duyệt.`,
+      steps: [
+        "Dùng queue nếu phần tử vào trước phải được xử lý trước.",
+        "Dùng deque nếu cần thêm/xóa hai đầu hoặc lấy max/min cửa sổ trượt.",
+        "Dùng priority_queue nếu mỗi bước cần lấy phần tử nhỏ/lớn nhất hiện tại.",
+        "Lưu chỉ số khi cần biết phần tử đã ra khỏi cửa sổ hay chưa."
+      ],
+      testAnalysis: [
+        "Test hàng đợi chỉ có một phần tử.",
+        "Test nhiều phần tử cùng độ ưu tiên.",
+        "Test cửa sổ k = 1 và k = n.",
+        "Với sample của đề, ghi lại nội dung queue/deque/heap sau từng bước xử lý."
+      ]
+    },
+    mitm: {
+      idea: `Bài ${cleanTitle} có dạng chọn hoặc không chọn nhiều phần tử nhưng n không quá lớn. Chia đôi tập giúp biến 2^n thành hai danh sách 2^(n/2), sau đó ghép bằng sort và binary search.`,
+      steps: [
+        "Chia mảng thành hai nửa trái/phải.",
+        "Sinh toàn bộ tổng hoặc trạng thái của từng nửa.",
+        "Sort một danh sách để ghép nhanh bằng equal_range, lower_bound hoặc two pointers.",
+        "Dùng long long cho tổng và số cách."
+      ],
+      testAnalysis: [
+        "Test n nhỏ để so sánh với brute force 2^n.",
+        "Test target bằng 0 hoặc lớn hơn tổng toàn bộ.",
+        "Test có nhiều tập con cho cùng một tổng để kiểm tra đếm trùng.",
+        "Với sample của đề, liệt kê tổng nửa trái và nửa phải rồi ghép từng cặp."
+      ]
+    },
+    math: {
+      idea: `Bài ${cleanTitle} nên tách về công thức số học: gcd, đồng dư, lũy thừa nhanh, nhân modulo lớn, nguyên tố hoặc nghiệm phương trình. Điểm quan trọng là tránh tràn số và xử lý điều kiện tồn tại.`,
+      steps: [
+        "Rút gọn bài toán về công thức hoặc tính chất chia hết.",
+        "Dùng gcd/extended gcd khi có phương trình tuyến tính hoặc nghịch đảo modulo.",
+        "Dùng __int128 cho phép nhân khi giá trị có thể tới 1e18.",
+        "Chuẩn hóa modulo âm bằng (x % mod + mod) % mod."
+      ],
+      testAnalysis: [
+        "Test số nhỏ để tính tay.",
+        "Test trường hợp không có nghiệm, ví dụ c không chia hết cho gcd(a, b).",
+        "Test giá trị gần 1e18 để phát hiện tràn số.",
+        "Với sample của đề, thay từng biến vào công thức trước khi code."
+      ]
+    },
+    prefix: {
+      idea: `Bài ${cleanTitle} thường cần trả lời nhanh tổng/đếm trên đoạn, tìm cặp sau khi sort hoặc gom tần suất. Hãy tiền xử lý prefix, sort hoặc bảng đếm để mỗi truy vấn không phải duyệt lại từ đầu.`,
+      steps: [
+        "Nếu hỏi tổng đoạn, tạo prefix sum 1-based.",
+        "Nếu hỏi cặp, sort rồi dùng two pointers hoặc binary search.",
+        "Nếu hỏi số lần xuất hiện, dùng map/unordered_map hoặc mảng đếm sau nén.",
+        "So sánh với brute force trên test nhỏ để bắt lỗi lệch chỉ số."
+      ],
+      testAnalysis: [
+        "Test đoạn bắt đầu ở 1 hoặc kết thúc ở n.",
+        "Test toàn bộ phần tử bằng nhau.",
+        "Test số âm nếu đề cho phép, vì tổng/prefix có thể giảm.",
+        "Với sample của đề, lập bảng prefix hoặc tần suất rồi đối chiếu từng truy vấn."
+      ]
+    },
+    general: {
+      idea: `Bài ${cleanTitle} nằm trong nhóm tổng hợp nên bước quan trọng nhất là nhận dạng dạng bài từ giới hạn dữ liệu. Hãy thử viết brute force cho test nhỏ, sau đó thay bằng sort, prefix, map, stack, queue hoặc binary search tùy dấu hiệu.`,
+      steps: [
+        "Đọc kỹ input/output và ghi lại n, q, miền giá trị lớn nhất.",
+        "Ước lượng độ phức tạp được phép: n <= 1e5 thường cần O(n log n) hoặc O(n).",
+        "Tách solve(), đặt tên biến theo đúng ý nghĩa trong đề.",
+        "Nếu chưa chắc thuật toán, tạo brute force cho test nhỏ để so đáp án."
+      ],
+      testAnalysis: [
+        "Test nhỏ nhất để kiểm tra đọc/in đúng định dạng.",
+        "Test có đáp án rỗng hoặc không tồn tại nếu đề cho phép.",
+        "Test toàn giá trị bằng nhau, tăng dần, giảm dần.",
+        "Với sample của đề, mô phỏng từng bước bằng bảng trước khi chạy code."
+      ]
+    }
+  };
+
+  return templates[patternKey] || templates.general;
+}
+
+function renderLevel2OjProblemSolution(problem, moduleTitle, patternKey, addCode) {
+  if (!shouldShowLevel2OjProblemSolution(moduleTitle)) return "";
+  const pattern = level2OjPatterns[patternKey];
+  const solution = getLevel2OjProblemSolution(problem, patternKey);
+  return `
+    <details class="oj-problem-solution">
+      <summary>Hướng dẫn giải bài này</summary>
+      <div class="oj-solution-body">
+        <div class="oj-solution-block">
+          <strong>Ý tưởng</strong>
+          <p>${escapeHtml(solution.idea)}</p>
+        </div>
+        <div class="oj-solution-block">
+          <strong>Cách làm</strong>
+          ${listMarkup(solution.steps, "oj-solution-list")}
+        </div>
+        <div class="oj-solution-block">
+          <strong>Phân tích test case</strong>
+          ${listMarkup(solution.testAnalysis, "oj-solution-list")}
+        </div>
+        <div class="oj-solution-block">
+          <strong>Code C++17 mẫu (${escapeHtml(pattern.title)})</strong>
+          ${addCode(`C++17 ${problem.title}`, pattern.code)}
+        </div>
+      </div>
+    </details>
+  `;
+}
+
 function renderLevel2OjGuide(addCode) {
   const data = window.level2Oj;
   if (!data?.modules?.length) return "";
@@ -3259,6 +3421,7 @@ function renderLevel2OjGuide(addCode) {
             const pattern = level2OjPatterns[patternKey];
             const href = `https://oj.uniedu.vn${problem.href}`;
             const searchText = `${module.title} ${problem.title} ${problem.href} ${pattern.title}`.toLowerCase();
+            const solutionMarkup = renderLevel2OjProblemSolution(problem, module.title, patternKey, addCode);
             return `
               <article class="oj-problem-card" data-oj-card data-oj-pattern="${patternKey}" data-oj-search="${escapeHtml(searchText)}">
                 <div class="oj-problem-main">
@@ -3274,6 +3437,7 @@ function renderLevel2OjGuide(addCode) {
                   ${problem.ac ? `<span>${escapeHtml(problem.ac)} AC</span>` : ""}
                   <a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">Mở đề gốc</a>
                 </div>
+                ${solutionMarkup}
               </article>
             `;
           }).join("")}
@@ -3308,7 +3472,7 @@ function renderLevel2OjGuide(addCode) {
       </div>
 
       <div class="oj-note">
-        <strong>Cách dùng:</strong> mở đề gốc trên OJ để đọc input/output chi tiết, chọn đúng nhóm gợi ý, rồi chỉnh code mẫu theo biến và điều kiện của đề.
+        <strong>Cách dùng:</strong> trong hai mô-đun Luyện tập tổng hợp và Tổng hợp cấp tốc, mở từng bài để xem ý tưởng, cách làm, phân tích test case và code C++17 mẫu. Code là khung theo dạng bài, cần chỉnh biến/input/output theo đề gốc.
       </div>
 
       <div class="oj-pattern-grid">
