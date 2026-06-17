@@ -3423,18 +3423,20 @@ function renderLevel2OjGuide(addCode) {
             const searchText = `${module.title} ${problem.title} ${problem.href} ${pattern.title}`.toLowerCase();
             const solutionMarkup = renderLevel2OjProblemSolution(problem, module.title, patternKey, addCode);
             return `
-              <article class="oj-problem-card" data-oj-card data-oj-pattern="${patternKey}" data-oj-search="${escapeHtml(searchText)}">
+              <article class="oj-problem-card ${solutionMarkup ? "has-solution" : ""}" data-oj-card data-oj-pattern="${patternKey}" data-oj-search="${escapeHtml(searchText)}" ${solutionMarkup ? 'role="button" tabindex="0" aria-expanded="false"' : ""}>
                 <div class="oj-problem-main">
                   <span class="oj-index">#${problem.index}</span>
                   <div>
                     <h6>${escapeHtml(problem.title)}</h6>
                     <p>${escapeHtml(pattern.shortGuide)}</p>
+                    ${solutionMarkup ? `<span class="oj-click-hint">Ấn vào bài để xem hướng dẫn</span>` : ""}
                   </div>
                 </div>
                 <div class="oj-problem-meta">
                   <span>${escapeHtml(pattern.title)}</span>
                   ${problem.score ? `<span>${escapeHtml(problem.score)} điểm</span>` : ""}
                   ${problem.ac ? `<span>${escapeHtml(problem.ac)} AC</span>` : ""}
+                  ${solutionMarkup ? `<span class="oj-guide-chip" data-oj-guide-chip>Hướng dẫn</span>` : ""}
                   <a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">Mở đề gốc</a>
                 </div>
                 ${solutionMarkup}
@@ -3520,6 +3522,41 @@ function setupLevel2OjFilters() {
 
   search.addEventListener("input", applyFilter);
   patternFilter.addEventListener("change", applyFilter);
+}
+
+function setupLevel2OjProblemToggles() {
+  const solutionCards = [...slide.querySelectorAll(".oj-problem-card.has-solution")];
+  if (!solutionCards.length) return;
+
+  const syncCard = (card, details) => {
+    const isOpen = details.open;
+    card.classList.toggle("is-expanded", isOpen);
+    card.setAttribute("aria-expanded", String(isOpen));
+    const chip = card.querySelector("[data-oj-guide-chip]");
+    if (chip) chip.textContent = isOpen ? "Đang mở" : "Hướng dẫn";
+  };
+
+  solutionCards.forEach((card) => {
+    const details = card.querySelector(".oj-problem-solution");
+    if (!details) return;
+    syncCard(card, details);
+
+    details.addEventListener("toggle", () => syncCard(card, details));
+
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("a, button, summary, .copy-button, .code-shell, pre, code")) return;
+      details.open = !details.open;
+      syncCard(card, details);
+    });
+
+    card.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      if (event.target.closest("a, button, summary, .copy-button")) return;
+      event.preventDefault();
+      details.open = !details.open;
+      syncCard(card, details);
+    });
+  });
 }
 
 function renderSlide() {
@@ -3643,6 +3680,7 @@ function renderSlide() {
     button.addEventListener("click", () => copyText(codePayloads[codeIndex] || "", button));
   });
   setupLevel2OjFilters();
+  setupLevel2OjProblemToggles();
 
   prevBtn.disabled = current === 1;
   nextBtn.disabled = current === totalTopics;

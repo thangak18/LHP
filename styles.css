@@ -1240,6 +1240,24 @@ code {
   display: none;
 }
 
+.oj-problem-card.has-solution {
+  cursor: pointer;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+
+.oj-problem-card.has-solution:hover,
+.oj-problem-card.has-solution:focus-visible {
+  border-color: rgba(199, 111, 66, 0.72);
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(63, 54, 44, 0.08);
+  outline: none;
+}
+
+.oj-problem-card.is-expanded {
+  border-color: var(--amber);
+  background: #ffffff;
+}
+
 .oj-problem-main {
   display: grid;
   grid-template-columns: 46px minmax(0, 1fr);
@@ -1273,6 +1291,14 @@ code {
   font-size: 0.86rem;
 }
 
+.oj-click-hint {
+  display: inline-flex;
+  margin-top: 8px;
+  color: var(--rose);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
 .oj-problem-meta {
   display: flex;
   flex-wrap: wrap;
@@ -1290,6 +1316,11 @@ code {
   background: rgba(79, 98, 146, 0.1);
   font-size: 0.78rem;
   font-weight: 850;
+}
+
+.oj-problem-meta .oj-guide-chip {
+  color: #ffffff;
+  background: var(--amber);
 }
 
 .oj-problem-solution {
