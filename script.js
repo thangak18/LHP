@@ -2851,6 +2851,17 @@ function renderCodeBlock(label, codeIndex, className = "") {
   `;
 }
 
+function renderStaticCodeBlock(label, code, className = "") {
+  return `
+    <div class="code-shell ${className}">
+      <div class="code-head">
+        <span>${escapeHtml(label)}</span>
+      </div>
+      <pre><code>${escapeHtml(code || "(trống)")}</code></pre>
+    </div>
+  `;
+}
+
 const level2OjPatternOrder = ["binary", "compression", "stack", "queue", "mitm", "math", "prefix", "general"];
 
 const level2OjPatterns = {
@@ -3221,6 +3232,151 @@ function shouldShowLevel2OjProblemSolution(moduleTitle) {
   return title.includes("luyen tap tong hop") || title.includes("tong hop cap toc");
 }
 
+function getLevel2OjSampleInfo(problem) {
+  return window.level2OjSamples?.byHref?.[problem.href] || null;
+}
+
+function splitSampleLines(value) {
+  if (!value) return [];
+  return String(value).replace(/\r/g, "").split("\n");
+}
+
+function describeTokenLine(line) {
+  const tokens = String(line).trim().split(/\s+/).filter(Boolean);
+  if (!tokens.length) return "dòng trống";
+  if (tokens.length === 1) return `1 giá trị: ${tokens[0]}`;
+  return `${tokens.length} giá trị: ${tokens.join(", ")}`;
+}
+
+function specificSampleSteps(problem, sample) {
+  const title = normalizeOjText(`${problem.title} ${problem.href}`);
+  const input = splitSampleLines(sample.input).map((line) => line.trim()).filter(Boolean);
+  const tokens = input.join(" ").split(/\s+/).filter(Boolean);
+
+  if (title.includes("phuongtrinh_diophantine") && tokens.length >= 3) {
+    const [a, b, c] = tokens.slice(0, 3).map(Number);
+    if ([a, b, c].every(Number.isFinite) && c <= 5000) {
+      const pairs = [];
+      for (let x = 1; x * a < c; x++) {
+        const rest = c - a * x;
+        if (rest > 0 && rest % b === 0) pairs.push([x, rest / b]);
+      }
+      return [
+        `Đề cần đếm nghiệm nguyên dương của ${a} * x + ${b} * y = ${c}.`,
+        `Thử các x dương sao cho ${a} * x < ${c}; với mỗi x, phần còn lại là ${c} - ${a} * x.`,
+        pairs.length
+          ? `Các cặp hợp lệ tìm được: ${pairs.map(([x, y]) => `(${x}, ${y})`).join(", ")}.`
+          : "Không có cặp (x, y) nguyên dương nào làm phần còn lại chia hết.",
+        `Vì có ${pairs.length} cặp hợp lệ nên output là ${pairs.length}.`
+      ];
+    }
+  }
+
+  if (title.includes("stackbs")) {
+    const q = Number(tokens[0]);
+    const operations = input.slice(1);
+    const st = [];
+    const log = [`q = ${q}, bắt đầu với stack rỗng [].`];
+    operations.forEach((line, index) => {
+      const parts = line.split(/\s+/).filter(Boolean);
+      if (parts[0] === "1") {
+        st.push(parts[1]);
+        log.push(`Truy vấn ${index + 1}: push ${parts[1]}, stack thành [${st.join(", ")}].`);
+      } else if (parts[0] === "2") {
+        const removed = st.length ? st.pop() : null;
+        log.push(`Truy vấn ${index + 1}: pop${removed === null ? " khi stack rỗng" : ` ${removed}`}, stack thành [${st.join(", ")}].`);
+      } else if (parts[0] === "3") {
+        log.push(`Truy vấn ${index + 1}: top là ${st.length ? st[st.length - 1] : -1}, in ra giá trị này.`);
+      }
+    });
+    return log;
+  }
+
+  if (title.includes("chinese_modulo") && tokens.length >= 3) {
+    const n = Number(tokens[0]);
+    const pairs = [];
+    for (let i = 0; i < n; i++) {
+      pairs.push([Number(tokens[1 + i * 2]), Number(tokens[2 + i * 2])]);
+    }
+    const limit = pairs.reduce((acc, [, mod]) => acc * mod, 1);
+    if (pairs.every(([r, mod]) => Number.isFinite(r) && Number.isFinite(mod)) && limit <= 100000) {
+      let answer = 0;
+      while (answer < limit && !pairs.every(([r, mod]) => answer % mod === r)) answer++;
+      return [
+        `Có ${n} điều kiện đồng dư: ${pairs.map(([r, mod]) => `x mod ${mod} = ${r}`).join("; ")}.`,
+        `Thử x tăng dần từ 0 và kiểm tra đồng thời tất cả điều kiện.`,
+        `Giá trị nhỏ nhất thỏa toàn bộ hệ là ${answer}.`,
+        `Vì vậy output mẫu là ${answer}.`
+      ];
+    }
+  }
+
+  return [];
+}
+
+function buildGenericSampleSteps(problem, patternKey, sample) {
+  const pattern = level2OjPatterns[patternKey];
+  const inputLines = splitSampleLines(sample.input);
+  const outputLines = splitSampleLines(sample.output);
+  const steps = [
+    `Sample ${sample.number} có ${inputLines.length || 0} dòng input và ${outputLines.length || 0} dòng output.`,
+    ...inputLines.map((line, index) => `Đọc dòng input ${index + 1}: "${line}" (${describeTokenLine(line)}).`),
+    `Áp dụng dạng ${pattern.title}: ${pattern.shortGuide}`,
+    "Chạy code theo đúng thứ tự đọc dữ liệu ở trên; mọi biến trung gian phải được cập nhật sau từng dòng/truy vấn, không bỏ qua trường hợp biên.",
+    ...outputLines.map((line, index) => `Sau khi xử lý, dòng output ${index + 1} phải là "${line}".`),
+    "Nếu kết quả chạy tay khác output mẫu, kiểm tra lại kiểu dữ liệu, chỉ số 0/1-based, điều kiện so sánh và thứ tự in."
+  ];
+  return steps;
+}
+
+function renderLevel2OjSampleAnalysis(problem, patternKey) {
+  const sampleInfo = getLevel2OjSampleInfo(problem);
+  if (!sampleInfo) {
+    return `
+      <div class="oj-sample-empty">
+        Chưa có dữ liệu sample text cho bài này trong file trích xuất. Mở đề gốc để xem sample và tự đối chiếu theo code mẫu.
+      </div>
+    `;
+  }
+
+  if (!sampleInfo.samples?.length) {
+    return `
+      <div class="oj-sample-empty">
+        OJ không cung cấp sample input/output dạng text cho bài này, hoặc đề được nhúng bằng ảnh nên không thể trích sample tự động. Không bịa test mẫu; hãy mở đề gốc để xem ảnh đề và tự nhập lại sample nếu có.
+      </div>
+    `;
+  }
+
+  return `
+    <div class="oj-sample-stack">
+      ${sampleInfo.samples.map((sample) => {
+        const specific = specificSampleSteps(problem, sample);
+        const generic = buildGenericSampleSteps(problem, patternKey, sample);
+        const steps = specific.length ? [...specific, ...generic] : generic;
+        return `
+          <article class="oj-sample-card">
+            <h5>Sample ${sample.number}</h5>
+            <div class="oj-sample-io">
+              <div>
+                <strong>Input mẫu ${sample.number}</strong>
+                ${renderStaticCodeBlock(`Input ${sample.number}`, sample.input, "sample")}
+              </div>
+              <div>
+                <strong>Output mẫu ${sample.number}</strong>
+                ${renderStaticCodeBlock(`Output ${sample.number}`, sample.output, "sample")}
+              </div>
+            </div>
+            <strong>Chạy tay chi tiết</strong>
+            <ol class="oj-sample-steps">
+              ${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}
+            </ol>
+          </article>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
 function getLevel2OjProblemSolution(problem, patternKey) {
   const cleanTitle = problem.title.replace(/^\s*\d+\.\s*/, "");
   const templates = {
@@ -3367,7 +3523,7 @@ function renderLevel2OjProblemSolution(problem, moduleTitle, patternKey, addCode
         </div>
         <div class="oj-solution-block">
           <strong>Phân tích test case</strong>
-          ${listMarkup(solution.testAnalysis, "oj-solution-list")}
+          ${renderLevel2OjSampleAnalysis(problem, patternKey)}
         </div>
         <div class="oj-solution-block">
           <strong>Code C++17 mẫu (${escapeHtml(pattern.title)})</strong>
@@ -3669,14 +3825,11 @@ function renderSlide() {
     ${practiceMarkup(guide.practice || [], addCode)}
   `;
 
-  const codeBlocks = slide.querySelectorAll(".code-shell code");
-  codeBlocks.forEach((block, index) => {
-    block.textContent = codePayloads[index] || "";
-  });
-
   const copyButtons = slide.querySelectorAll(".copy-button");
   copyButtons.forEach((button) => {
     const codeIndex = Number(button.dataset.codeIndex);
+    const block = button.closest(".code-shell")?.querySelector("code");
+    if (block) block.textContent = codePayloads[codeIndex] || "";
     button.addEventListener("click", () => copyText(codePayloads[codeIndex] || "", button));
   });
   setupLevel2OjFilters();

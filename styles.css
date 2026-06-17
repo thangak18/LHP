@@ -1393,6 +1393,64 @@ code {
   margin-top: 8px;
 }
 
+.oj-sample-empty {
+  padding: 12px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--muted);
+  background: #ffffff;
+}
+
+.oj-sample-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.oj-sample-card {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: #ffffff;
+}
+
+.oj-sample-card h5 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.98rem;
+}
+
+.oj-sample-card > strong,
+.oj-sample-io strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.oj-sample-io {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.oj-sample-steps {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 22px;
+  color: #37322c;
+}
+
+.oj-sample-steps li::marker {
+  color: var(--amber);
+  font-weight: 900;
+}
+
 @media (max-width: 980px) {
   .app-shell {
     grid-template-columns: 1fr;
@@ -1424,7 +1482,8 @@ code {
   .oj-section-head,
   .oj-controls,
   .oj-pattern-grid,
-  .oj-problem-card {
+  .oj-problem-card,
+  .oj-sample-io {
     grid-template-columns: 1fr;
   }
 
