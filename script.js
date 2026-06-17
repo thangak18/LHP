@@ -2278,7 +2278,9 @@ int main() {
 const removedTopicTitles = new Set(["Luyện tập tổng hợp", "Tổng hợp cấp tốc"]);
 
 levels.forEach((level) => {
-  level.topics = level.topics.filter((topic) => !removedTopicTitles.has(topic.title));
+  if (level.level !== 2) {
+    level.topics = level.topics.filter((topic) => !removedTopicTitles.has(topic.title));
+  }
 });
 
 const visualLibrary = {
@@ -2468,9 +2470,26 @@ function getActiveTopic() {
   return getActiveLevel().topics[state.topicIndex];
 }
 
+function getLevel2OjProblemText() {
+  const modules = window.level2Oj?.modules || [];
+  return modules.flatMap((module) => [
+    module.title,
+    module.href,
+    ...(module.problems || []).flatMap((problem) => [
+      problem.title,
+      problem.href,
+      problem.score,
+      problem.ac
+    ])
+  ]);
+}
+
 function topicMatches(topic) {
   if (!state.query) return true;
   const guide = getLessonGuide(topic);
+  const level2OjText = getActiveLevel().level === 2 && topic.title === "Luyện tập tổng hợp"
+    ? getLevel2OjProblemText()
+    : [];
   const guideText = [
     ...(guide.deepTheory || []),
     ...(guide.why || []),
@@ -2517,6 +2536,7 @@ function topicMatches(topic) {
     topic.complexity,
     ...topic.theory,
     ...topic.notes,
+    ...level2OjText,
     ...guideText
   ].join(" ").toLowerCase();
   return haystack.includes(state.query);
@@ -2831,6 +2851,513 @@ function renderCodeBlock(label, codeIndex, className = "") {
   `;
 }
 
+const level2OjPatternOrder = ["binary", "compression", "stack", "queue", "mitm", "math", "prefix", "general"];
+
+const level2OjPatterns = {
+  binary: {
+    title: "Binary Search",
+    shortGuide: "Tìm tính đơn điệu, viết hàm can(mid) hoặc dùng lower_bound/upper_bound trên dãy đã sort.",
+    checklist: [
+      "Xác định đang tìm vị trí, số lượng hay đáp án tối ưu.",
+      "Nếu là tối ưu, đặt mid là đáp án thử và chứng minh can(mid) đơn điệu.",
+      "Chọn biên chắc chắn chứa đáp án, ưu tiên long long cho tổng/giá trị lớn.",
+      "Với mảng đã sort, dùng lower_bound/upper_bound để giảm lỗi biên."
+    ],
+    code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+bool can(const vector<long long>& a, long long limit, int k) {
+    int parts = 1;
+    long long sum = 0;
+    for (long long x : a) {
+        if (x > limit) return false;
+        if (sum + x > limit) {
+            parts++;
+            sum = 0;
+        }
+        sum += x;
+    }
+    return parts <= k;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, k;
+    cin >> n >> k;
+    vector<long long> a(n);
+    long long l = 0, r = 0;
+    for (long long &x : a) {
+        cin >> x;
+        l = max(l, x);
+        r += x;
+    }
+
+    while (l < r) {
+        long long mid = l + (r - l) / 2;
+        if (can(a, mid, k)) r = mid;
+        else l = mid + 1;
+    }
+
+    cout << l << '\n';
+    return 0;
+}`
+  },
+  compression: {
+    title: "Coordinate Compression",
+    shortGuide: "Gom mọi giá trị cần xét, sort unique, rồi ánh xạ giá trị lớn về rank nhỏ để dùng mảng/Fenwick/đếm đoạn.",
+    checklist: [
+      "Gom đủ các giá trị xuất hiện trong dữ liệu, truy vấn và biên đoạn nếu bài cần.",
+      "Sort rồi erase unique để có bảng giá trị phân biệt.",
+      "Rank 0-based dùng cho vector, rank 1-based dùng cho Fenwick.",
+      "Không dùng rank để tính khoảng cách thật giữa hai tọa độ."
+    ],
+    code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+    vector<long long> a(n), values;
+    values.reserve(n);
+
+    for (long long &x : a) {
+        cin >> x;
+        values.push_back(x);
+    }
+
+    sort(values.begin(), values.end());
+    values.erase(unique(values.begin(), values.end()), values.end());
+
+    for (long long x : a) {
+        int rank1 = int(lower_bound(values.begin(), values.end(), x) - values.begin()) + 1;
+        cout << rank1 << ' ';
+    }
+    cout << '\n';
+    return 0;
+}`
+  },
+  stack: {
+    title: "Stack",
+    shortGuide: "Dùng LIFO cho thao tác cuối dãy, ngoặc, undo, hoặc monotonic stack để tìm phần tử gần nhất.",
+    checklist: [
+      "Nếu bài hỏi phần tử gần nhất lớn/nhỏ hơn, thử stack đơn điệu.",
+      "Mỗi phần tử chỉ nên được push/pop tối đa một lần.",
+      "Luôn kiểm tra empty() trước khi gọi top().",
+      "Nếu cần lưu vị trí, push chỉ số thay vì push giá trị."
+    ],
+    code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+    vector<long long> a(n), ans(n, -1);
+    for (long long &x : a) cin >> x;
+
+    stack<int> st;
+    for (int i = n - 1; i >= 0; --i) {
+        while (!st.empty() && a[st.top()] <= a[i]) st.pop();
+        if (!st.empty()) ans[i] = a[st.top()];
+        st.push(i);
+    }
+
+    for (long long x : ans) cout << x << ' ';
+    cout << '\n';
+    return 0;
+}`
+  },
+  queue: {
+    title: "Queue / Deque / Priority Queue",
+    shortGuide: "Dùng queue cho thứ tự FIFO, deque cho cửa sổ trượt, priority_queue cho top-k/min-max động.",
+    checklist: [
+      "Nếu phần tử vào trước ra trước, dùng queue.",
+      "Nếu cửa sổ trượt cần max/min, dùng deque đơn điệu lưu chỉ số.",
+      "Nếu luôn lấy phần tử tốt nhất hiện tại, dùng priority_queue.",
+      "Với min-heap, dùng greater<T> hoặc đảo dấu giá trị."
+    ],
+    code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, k;
+    cin >> n >> k;
+    vector<long long> a(n);
+    for (long long &x : a) cin >> x;
+
+    deque<int> dq;
+    for (int i = 0; i < n; ++i) {
+        while (!dq.empty() && dq.front() <= i - k) dq.pop_front();
+        while (!dq.empty() && a[dq.back()] <= a[i]) dq.pop_back();
+        dq.push_back(i);
+
+        if (i >= k - 1) cout << a[dq.front()] << ' ';
+    }
+    cout << '\n';
+    return 0;
+}`
+  },
+  mitm: {
+    title: "Chia Đôi Tập",
+    shortGuide: "Khi n khoảng 30-40 và mỗi phần tử chọn/không chọn, tách mảng làm hai nửa rồi ghép kết quả.",
+    checklist: [
+      "Chia tập thành hai nửa có kích thước gần bằng nhau.",
+      "Sinh toàn bộ tổng/trạng thái của từng nửa.",
+      "Sort một nửa để ghép bằng binary search hoặc two pointers.",
+      "Dùng long long vì tổng tập con rất dễ vượt int."
+    ],
+    code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+vector<long long> buildSums(const vector<long long>& a) {
+    int n = a.size();
+    vector<long long> sums;
+    sums.reserve(1 << n);
+    for (int mask = 0; mask < (1 << n); ++mask) {
+        long long s = 0;
+        for (int i = 0; i < n; ++i) {
+            if (mask >> i & 1) s += a[i];
+        }
+        sums.push_back(s);
+    }
+    return sums;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    long long target;
+    cin >> n >> target;
+    vector<long long> a(n);
+    for (long long &x : a) cin >> x;
+
+    vector<long long> left(a.begin(), a.begin() + n / 2);
+    vector<long long> right(a.begin() + n / 2, a.end());
+    vector<long long> L = buildSums(left);
+    vector<long long> R = buildSums(right);
+    sort(R.begin(), R.end());
+
+    long long ans = 0;
+    for (long long x : L) {
+        auto range = equal_range(R.begin(), R.end(), target - x);
+        ans += range.second - range.first;
+    }
+
+    cout << ans << '\n';
+    return 0;
+}`
+  },
+  math: {
+    title: "Math / Modulo",
+    shortGuide: "Tách bài về gcd, modulo, lũy thừa nhanh, nhân modulo lớn, đồng dư hoặc công thức số học.",
+    checklist: [
+      "Đọc giới hạn để biết có cần __int128 khi nhân hay không.",
+      "Dùng gcd/extended gcd cho phương trình ax + by = c và nghịch đảo modulo tổng quát.",
+      "Dùng lũy thừa nhanh thay vì pow(double).",
+      "Chuẩn hóa số âm bằng (x % mod + mod) % mod."
+    ],
+    code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+using int64 = long long;
+
+int64 mulMod(int64 a, int64 b, int64 mod) {
+    return (int64)((__int128)a * b % mod);
+}
+
+int64 powMod(int64 a, int64 e, int64 mod) {
+    int64 res = 1 % mod;
+    a %= mod;
+    while (e > 0) {
+        if (e & 1) res = mulMod(res, a, mod);
+        a = mulMod(a, a, mod);
+        e >>= 1;
+    }
+    return res;
+}
+
+int64 extGcd(int64 a, int64 b, int64 &x, int64 &y) {
+    if (b == 0) {
+        x = 1;
+        y = 0;
+        return a;
+    }
+    int64 x1, y1;
+    int64 g = extGcd(b, a % b, x1, y1);
+    x = y1;
+    y = x1 - (a / b) * y1;
+    return g;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    long long a, b, mod;
+    cin >> a >> b >> mod;
+    cout << powMod(a, b, mod) << '\n';
+    return 0;
+}`
+  },
+  prefix: {
+    title: "Prefix / Sort / Two Pointers",
+    shortGuide: "Dùng sắp xếp, prefix sum, đếm tần suất hoặc hai con trỏ để hạ độ phức tạp từ O(n^2).",
+    checklist: [
+      "Nếu hỏi tổng đoạn, tạo prefix sum.",
+      "Nếu hỏi cặp/tập sau khi sort, thử two pointers hoặc lower_bound.",
+      "Nếu hỏi số lần xuất hiện, dùng map/unordered_map/vector cnt sau khi nén.",
+      "Kiểm tra kỹ chỉ số l, r vì prefix thường lệch 1 đơn vị."
+    ],
+    code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, q;
+    cin >> n >> q;
+    vector<long long> a(n + 1), pref(n + 1, 0);
+    for (int i = 1; i <= n; ++i) {
+        cin >> a[i];
+        pref[i] = pref[i - 1] + a[i];
+    }
+
+    while (q--) {
+        int l, r;
+        cin >> l >> r;
+        cout << pref[r] - pref[l - 1] << '\n';
+    }
+
+    return 0;
+}`
+  },
+  general: {
+    title: "Khung Tổng Hợp",
+    shortGuide: "Dùng khi bài chưa lộ rõ dạng: đọc giới hạn, chọn O(n), O(n log n) hay O(sqrt n), rồi tách solve() để thử từng ý.",
+    checklist: [
+      "Gạch chân input lớn nhất và kiểu dữ liệu có thể tràn.",
+      "Tạo test nhỏ để so với brute force nếu thuật toán tối ưu phức tạp.",
+      "Viết solve() độc lập để dễ xử lý nhiều test.",
+      "Sau khi AC mẫu, thử biên n = 1, toàn số bằng nhau, số âm và đáp án rỗng."
+    ],
+    code: String.raw`#include <bits/stdc++.h>
+using namespace std;
+
+void solve() {
+    int n;
+    cin >> n;
+    vector<long long> a(n);
+    for (long long &x : a) cin >> x;
+
+    // Bước 1: đọc giới hạn và chọn cấu trúc dữ liệu phù hợp.
+    // Bước 2: thay phần dưới bằng kỹ thuật nhận ra từ đề:
+    // sort + two pointers, prefix sum, map đếm, binary search, stack/deque...
+    sort(a.begin(), a.end());
+
+    long long answer = 0;
+    for (long long x : a) {
+        answer += x;
+    }
+
+    cout << answer << '\n';
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int t = 1;
+    // cin >> t;
+    while (t--) solve();
+    return 0;
+}`
+  }
+};
+
+function normalizeOjText(value) {
+  return String(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d");
+}
+
+function inferLevel2OjPattern(problem, moduleTitle) {
+  const text = normalizeOjText(`${moduleTitle} ${problem.title} ${problem.href}`);
+
+  if (text.includes("binary search")) return "binary";
+  if (text.includes("coordinate")) return "compression";
+  if (text.includes("stack")) return "stack";
+  if (text.includes("queue") || text.includes("deque") || text.includes("priority")) return "queue";
+  if (text.includes("chia doi tap")) return "mitm";
+  if (text.includes("math")) return "math";
+
+  if (/(diophantine|chinese|mod|prime|nguyen to|uoc|gcd|lcm|pow|fastpow|eqn|phuong trinh|phan so|duprime|supperprime|threeprimes|sumdiv)/.test(text)) return "math";
+  if (/(stack|brack|ngoac|patrik|sortcar)/.test(text)) return "stack";
+  if (/(queue|deque|pq|heap|kpair|roomalloc|ropemerge|bfsez|medseg)/.test(text)) return "queue";
+  if (/(tknp|timcapso|binary|search|chiamang|xuongnhamay|median|shop|submat|demcap|nearest|capso)/.test(text)) return "binary";
+  if (/(compress|cover|segment|doan|upseg|paint_painarea|toa do)/.test(text)) return "compression";
+  if (/(sumsub|subset|applediv|bipalin|tap con)/.test(text)) return "mitm";
+  if (/(prefix|sum|cnt|count|thong ke|day|mang|array|doancanbang|sumxx|sumrec|tang)/.test(text)) return "prefix";
+
+  return "general";
+}
+
+function renderLevel2OjGuide(addCode) {
+  const data = window.level2Oj;
+  if (!data?.modules?.length) return "";
+
+  const patternCounts = Object.fromEntries(level2OjPatternOrder.map((key) => [key, 0]));
+  data.modules.forEach((module) => {
+    (module.problems || []).forEach((problem) => {
+      patternCounts[inferLevel2OjPattern(problem, module.title)]++;
+    });
+  });
+
+  const patternCards = level2OjPatternOrder.map((key) => {
+    const pattern = level2OjPatterns[key];
+    return `
+      <article class="oj-pattern-card" data-oj-pattern-guide="${key}">
+        <div class="oj-pattern-head">
+          <h5>${escapeHtml(pattern.title)}</h5>
+          <span>${patternCounts[key]} lượt bài</span>
+        </div>
+        <p>${escapeHtml(pattern.shortGuide)}</p>
+        ${listMarkup(pattern.checklist, "oj-check-list")}
+        <details class="oj-code-details">
+          <summary>Code mẫu C++17</summary>
+          ${addCode(`C++17 - ${pattern.title}`, pattern.code)}
+        </details>
+      </article>
+    `;
+  }).join("");
+
+  const moduleCards = data.modules.map((module, moduleIndex) => {
+    const problems = module.problems || [];
+    return `
+      <details class="oj-module" data-oj-module ${moduleIndex === 0 ? "open" : ""}>
+        <summary>
+          <span>${escapeHtml(module.title)}</span>
+          <span class="oj-visible-count">${problems.length}/${problems.length} bài</span>
+        </summary>
+        <div class="oj-problem-list">
+          ${problems.map((problem) => {
+            const patternKey = inferLevel2OjPattern(problem, module.title);
+            const pattern = level2OjPatterns[patternKey];
+            const href = `https://oj.uniedu.vn${problem.href}`;
+            const searchText = `${module.title} ${problem.title} ${problem.href} ${pattern.title}`.toLowerCase();
+            return `
+              <article class="oj-problem-card" data-oj-card data-oj-pattern="${patternKey}" data-oj-search="${escapeHtml(searchText)}">
+                <div class="oj-problem-main">
+                  <span class="oj-index">#${problem.index}</span>
+                  <div>
+                    <h6>${escapeHtml(problem.title)}</h6>
+                    <p>${escapeHtml(pattern.shortGuide)}</p>
+                  </div>
+                </div>
+                <div class="oj-problem-meta">
+                  <span>${escapeHtml(pattern.title)}</span>
+                  ${problem.score ? `<span>${escapeHtml(problem.score)} điểm</span>` : ""}
+                  ${problem.ac ? `<span>${escapeHtml(problem.ac)} AC</span>` : ""}
+                  <a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">Mở đề gốc</a>
+                </div>
+              </article>
+            `;
+          }).join("")}
+        </div>
+      </details>
+    `;
+  }).join("");
+
+  return `
+    <section class="oj-section">
+      <div class="oj-section-head">
+        <div>
+          <h4 class="section-title">Bài tập OJ Level 2</h4>
+          <p>Danh sách lấy từ roadmap Level 2: ${data.uniqueCount} bài duy nhất, ${data.rowCount} lượt xuất hiện trong 8 mô-đun. Mỗi bài có gợi ý dạng giải và code mẫu theo nhóm thuật toán.</p>
+        </div>
+        <a class="oj-source-link" href="${escapeHtml(data.source)}" target="_blank" rel="noopener noreferrer">Roadmap gốc</a>
+      </div>
+
+      <div class="oj-controls">
+        <label>
+          <span>Tìm bài</span>
+          <input id="ojSearch" type="search" placeholder="Ví dụ: TKNP, stack, modulo">
+        </label>
+        <label>
+          <span>Lọc dạng</span>
+          <select id="ojPatternFilter">
+            <option value="">Tất cả dạng</option>
+            ${level2OjPatternOrder.map((key) => `<option value="${key}">${escapeHtml(level2OjPatterns[key].title)}</option>`).join("")}
+          </select>
+        </label>
+        <p id="ojResultCount">${data.rowCount} lượt bài</p>
+      </div>
+
+      <div class="oj-note">
+        <strong>Cách dùng:</strong> mở đề gốc trên OJ để đọc input/output chi tiết, chọn đúng nhóm gợi ý, rồi chỉnh code mẫu theo biến và điều kiện của đề.
+      </div>
+
+      <div class="oj-pattern-grid">
+        ${patternCards}
+      </div>
+
+      <div class="oj-modules">
+        ${moduleCards}
+      </div>
+    </section>
+  `;
+}
+
+function setupLevel2OjFilters() {
+  const search = slide.querySelector("#ojSearch");
+  const patternFilter = slide.querySelector("#ojPatternFilter");
+  const resultCount = slide.querySelector("#ojResultCount");
+  const cards = [...slide.querySelectorAll("[data-oj-card]")];
+  const modules = [...slide.querySelectorAll("[data-oj-module]")];
+  if (!search || !patternFilter || !cards.length) return;
+
+  const applyFilter = () => {
+    const query = normalizeOjText(search.value.trim());
+    const pattern = patternFilter.value;
+    let visibleTotal = 0;
+
+    cards.forEach((card) => {
+      const matchesQuery = !query || normalizeOjText(card.dataset.ojSearch || "").includes(query);
+      const matchesPattern = !pattern || card.dataset.ojPattern === pattern;
+      const visible = matchesQuery && matchesPattern;
+      card.hidden = !visible;
+      if (visible) visibleTotal++;
+    });
+
+    modules.forEach((module) => {
+      const moduleCards = [...module.querySelectorAll("[data-oj-card]")];
+      const visibleCards = moduleCards.filter((card) => !card.hidden).length;
+      module.hidden = visibleCards === 0;
+      const counter = module.querySelector(".oj-visible-count");
+      if (counter) counter.textContent = `${visibleCards}/${moduleCards.length} bài`;
+    });
+
+    if (resultCount) resultCount.textContent = `${visibleTotal} lượt bài`;
+  };
+
+  search.addEventListener("input", applyFilter);
+  patternFilter.addEventListener("change", applyFilter);
+}
+
 function renderSlide() {
   const level = getActiveLevel();
   const topic = getActiveTopic();
@@ -2843,6 +3370,9 @@ function renderSlide() {
     return renderCodeBlock(label, codeIndex, className);
   };
   const conceptsMarkup = conceptSectionsMarkup(guide.conceptSections || [], addCode);
+  const level2OjMarkup = level.level === 2 && topic.title === "Luyện tập tổng hợp"
+    ? renderLevel2OjGuide(addCode)
+    : "";
   const theoryMarkup = `
     <div class="full-flow">
       ${detailBlock("Lý thuyết chi tiết", detailedTheory, "theory-list")}
@@ -2926,6 +3456,8 @@ function renderSlide() {
 
     ${theoryMarkup}
 
+    ${level2OjMarkup}
+
     <section class="examples-section">
       <h4 class="section-title">2 ví dụ áp dụng</h4>
       <div class="example-stack">
@@ -2946,6 +3478,7 @@ function renderSlide() {
     const codeIndex = Number(button.dataset.codeIndex);
     button.addEventListener("click", () => copyText(codePayloads[codeIndex] || "", button));
   });
+  setupLevel2OjFilters();
 
   prevBtn.disabled = current === 1;
   nextBtn.disabled = current === totalTopics;
