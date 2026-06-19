@@ -1323,6 +1323,11 @@ code {
   background: var(--amber);
 }
 
+.oj-problem-meta .oj-verified-chip {
+  color: #ffffff;
+  background: var(--green);
+}
+
 .oj-problem-solution {
   grid-column: 1 / -1;
   min-width: 0;
@@ -1362,6 +1367,16 @@ code {
 .oj-solution-block p {
   margin: 0;
   color: #37322c;
+}
+
+.oj-solution-verified,
+.oj-solution-code-note {
+  margin-top: 8px !important;
+  padding: 10px 12px;
+  border-left: 4px solid var(--green);
+  border-radius: var(--radius);
+  color: #37322c;
+  background: rgba(93, 143, 79, 0.1);
 }
 
 .oj-solution-list {

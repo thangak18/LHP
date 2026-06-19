@@ -3236,6 +3236,10 @@ function getLevel2OjSampleInfo(problem) {
   return window.level2OjSamples?.byHref?.[problem.href] || null;
 }
 
+function getExactLevel2Solution(problem) {
+  return window.level2Solutions?.byHref?.[problem.href] || null;
+}
+
 function splitSampleLines(value) {
   if (!value) return [];
   return String(value).replace(/\r/g, "").split("\n");
@@ -3290,6 +3294,76 @@ function specificSampleSteps(problem, sample) {
       }
     });
     return log;
+  }
+
+  if (title.includes("jump") && tokens.length >= 2) {
+    const n = Number(tokens[0]);
+    const q = Number(tokens[1]);
+    const heights = tokens.slice(2, 2 + n).map(Number);
+    const queries = tokens.slice(2 + n, 2 + n + q).map(Number);
+    if (Number.isFinite(n) && Number.isFinite(q) && heights.length === n && queries.length === q) {
+      const next = Array(n + 1).fill(0);
+      const jumps = Array(n + 1).fill(0);
+      const st = [];
+      const steps = [
+        `n = ${n}, q = ${q}. Chiều cao các cột theo thứ tự là: ${heights.join(", ")}.`,
+        "Duyệt từ phải sang trái, giữ stack các cột có chiều cao giảm dần để tìm cột cao hơn gần nhất bên phải."
+      ];
+      for (let i = n; i >= 1; i--) {
+        const popped = [];
+        while (st.length && heights[st[st.length - 1] - 1] <= heights[i - 1]) {
+          popped.push(st.pop());
+        }
+        next[i] = st.length ? st[st.length - 1] : 0;
+        jumps[i] = next[i] ? 1 + jumps[next[i]] : 0;
+        if (n <= 12) {
+          const removed = popped.length ? ` Loại khỏi stack các cột ${popped.join(", ")} vì không cao hơn ${heights[i - 1]}.` : "";
+          const target = next[i] ? `cột cao hơn gần nhất là ${next[i]} (cao ${heights[next[i] - 1]})` : "không có cột cao hơn bên phải";
+          steps.push(`Xét cột ${i} cao ${heights[i - 1]}.${removed} Kết luận ${target}, nên số bước từ cột ${i} là ${jumps[i]}.`);
+        }
+        st.push(i);
+      }
+      queries.forEach((x, index) => {
+        const path = [];
+        let current = x;
+        while (current) {
+          path.push(current);
+          current = next[current];
+        }
+        const moves = Math.max(0, path.length - 1);
+        steps.push(`Câu hỏi ${index + 1}: bắt đầu ở cột ${x}, đường nhảy là ${path.join(" -> ")}, có ${moves} bước nên in ${jumps[x]}.`);
+      });
+      steps.push(`Ghép các đáp án theo thứ tự truy vấn được output mẫu: ${queries.map((x) => jumps[x]).join(", ")}.`);
+      return steps;
+    }
+  }
+
+  if (title.includes("dosau")) {
+    const s = sample.input.trim();
+    const steps = [
+      `Chuỗi cần xét là "${s}". depth bắt đầu bằng 0, best bắt đầu bằng 0.`,
+      "Gặp '(' thì tăng depth, gặp ')' thì giảm depth, gặp chữ thường thì giữ nguyên."
+    ];
+    let depth = 0;
+    let best = 0;
+    let valid = true;
+    [...s].forEach((ch, index) => {
+      if (ch === "(") {
+        depth++;
+        best = Math.max(best, depth);
+        steps.push(`Ký tự ${index + 1} là '(': depth tăng lên ${depth}, best hiện tại là ${best}.`);
+      } else if (ch === ")") {
+        depth--;
+        if (depth < 0) valid = false;
+        steps.push(`Ký tự ${index + 1} là ')': depth giảm còn ${depth}${depth < 0 ? ", chuỗi mất cân bằng" : ""}.`);
+      } else {
+        steps.push(`Ký tự ${index + 1} là '${ch}': không phải ngoặc nên depth vẫn là ${depth}.`);
+      }
+    });
+    if (depth !== 0) valid = false;
+    steps.push(valid ? `Kết thúc chuỗi, depth = 0 nên chuỗi cân bằng; độ sâu lớn nhất là ${best}.` : `Kết thúc chuỗi, depth = ${depth} hoặc từng bị âm nên chuỗi không cân bằng.`);
+    steps.push(`Vì vậy output mẫu là ${valid ? best : -1}.`);
+    return steps;
   }
 
   if (title.includes("chinese_modulo") && tokens.length >= 3) {
@@ -3509,13 +3583,20 @@ function renderLevel2OjProblemSolution(problem, moduleTitle, patternKey, addCode
   if (!shouldShowLevel2OjProblemSolution(moduleTitle)) return "";
   const pattern = level2OjPatterns[patternKey];
   const solution = getLevel2OjProblemSolution(problem, patternKey);
+  const exactSolution = getExactLevel2Solution(problem);
   return `
     <details class="oj-problem-solution">
       <summary>Hướng dẫn giải bài này</summary>
       <div class="oj-solution-body">
         <div class="oj-solution-block">
           <strong>Ý tưởng</strong>
-          <p>${escapeHtml(solution.idea)}</p>
+          <p>${escapeHtml(exactSolution?.idea || solution.idea)}</p>
+          ${exactSolution ? `
+            <p class="oj-solution-verified">
+              Đáp án riêng đã kiểm sample: ${escapeHtml((exactSolution.checkedSamples || []).map((item) => `#${item}`).join(", ") || "có")}.
+              Độ phức tạp: ${escapeHtml(exactSolution.complexity || "đã ghi trong code")}.
+            </p>
+          ` : ""}
         </div>
         <div class="oj-solution-block">
           <strong>Cách làm</strong>
@@ -3526,8 +3607,15 @@ function renderLevel2OjProblemSolution(problem, moduleTitle, patternKey, addCode
           ${renderLevel2OjSampleAnalysis(problem, patternKey)}
         </div>
         <div class="oj-solution-block">
-          <strong>Code C++17 mẫu (${escapeHtml(pattern.title)})</strong>
-          ${addCode(`C++17 ${problem.title}`, pattern.code)}
+          <strong>${exactSolution ? "Code C++17 đáp án riêng" : "Code C++17"}</strong>
+          ${exactSolution ? `
+            <p class="oj-solution-code-note">Code dưới đây là lời giải riêng cho bài này, có comment bên cạnh từng dòng và đã chạy qua sample đã trích từ đề.</p>
+            ${addCode(`C++17 ${problem.title}`, exactSolution.code)}
+          ` : `
+            <div class="oj-sample-empty">
+              Chưa hiển thị code cho bài này vì chưa có lời giải riêng đã kiểm sample. Không dùng code mẫu theo dạng bài ở đây để tránh sai đáp án.
+            </div>
+          `}
         </div>
       </div>
     </details>
@@ -3537,6 +3625,7 @@ function renderLevel2OjProblemSolution(problem, moduleTitle, patternKey, addCode
 function renderLevel2OjGuide(addCode) {
   const data = window.level2Oj;
   if (!data?.modules?.length) return "";
+  const checkedSolutionCount = Object.keys(window.level2Solutions?.byHref || {}).length;
 
   const patternCounts = Object.fromEntries(level2OjPatternOrder.map((key) => [key, 0]));
   data.modules.forEach((module) => {
@@ -3578,6 +3667,7 @@ function renderLevel2OjGuide(addCode) {
             const href = `https://oj.uniedu.vn${problem.href}`;
             const searchText = `${module.title} ${problem.title} ${problem.href} ${pattern.title}`.toLowerCase();
             const solutionMarkup = renderLevel2OjProblemSolution(problem, module.title, patternKey, addCode);
+            const exactSolution = getExactLevel2Solution(problem);
             return `
               <article class="oj-problem-card ${solutionMarkup ? "has-solution" : ""}" data-oj-card data-oj-pattern="${patternKey}" data-oj-search="${escapeHtml(searchText)}" ${solutionMarkup ? 'role="button" tabindex="0" aria-expanded="false"' : ""}>
                 <div class="oj-problem-main">
@@ -3592,6 +3682,7 @@ function renderLevel2OjGuide(addCode) {
                   <span>${escapeHtml(pattern.title)}</span>
                   ${problem.score ? `<span>${escapeHtml(problem.score)} điểm</span>` : ""}
                   ${problem.ac ? `<span>${escapeHtml(problem.ac)} AC</span>` : ""}
+                  ${exactSolution ? `<span class="oj-verified-chip">Đáp án đã kiểm</span>` : ""}
                   ${solutionMarkup ? `<span class="oj-guide-chip" data-oj-guide-chip>Hướng dẫn</span>` : ""}
                   <a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">Mở đề gốc</a>
                 </div>
@@ -3609,7 +3700,7 @@ function renderLevel2OjGuide(addCode) {
       <div class="oj-section-head">
         <div>
           <h4 class="section-title">Bài tập OJ Level 2</h4>
-          <p>Danh sách lấy từ roadmap Level 2: ${data.uniqueCount} bài duy nhất, ${data.rowCount} lượt xuất hiện trong 8 mô-đun. Mỗi bài có gợi ý dạng giải và code mẫu theo nhóm thuật toán.</p>
+          <p>Danh sách lấy từ roadmap Level 2: ${data.uniqueCount} bài duy nhất, ${data.rowCount} lượt xuất hiện trong 8 mô-đun. Code chỉ hiện ở các bài đã có lời giải riêng và đã kiểm sample; hiện có ${checkedSolutionCount} bài như vậy.</p>
         </div>
         <a class="oj-source-link" href="${escapeHtml(data.source)}" target="_blank" rel="noopener noreferrer">Roadmap gốc</a>
       </div>
@@ -3630,7 +3721,7 @@ function renderLevel2OjGuide(addCode) {
       </div>
 
       <div class="oj-note">
-        <strong>Cách dùng:</strong> trong hai mô-đun Luyện tập tổng hợp và Tổng hợp cấp tốc, mở từng bài để xem ý tưởng, cách làm, phân tích test case và code C++17 mẫu. Code là khung theo dạng bài, cần chỉnh biến/input/output theo đề gốc.
+        <strong>Cách dùng:</strong> trong hai mô-đun Luyện tập tổng hợp và Tổng hợp cấp tốc, mở từng bài để xem ý tưởng, cách làm và phân tích sample thật. Chỉ bài nào có nhãn đáp án đã kiểm mới có code C++17; các bài còn lại đang chờ rà riêng để tránh đưa code sai.
       </div>
 
       <div class="oj-pattern-grid">
