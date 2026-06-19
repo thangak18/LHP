@@ -287,6 +287,57 @@ int main() { // Hàm chính của chương trình.
     return 0; // Kết thúc chương trình.
 } // Kết thúc hàm main.`
     },
+    "/problem/bai2_ts10_chuyentranphu_haiphong": {
+      title: "2. BAI2 - TS10 - Chuyên Trần Phú - Hải Phòng - 25-26",
+      status: "sample-checked",
+      checkedSamples: [1, 2],
+      idea: "Biến điều kiện 'một nucleotide xuất hiện floor(len/2)+1 lần' thành tổng đoạn bằng 1 hoặc 2 sau khi gán nucleotide đang xét là +1 và ba loại còn lại là -1.",
+      complexity: "O(4n)",
+      code: String.raw`#include <iostream> // Dùng cin và cout để nhập xuất.
+#include <string> // Dùng string để lưu chuỗi gene.
+#include <vector> // Dùng vector để lưu vị trí xuất hiện đầu tiên của từng prefix sum.
+using namespace std; // Cho phép dùng cin, cout, string, vector trực tiếp.
+
+int main() { // Hàm chính của chương trình.
+    ios::sync_with_stdio(false); // Tăng tốc nhập xuất.
+    cin.tie(nullptr); // Không tự flush cout trước mỗi lần cin.
+
+    int n = 0; // n là độ dài chuỗi nucleotide.
+    string s; // s là chuỗi gene gồm các ký tự A, U, G, C.
+    cin >> n >> s; // Đọc n và chuỗi s.
+
+    string alphabet = "AUGC"; // Bốn loại nucleotide cần lần lượt xét làm loại xuất hiện trội.
+    int answer = 0; // answer là độ dài lớn nhất tìm được.
+
+    for (char target : alphabet) { // Thử từng nucleotide làm loại có số lần xuất hiện đặc biệt.
+        const int offset = n + 5; // offset để đổi prefix sum âm thành chỉ số không âm.
+        vector<int> first(2 * n + 11, -1); // first[v] lưu vị trí đầu tiên có prefix sum v - offset.
+        int prefix = 0; // prefix là tổng +1/-1 từ đầu chuỗi tới vị trí đang xét.
+        first[offset] = 0; // Prefix trước khi đọc ký tự nào bằng 0 tại vị trí 0.
+
+        for (int i = 1; i <= n; ++i) { // Duyệt từng vị trí kết thúc đoạn.
+            if (s[i - 1] == target) ++prefix; // Gặp target thì cộng 1.
+            else --prefix; // Gặp nucleotide khác target thì trừ 1.
+
+            int need1 = prefix - 1 + offset; // Muốn tổng đoạn bằng 1 thì prefix đầu đoạn phải là prefix - 1.
+            int need2 = prefix - 2 + offset; // Muốn tổng đoạn bằng 2 thì prefix đầu đoạn phải là prefix - 2.
+
+            if (0 <= need1 && need1 < (int)first.size() && first[need1] != -1) { // Nếu từng có prefix cần cho tổng 1.
+                answer = max(answer, i - first[need1]); // Cập nhật độ dài đoạn hợp lệ.
+            } // Kết thúc kiểm tra tổng 1.
+            if (0 <= need2 && need2 < (int)first.size() && first[need2] != -1) { // Nếu từng có prefix cần cho tổng 2.
+                answer = max(answer, i - first[need2]); // Cập nhật độ dài đoạn hợp lệ.
+            } // Kết thúc kiểm tra tổng 2.
+
+            int id = prefix + offset; // Đổi prefix hiện tại thành chỉ số trong mảng first.
+            if (first[id] == -1) first[id] = i; // Chỉ lưu vị trí sớm nhất để đoạn sau dài nhất.
+        } // Kết thúc duyệt chuỗi với target hiện tại.
+    } // Kết thúc thử bốn nucleotide.
+
+    cout << answer << '\n'; // In độ dài trình tự nucleotide đặc biệt dài nhất.
+    return 0; // Kết thúc chương trình.
+} // Kết thúc hàm main.`
+    },
     "/problem/dosau": {
       title: "2. DOSAU",
       status: "sample-checked",

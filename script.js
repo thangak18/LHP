@@ -3438,6 +3438,38 @@ function specificSampleSteps(problem, sample) {
     }
   }
 
+  if (title.includes("bai2_ts10_chuyentranphu_haiphong")) {
+    const n = Number(tokens[0]);
+    const s = tokens[1] || "";
+    if (Number.isFinite(n) && s.length === n) {
+      const explainTarget = (target) => {
+        let prefix = 0;
+        const first = new Map([[0, 0]]);
+        let best = 0;
+        const detail = [];
+        for (let i = 1; i <= n; i++) {
+          prefix += s[i - 1] === target ? 1 : -1;
+          for (const need of [prefix - 1, prefix - 2]) {
+            if (first.has(need)) best = Math.max(best, i - first.get(need));
+          }
+          if (!first.has(prefix)) first.set(prefix, i);
+          detail.push(`i = ${i}, ký tự ${s[i - 1]}, prefix theo ${target} là ${prefix}, best tạm cho ${target} là ${best}.`);
+        }
+        return { target, best, detail };
+      };
+      const runs = [..."AUGC"].map(explainTarget);
+      const bestRun = runs.reduce((best, item) => item.best > best.best ? item : best, runs[0]);
+      return [
+        `Đề cần đoạn dài nhất sao cho có một nucleotide xuất hiện floor(len/2)+1 lần.`,
+        `Với một nucleotide cố định, gán nó là +1, ba loại còn lại là -1. Khi đó đoạn hợp lệ có tổng bằng 1 nếu độ dài lẻ, hoặc bằng 2 nếu độ dài chẵn.`,
+        `Chuỗi mẫu là ${s}; ta thử lần lượt A, U, G, C.`,
+        ...bestRun.detail,
+        `Trong bốn nucleotide, độ dài lớn nhất tìm được là ${Math.max(...runs.map((item) => item.best))}.`,
+        `Vì vậy output mẫu là ${Math.max(...runs.map((item) => item.best))}.`
+      ];
+    }
+  }
+
   if (title.includes("supperprime")) {
     const s = tokens[0] || "";
     const isPrime = (value) => {
@@ -3686,7 +3718,6 @@ function renderLevel2OjProblemSolution(problem, moduleTitle, patternKey, addCode
   const pattern = level2OjPatterns[patternKey];
   const solution = getLevel2OjProblemSolution(problem, patternKey);
   const exactSolution = getExactLevel2Solution(problem);
-  const fallbackCode = ensureInlineCodeComments(pattern.code, pattern.title);
   return `
     <details class="oj-problem-solution">
       <summary>Hướng dẫn giải bài này</summary>
@@ -3715,8 +3746,9 @@ function renderLevel2OjProblemSolution(problem, moduleTitle, patternKey, addCode
             <p class="oj-solution-code-note">Code dưới đây là lời giải riêng cho bài này, có comment bên cạnh từng dòng và đã chạy qua sample đã trích từ đề.</p>
             ${addCode(`C++17 ${problem.title}`, exactSolution.code)}
           ` : `
-            <p class="oj-solution-code-note">Bài này chưa có lời giải riêng đã chạy sample, nên tạm hiển thị code C++17 theo dạng ${escapeHtml(pattern.title)} để không bỏ trống. Khi có lời giải riêng đã compile và chạy sample, bài sẽ có nhãn xanh "Đáp án đã kiểm".</p>
-            ${addCode(`C++17 ${problem.title} - ${pattern.title}`, fallbackCode)}
+            <div class="oj-sample-empty">
+              Bài này chưa được đưa code lên vì chưa có lời giải riêng đã compile và chạy sample. Không hiển thị code khung để tránh nhầm với đáp án.
+            </div>
           `}
         </div>
       </div>
@@ -3802,7 +3834,7 @@ function renderLevel2OjGuide(addCode) {
       <div class="oj-section-head">
         <div>
           <h4 class="section-title">Bài tập OJ Level 2</h4>
-          <p>Danh sách lấy từ roadmap Level 2: ${data.uniqueCount} bài duy nhất, ${data.rowCount} lượt xuất hiện trong 8 mô-đun. Mỗi bài đều có code C++17 để mở xem; hiện có ${checkedSolutionCount} bài có lời giải riêng đã compile và chạy sample.</p>
+          <p>Danh sách lấy từ roadmap Level 2: ${data.uniqueCount} bài duy nhất, ${data.rowCount} lượt xuất hiện trong 8 mô-đun. Chỉ bài có nhãn "Đáp án đã kiểm" mới hiển thị code C++17 vì đó là code riêng đã compile và chạy sample; hiện có ${checkedSolutionCount} bài như vậy.</p>
         </div>
         <a class="oj-source-link" href="${escapeHtml(data.source)}" target="_blank" rel="noopener noreferrer">Roadmap gốc</a>
       </div>
@@ -3823,7 +3855,7 @@ function renderLevel2OjGuide(addCode) {
       </div>
 
       <div class="oj-note">
-        <strong>Cách dùng:</strong> mở từng bài để xem ý tưởng, cách làm, phân tích sample thật và code C++17. Bài có nhãn "Đáp án đã kiểm" là bài đã có code riêng được compile và chạy sample; các bài còn lại đang được thay dần bằng lời giải riêng sau khi kiểm.
+        <strong>Cách dùng:</strong> mở từng bài để xem ý tưởng, cách làm và phân tích sample thật. Code C++17 chỉ xuất hiện khi bài đã có lời giải riêng được compile và chạy sample; các bài còn lại không dùng code khung để tránh sai đáp án.
       </div>
 
       <div class="oj-pattern-grid">
