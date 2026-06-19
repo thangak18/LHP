@@ -3516,6 +3516,53 @@ function specificSampleSteps(problem, sample) {
     }
   }
 
+  if (title.includes("salanchokhach")) {
+    const m = Number(tokens[0]);
+    const n = Number(tokens[1]);
+    const limit = Number(tokens[2]);
+    if (Number.isFinite(m) && Number.isFinite(n) && Number.isFinite(limit)) {
+      const start = Array.from({ length: n + 1 }, () => []);
+      for (let i = 0; i < m; i++) {
+        const a = Number(tokens[3 + i * 3]);
+        const b = Number(tokens[4 + i * 3]);
+        const c = Number(tokens[5 + i * 3]);
+        start[a].push([b, c]);
+      }
+      const active = new Map();
+      let onboard = 0;
+      let served = 0;
+      const steps = [
+        `Có ${m} nhóm khách, ${n} bến, sức chứa sà lan L = ${limit}.`,
+        "Quét bến từ 1 đến n. Ở mỗi bến cho khách tới nơi xuống trước, nhận khách mới, nếu quá tải thì bỏ bớt khách có bến xuống xa nhất."
+      ];
+      for (let station = 1; station <= n; station++) {
+        if (active.has(station)) {
+          const count = active.get(station);
+          onboard -= count;
+          active.delete(station);
+          steps.push(`Bến ${station}: ${count} khách xuống, còn ${onboard} khách trên sà lan.`);
+        }
+        for (const [to, count] of start[station]) {
+          active.set(to, (active.get(to) || 0) + count);
+          onboard += count;
+          served += count;
+          steps.push(`Bến ${station}: tạm nhận ${count} khách đi tới bến ${to}, onboard = ${onboard}, tổng đã nhận = ${served}.`);
+        }
+        while (onboard > limit) {
+          const farthest = Math.max(...active.keys());
+          const remove = Math.min(active.get(farthest), onboard - limit);
+          active.set(farthest, active.get(farthest) - remove);
+          onboard -= remove;
+          served -= remove;
+          if (active.get(farthest) === 0) active.delete(farthest);
+          steps.push(`Bến ${station}: quá sức chứa, bỏ ${remove} khách có bến xuống xa nhất là ${farthest}; onboard = ${onboard}, tổng phục vụ còn ${served}.`);
+        }
+      }
+      steps.push(`Sau khi quét hết các bến, số khách phục vụ tối đa là ${served}.`);
+      return steps;
+    }
+  }
+
   return [];
 }
 

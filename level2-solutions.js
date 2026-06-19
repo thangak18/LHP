@@ -205,6 +205,64 @@ int main() { // Hàm chính.
     return 0; // Kết thúc chương trình.
 } // Kết thúc hàm main.`
     },
+    "/problem/salanchokhach": {
+      title: "3. SALANCHOKHACH",
+      status: "sample-checked",
+      checkedSamples: [1],
+      idea: "Quét các bến theo thứ tự. Khi số khách trên sà lan vượt L, bỏ bớt nhóm có bến xuống xa nhất vì họ chiếm chỗ lâu nhất.",
+      complexity: "O((M + N) log N)",
+      code: String.raw`#include <iostream> // Dùng cin và cout để nhập xuất.
+#include <vector> // Dùng vector để gom các nhóm khách theo bến lên.
+#include <map> // Dùng map để lấy nhóm đang đi có bến xuống xa nhất.
+using namespace std; // Cho phép dùng cin, cout, vector, map trực tiếp.
+
+int main() { // Hàm chính của chương trình.
+    ios::sync_with_stdio(false); // Tăng tốc nhập xuất.
+    cin.tie(nullptr); // Không tự flush cout trước mỗi lần cin.
+
+    int m = 0, n = 0; // m là số nhóm khách, n là số bến.
+    long long limit = 0; // limit là sức chứa tối đa của sà lan.
+    cin >> m >> n >> limit; // Đọc m, n, limit theo đề.
+
+    vector<vector<pair<int, long long>>> start(n + 1); // start[a] lưu các nhóm lên tại bến a dưới dạng (bến xuống, số khách).
+    for (int i = 0; i < m; ++i) { // Đọc từng nhóm khách.
+        int a = 0, b = 0; // a là bến lên, b là bến xuống.
+        long long c = 0; // c là số người trong nhóm.
+        cin >> a >> b >> c; // Đọc thông tin nhóm khách.
+        start[a].push_back({b, c}); // Đưa nhóm này vào danh sách khách chờ ở bến a.
+    } // Kết thúc đọc dữ liệu.
+
+    map<int, long long> active; // active[b] là số khách đã nhận đang đi tới bến b.
+    long long onboard = 0; // onboard là số khách hiện đang ở trên sà lan.
+    long long served = 0; // served là tổng số khách được nhận phục vụ.
+
+    for (int station = 1; station <= n; ++station) { // Quét từng bến từ thượng nguồn tới hạ lưu.
+        auto drop = active.find(station); // Tìm số khách xuống tại bến hiện tại.
+        if (drop != active.end()) { // Nếu có khách xuống ở bến này.
+            onboard -= drop->second; // Giảm số khách đang trên sà lan.
+            active.erase(drop); // Xóa nhóm đã xuống khỏi tập khách đang đi.
+        } // Kết thúc xử lý khách xuống.
+
+        for (auto [to, count] : start[station]) { // Xét các nhóm khách lên tại bến hiện tại.
+            active[to] += count; // Tạm nhận nhóm này lên sà lan.
+            onboard += count; // Tăng số khách đang trên sà lan.
+            served += count; // Tạm cộng nhóm này vào tổng khách phục vụ.
+        } // Kết thúc nhận khách tại bến.
+
+        while (onboard > limit) { // Nếu sà lan vượt quá sức chứa.
+            auto farthest = prev(active.end()); // Lấy nhóm có bến xuống xa nhất.
+            long long remove = min(farthest->second, onboard - limit); // Chỉ bỏ vừa đủ số khách để không quá tải.
+            farthest->second -= remove; // Giảm số khách được giữ lại của nhóm xa nhất.
+            onboard -= remove; // Cập nhật số khách còn trên sà lan.
+            served -= remove; // Những khách bị bỏ không được tính là phục vụ.
+            if (farthest->second == 0) active.erase(farthest); // Nếu nhóm xa nhất bị bỏ hết thì xóa khỏi map.
+        } // Kết thúc sửa quá tải.
+    } // Kết thúc quét các bến.
+
+    cout << served << '\n'; // In số khách lớn nhất có thể phục vụ.
+    return 0; // Kết thúc chương trình.
+} // Kết thúc hàm main.`
+    },
     "/problem/mu_nhanh_fastpow": {
       title: "2. Fast Pow",
       status: "sample-checked",
