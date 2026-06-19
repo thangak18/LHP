@@ -241,6 +241,52 @@ int main() { // Hàm chính.
     return 0; // Kết thúc chương trình.
 } // Kết thúc hàm main.`
     },
+    "/problem/phan_so_gan_nhat_nearestf": {
+      title: "2.Phân số gần nhất - NEARESTF",
+      status: "sample-checked",
+      checkedSamples: [1, 2],
+      idea: "Duyệt mọi mẫu số từ 1 đến n, với mỗi mẫu số chọn tử số gần x * mẫu số nhất rồi so sánh sai số để lấy phân số gần x nhất.",
+      complexity: "O(n)",
+      code: String.raw`#include <iostream> // Dùng cin và cout để nhập xuất.
+#include <cmath> // Dùng roundl và fabsl để làm việc với số thực.
+#include <numeric> // Dùng gcd để rút gọn phân số.
+using namespace std; // Cho phép dùng cin, cout, gcd trực tiếp.
+
+int main() { // Hàm chính của chương trình.
+    ios::sync_with_stdio(false); // Tăng tốc nhập xuất.
+    cin.tie(nullptr); // Không tự flush cout trước mỗi lần cin.
+
+    long double x = 0; // x là số thực cần xấp xỉ bằng phân số.
+    int n = 0; // n là mẫu số lớn nhất được phép thử.
+    cin >> x >> n; // Đọc x và n từ input.
+
+    long double bestDiff = 1e100L; // bestDiff lưu sai số nhỏ nhất hiện tại.
+    long long bestP = 0; // bestP là tử số tốt nhất.
+    long long bestQ = 1; // bestQ là mẫu số tốt nhất.
+
+    for (int q = 1; q <= n; ++q) { // Thử từng mẫu số q từ 1 đến n.
+        long long center = llround(x * q); // Tử số gần x*q nhất thường cho phân số gần x nhất với mẫu q.
+        for (long long p = center - 1; p <= center + 1; ++p) { // Thử thêm hai lân cận để tránh lỗi làm tròn số thực.
+            if (p < 0) continue; // Bỏ tử số âm vì phân số cần không âm.
+            long double value = (long double)p / q; // Tính giá trị phân số p/q.
+            long double diff = fabsl(value - x); // Tính sai số tuyệt đối so với x.
+            bool better = diff + 1e-18L < bestDiff; // Tốt hơn nếu sai số nhỏ hơn rõ ràng.
+            if (!better && fabsl(diff - bestDiff) <= 1e-18L) { // Nếu sai số bằng nhau gần như tuyệt đối.
+                better = q < bestQ || (q == bestQ && p < bestP); // Ưu tiên mẫu số nhỏ hơn, rồi tử số nhỏ hơn.
+            } // Kết thúc xử lý hòa.
+            if (better) { // Nếu phân số hiện tại tốt hơn đáp án cũ.
+                bestDiff = diff; // Cập nhật sai số tốt nhất.
+                bestP = p; // Cập nhật tử số tốt nhất.
+                bestQ = q; // Cập nhật mẫu số tốt nhất.
+            } // Kết thúc cập nhật đáp án.
+        } // Kết thúc thử các tử số quanh x*q.
+    } // Kết thúc duyệt mẫu số.
+
+    long long g = gcd(bestP, bestQ); // Tính gcd để rút gọn phân số.
+    cout << bestP / g << ' ' << bestQ / g << '\n'; // In phân số đã rút gọn.
+    return 0; // Kết thúc chương trình.
+} // Kết thúc hàm main.`
+    },
     "/problem/dosau": {
       title: "2. DOSAU",
       status: "sample-checked",
@@ -274,6 +320,45 @@ int main() { // Hàm chính của chương trình.
 
     if (depth != 0) valid = false; // Nếu còn ngoặc mở chưa đóng thì chuỗi không cân bằng.
     cout << (valid ? best : -1) << '\n'; // In độ sâu lớn nhất nếu hợp lệ, ngược lại in -1.
+    return 0; // Kết thúc chương trình.
+} // Kết thúc hàm main.`
+    },
+    "/problem/supperprime": {
+      title: "2. Số siêu nguyên Tố",
+      status: "sample-checked",
+      checkedSamples: [1, 2],
+      idea: "Kiểm tra số ban đầu và mọi hậu tố sau khi bỏ dần chữ số bên trái. Nếu tất cả các số còn lại đều nguyên tố thì in YES.",
+      complexity: "O(d * sqrt(n)) với d là số chữ số",
+      code: String.raw`#include <iostream> // Dùng cin và cout để nhập xuất.
+#include <string> // Dùng string để xử lý từng hậu tố chữ số.
+using namespace std; // Cho phép dùng cin, cout, string trực tiếp.
+
+bool isPrime(long long x) { // Hàm kiểm tra x có phải số nguyên tố hay không.
+    if (x < 2) return false; // Số nhỏ hơn 2 không phải số nguyên tố.
+    if (x % 2 == 0) return x == 2; // Số chẵn chỉ nguyên tố khi bằng 2.
+    for (long long d = 3; d * d <= x; d += 2) { // Thử các ước lẻ từ 3 đến căn bậc hai của x.
+        if (x % d == 0) return false; // Nếu chia hết cho d thì x là hợp số.
+    } // Kết thúc vòng thử ước.
+    return true; // Không tìm thấy ước nên x là số nguyên tố.
+} // Kết thúc hàm isPrime.
+
+int main() { // Hàm chính của chương trình.
+    ios::sync_with_stdio(false); // Tăng tốc nhập xuất.
+    cin.tie(nullptr); // Không tự flush cout trước mỗi lần cin.
+
+    string s; // s lưu số cần kiểm tra dưới dạng chuỗi.
+    cin >> s; // Đọc số từ input.
+
+    bool ok = true; // ok cho biết mọi hậu tố đã xét có nguyên tố hay không.
+    for (int start = 0; start < (int)s.size(); ++start) { // Bỏ dần start chữ số bên trái để lấy từng hậu tố.
+        long long value = 0; // value là giá trị số của hậu tố hiện tại.
+        for (int i = start; i < (int)s.size(); ++i) { // Duyệt các chữ số từ start đến cuối chuỗi.
+            value = value * 10 + (s[i] - '0'); // Ghép chữ số mới vào value.
+        } // Kết thúc dựng hậu tố.
+        if (!isPrime(value)) ok = false; // Nếu hậu tố không nguyên tố thì số không phải siêu nguyên tố.
+    } // Kết thúc kiểm tra mọi hậu tố.
+
+    cout << (ok ? "YES" : "NO") << '\n'; // In kết luận theo yêu cầu đề.
     return 0; // Kết thúc chương trình.
 } // Kết thúc hàm main.`
     }

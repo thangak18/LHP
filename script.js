@@ -3228,8 +3228,7 @@ function inferLevel2OjPattern(problem, moduleTitle) {
 }
 
 function shouldShowLevel2OjProblemSolution(moduleTitle) {
-  const title = normalizeOjText(moduleTitle);
-  return title.includes("luyen tap tong hop") || title.includes("tong hop cap toc");
+  return Boolean(moduleTitle);
 }
 
 function getLevel2OjSampleInfo(problem) {
@@ -3238,6 +3237,46 @@ function getLevel2OjSampleInfo(problem) {
 
 function getExactLevel2Solution(problem) {
   return window.level2Solutions?.byHref?.[problem.href] || null;
+}
+
+function commentForCodeLine(line, patternTitle) {
+  const trimmed = line.trim();
+  if (!trimmed) return "";
+  if (trimmed.startsWith("#include")) return "Nạp thư viện cần dùng cho lời giải.";
+  if (trimmed.startsWith("using namespace")) return "Dùng trực tiếp tên trong namespace std.";
+  if (trimmed.startsWith("using ")) return "Đặt bí danh kiểu dữ liệu để code gọn hơn.";
+  if (trimmed.includes("ios::sync_with_stdio")) return "Tăng tốc nhập xuất C++.";
+  if (trimmed.includes("cin.tie")) return "Tách cin khỏi cout để nhập xuất nhanh hơn.";
+  if (trimmed.startsWith("int main")) return "Hàm chính của chương trình.";
+  if (trimmed.startsWith("void solve")) return "Tách phần xử lý một test vào hàm solve.";
+  if (trimmed.startsWith("bool can")) return "Hàm kiểm tra điều kiện thử trong binary search.";
+  if (trimmed.startsWith("vector")) return "Khai báo mảng động phục vụ xử lý dữ liệu.";
+  if (trimmed.startsWith("stack")) return "Khai báo stack để lưu trạng thái cần xử lý sau cùng.";
+  if (trimmed.startsWith("deque")) return "Khai báo deque để thêm/xóa hai đầu khi duyệt.";
+  if (trimmed.startsWith("long long") || trimmed.startsWith("int ")) return "Khai báo biến cần dùng trong lời giải.";
+  if (trimmed.includes("cin >>")) return "Đọc dữ liệu theo đúng thứ tự input.";
+  if (trimmed.includes("cout <<")) return "In kết quả theo đúng định dạng output.";
+  if (trimmed.startsWith("for ")) return "Duyệt qua các phần tử hoặc trạng thái cần xét.";
+  if (trimmed.startsWith("while ")) return "Lặp cho tới khi điều kiện xử lý kết thúc.";
+  if (trimmed.startsWith("if ")) return "Rẽ nhánh theo điều kiện của thuật toán.";
+  if (trimmed.startsWith("else")) return "Xử lý trường hợp còn lại.";
+  if (trimmed.includes("sort(")) return "Sắp xếp để dùng tìm kiếm, ghép cặp hoặc nén dữ liệu.";
+  if (trimmed.includes("lower_bound") || trimmed.includes("upper_bound")) return "Tìm vị trí bằng binary search trong mảng đã sắp xếp.";
+  if (trimmed.includes("push_back")) return "Thêm phần tử vào cuối vector.";
+  if (trimmed.includes("pop")) return "Loại bỏ phần tử không còn cần dùng.";
+  if (trimmed.includes("return")) return "Trả kết quả hoặc kết thúc chương trình.";
+  if (trimmed === "{" || trimmed === "}") return "Mở hoặc đóng một khối lệnh.";
+  return `Dòng xử lý trong code C++17 theo dạng ${patternTitle}.`;
+}
+
+function ensureInlineCodeComments(code, patternTitle) {
+  return String(code || "")
+    .split("\n")
+    .map((line) => {
+      if (!line.trim() || line.includes("//")) return line;
+      return `${line} // ${commentForCodeLine(line, patternTitle)}`;
+    })
+    .join("\n");
 }
 
 function splitSampleLines(value) {
@@ -3366,6 +3405,66 @@ function specificSampleSteps(problem, sample) {
     return steps;
   }
 
+  if (title.includes("nearestf") || title.includes("phan_so_gan_nhat")) {
+    const x = Number(tokens[0]);
+    const n = Number(tokens[1]);
+    if (Number.isFinite(x) && Number.isFinite(n)) {
+      let bestP = 0;
+      let bestQ = 1;
+      let bestDiff = Infinity;
+      const interesting = [];
+      for (let q = 1; q <= n; q++) {
+        const candidates = new Set([Math.floor(x * q), Math.round(x * q), Math.ceil(x * q)]);
+        for (const p of candidates) {
+          if (p < 0) continue;
+          const diff = Math.abs(p / q - x);
+          if (diff < bestDiff - 1e-15 || (Math.abs(diff - bestDiff) <= 1e-15 && q < bestQ)) {
+            bestDiff = diff;
+            bestP = p;
+            bestQ = q;
+          }
+        }
+        if (n <= 12) interesting.push(`Mẫu q = ${q}: tử gần ${x} * ${q} là ${Math.round(x * q)}, sai số tốt nhất hiện tại là ${bestDiff.toFixed(12)} với ${bestP}/${bestQ}.`);
+      }
+      const gcd = (a, b) => b ? gcd(b, a % b) : Math.abs(a);
+      const g = gcd(bestP, bestQ) || 1;
+      return [
+        `Cần tìm phân số p/q gần ${x} nhất với 1 <= q <= ${n}.`,
+        "Với một q cố định, p tốt nhất sẽ nằm quanh x*q, nên chỉ cần thử floor/round/ceil của x*q.",
+        ...interesting,
+        `Phân số tốt nhất trước khi rút gọn là ${bestP}/${bestQ}, rút gọn được ${bestP / g}/${bestQ / g}.`,
+        `Vì vậy output mẫu là "${bestP / g} ${bestQ / g}".`
+      ];
+    }
+  }
+
+  if (title.includes("supperprime")) {
+    const s = tokens[0] || "";
+    const isPrime = (value) => {
+      if (value < 2) return false;
+      if (value % 2 === 0) return value === 2;
+      for (let d = 3; d * d <= value; d += 2) {
+        if (value % d === 0) return false;
+      }
+      return true;
+    };
+    if (/^\d+$/.test(s)) {
+      const checks = [];
+      let ok = true;
+      for (let start = 0; start < s.length; start++) {
+        const suffix = Number(s.slice(start));
+        const prime = isPrime(suffix);
+        if (!prime) ok = false;
+        checks.push(`Bỏ ${start} chữ số bên trái được hậu tố ${s.slice(start)} = ${suffix}, số này ${prime ? "là" : "không phải"} nguyên tố.`);
+      }
+      return [
+        `Kiểm tra số ${s} bằng cách xét lần lượt chính nó và các hậu tố sau khi bỏ dần chữ số bên trái.`,
+        ...checks,
+        `Tất cả hậu tố ${ok ? "đều nguyên tố" : "không đều nguyên tố"}, nên output là ${ok ? "YES" : "NO"}.`
+      ];
+    }
+  }
+
   if (title.includes("chinese_modulo") && tokens.length >= 3) {
     const n = Number(tokens[0]);
     const pairs = [];
@@ -3392,13 +3491,16 @@ function buildGenericSampleSteps(problem, patternKey, sample) {
   const pattern = level2OjPatterns[patternKey];
   const inputLines = splitSampleLines(sample.input);
   const outputLines = splitSampleLines(sample.output);
+  const inputTokens = inputLines.join(" ").trim().split(/\s+/).filter(Boolean);
+  const outputTokens = outputLines.join(" ").trim().split(/\s+/).filter(Boolean);
   const steps = [
-    `Sample ${sample.number} có ${inputLines.length || 0} dòng input và ${outputLines.length || 0} dòng output.`,
+    `Sample ${sample.number}: input có ${inputLines.length || 0} dòng, ${inputTokens.length} token; output có ${outputLines.length || 0} dòng, ${outputTokens.length} token.`,
     ...inputLines.map((line, index) => `Đọc dòng input ${index + 1}: "${line}" (${describeTokenLine(line)}).`),
-    `Áp dụng dạng ${pattern.title}: ${pattern.shortGuide}`,
-    "Chạy code theo đúng thứ tự đọc dữ liệu ở trên; mọi biến trung gian phải được cập nhật sau từng dòng/truy vấn, không bỏ qua trường hợp biên.",
+    `Nhận dạng tạm theo nhóm ${pattern.title}: ${pattern.shortGuide}`,
+    "Khi chạy tay, tạo bảng biến sau mỗi dòng input: biến nào đọc xong phải ghi giá trị ngay, mảng/truy vấn nào xuất hiện thì xử lý đúng thứ tự.",
+    "Đối chiếu từng token output từ trái sang phải; nếu có nhiều dòng output thì thứ tự dòng phải khớp tuyệt đối với sample.",
     ...outputLines.map((line, index) => `Sau khi xử lý, dòng output ${index + 1} phải là "${line}".`),
-    "Nếu kết quả chạy tay khác output mẫu, kiểm tra lại kiểu dữ liệu, chỉ số 0/1-based, điều kiện so sánh và thứ tự in."
+    "Nếu kết quả khác output mẫu, kiểm tra lại ba lỗi hay gặp: đọc thiếu dữ liệu, lệch chỉ số 0/1-based, hoặc chọn sai độ phức tạp so với giới hạn đề."
   ];
   return steps;
 }
@@ -3584,6 +3686,7 @@ function renderLevel2OjProblemSolution(problem, moduleTitle, patternKey, addCode
   const pattern = level2OjPatterns[patternKey];
   const solution = getLevel2OjProblemSolution(problem, patternKey);
   const exactSolution = getExactLevel2Solution(problem);
+  const fallbackCode = ensureInlineCodeComments(pattern.code, pattern.title);
   return `
     <details class="oj-problem-solution">
       <summary>Hướng dẫn giải bài này</summary>
@@ -3612,9 +3715,8 @@ function renderLevel2OjProblemSolution(problem, moduleTitle, patternKey, addCode
             <p class="oj-solution-code-note">Code dưới đây là lời giải riêng cho bài này, có comment bên cạnh từng dòng và đã chạy qua sample đã trích từ đề.</p>
             ${addCode(`C++17 ${problem.title}`, exactSolution.code)}
           ` : `
-            <div class="oj-sample-empty">
-              Chưa hiển thị code cho bài này vì chưa có lời giải riêng đã kiểm sample. Không dùng code mẫu theo dạng bài ở đây để tránh sai đáp án.
-            </div>
+            <p class="oj-solution-code-note">Bài này chưa có lời giải riêng đã chạy sample, nên tạm hiển thị code C++17 theo dạng ${escapeHtml(pattern.title)} để không bỏ trống. Khi có lời giải riêng đã compile và chạy sample, bài sẽ có nhãn xanh "Đáp án đã kiểm".</p>
+            ${addCode(`C++17 ${problem.title} - ${pattern.title}`, fallbackCode)}
           `}
         </div>
       </div>
@@ -3700,7 +3802,7 @@ function renderLevel2OjGuide(addCode) {
       <div class="oj-section-head">
         <div>
           <h4 class="section-title">Bài tập OJ Level 2</h4>
-          <p>Danh sách lấy từ roadmap Level 2: ${data.uniqueCount} bài duy nhất, ${data.rowCount} lượt xuất hiện trong 8 mô-đun. Code chỉ hiện ở các bài đã có lời giải riêng và đã kiểm sample; hiện có ${checkedSolutionCount} bài như vậy.</p>
+          <p>Danh sách lấy từ roadmap Level 2: ${data.uniqueCount} bài duy nhất, ${data.rowCount} lượt xuất hiện trong 8 mô-đun. Mỗi bài đều có code C++17 để mở xem; hiện có ${checkedSolutionCount} bài có lời giải riêng đã compile và chạy sample.</p>
         </div>
         <a class="oj-source-link" href="${escapeHtml(data.source)}" target="_blank" rel="noopener noreferrer">Roadmap gốc</a>
       </div>
@@ -3721,7 +3823,7 @@ function renderLevel2OjGuide(addCode) {
       </div>
 
       <div class="oj-note">
-        <strong>Cách dùng:</strong> trong hai mô-đun Luyện tập tổng hợp và Tổng hợp cấp tốc, mở từng bài để xem ý tưởng, cách làm và phân tích sample thật. Chỉ bài nào có nhãn đáp án đã kiểm mới có code C++17; các bài còn lại đang chờ rà riêng để tránh đưa code sai.
+        <strong>Cách dùng:</strong> mở từng bài để xem ý tưởng, cách làm, phân tích sample thật và code C++17. Bài có nhãn "Đáp án đã kiểm" là bài đã có code riêng được compile và chạy sample; các bài còn lại đang được thay dần bằng lời giải riêng sau khi kiểm.
       </div>
 
       <div class="oj-pattern-grid">
