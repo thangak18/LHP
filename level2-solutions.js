@@ -263,6 +263,236 @@ int main() { // Hàm chính của chương trình.
     return 0; // Kết thúc chương trình.
 } // Kết thúc hàm main.`
     },
+    "/problem/seating": {
+      title: "2. Tìm chỗ ngồi - Seating",
+      status: "sample-checked",
+      checkedSamples: [1, 2],
+      idea: "Đếm toàn bộ cặp ghế kề nhau theo hàng, rồi trừ các cặp có ít nhất một ghế đã bị chiếm.",
+      complexity: "O(k log k)",
+      code: String.raw`#include <iostream> // Dùng cin và cout để nhập xuất.
+#include <set> // Dùng set để lưu các cặp ghế kề nhau bị hỏng và tránh đếm trùng.
+using namespace std; // Cho phép dùng cin, cout, set trực tiếp.
+
+int main() { // Hàm chính của chương trình.
+    ios::sync_with_stdio(false); // Tăng tốc nhập xuất.
+    cin.tie(nullptr); // Không tự flush cout trước mỗi lần cin.
+
+    long long n = 0, m = 0; // n là số hàng, m là số ghế mỗi hàng.
+    int k = 0; // k là số ghế đã có người ngồi.
+    cin >> n >> m >> k; // Đọc n, m, k.
+
+    long long total = n * (m - 1); // Mỗi hàng có m-1 cặp ghế kề nhau, thứ tự hai người không quan trọng.
+    set<pair<long long, long long>> blocked; // Mỗi phần tử là (hàng, ghế trái) của một cặp kề nhau không dùng được.
+
+    for (int i = 0; i < k; ++i) { // Duyệt từng ghế đã bị chiếm.
+        long long row = 0, col = 0; // row là hàng, col là vị trí ghế trong hàng.
+        cin >> row >> col; // Đọc ghế đã có người ngồi.
+        if (col > 1) blocked.insert({row, col - 1}); // Cặp (col-1, col) bị hỏng nếu col không phải ghế đầu.
+        if (col < m) blocked.insert({row, col}); // Cặp (col, col+1) bị hỏng nếu col không phải ghế cuối.
+    } // Kết thúc đọc ghế đã chiếm.
+
+    cout << total - (long long)blocked.size() << '\n'; // Trừ số cặp bị hỏng để ra số cách còn lại.
+    return 0; // Kết thúc chương trình.
+} // Kết thúc hàm main.`
+    },
+    "/problem/ts10_cau3": {
+      title: "2. Thống kê - ts10 - Chuyên Vĩnh Phúc - 2024",
+      status: "sample-checked",
+      checkedSamples: [1],
+      idea: "Với mỗi dãy, đếm tần suất từng giá trị, rồi tạo suffix theo tần suất để trả lời nhanh số giá trị xuất hiện ít nhất k lần.",
+      complexity: "O(n + Q + V)",
+      code: String.raw`#include <iostream> // Dùng cin và cout để nhập xuất.
+#include <vector> // Dùng vector để lưu tần suất và mảng trả lời.
+using namespace std; // Cho phép dùng cin, cout, vector trực tiếp.
+
+vector<int> buildAnswers(int n) { // Đọc một dãy độ dài n và trả mảng ans[k] = số giá trị xuất hiện ít nhất k lần.
+    const int SHIFT = 100000; // Dịch giá trị âm lên chỉ số không âm.
+    const int SIZE = 200001; // Giá trị nằm trong đoạn [-100000, 100000].
+    vector<int> freq(SIZE, 0); // freq[id] là số lần xuất hiện của giá trị id - SHIFT.
+    for (int i = 0; i < n; ++i) { // Đọc n phần tử của dãy.
+        int x = 0; // x là giá trị hiện tại.
+        cin >> x; // Đọc x.
+        ++freq[x + SHIFT]; // Tăng tần suất của x.
+    } // Kết thúc đọc dãy.
+
+    vector<int> bucket(n + 2, 0); // bucket[f] là số giá trị xuất hiện đúng f lần.
+    for (int f : freq) { // Duyệt tần suất của mọi giá trị có thể.
+        if (f > 0) ++bucket[f]; // Chỉ tính các giá trị thật sự xuất hiện.
+    } // Kết thúc gom theo tần suất.
+
+    vector<int> ans(n + 2, 0); // ans[k] là số giá trị có tần suất >= k.
+    for (int k = n; k >= 1; --k) { // Tính suffix từ tần suất lớn xuống nhỏ.
+        ans[k] = ans[k + 1] + bucket[k]; // Giá trị xuất hiện >= k gồm >= k+1 và đúng k.
+    } // Kết thúc dựng mảng trả lời.
+    return ans; // Trả về mảng đáp án cho một dãy.
+} // Kết thúc buildAnswers.
+
+int main() { // Hàm chính của chương trình.
+    ios::sync_with_stdio(false); // Tăng tốc nhập xuất.
+    cin.tie(nullptr); // Không tự flush cout trước mỗi lần cin.
+
+    int n = 0, q = 0; // n là độ dài hai dãy, q là số truy vấn.
+    cin >> n >> q; // Đọc n và q.
+    vector<int> ansA = buildAnswers(n); // Đọc dãy A và tiền xử lý đáp án cho A.
+    vector<int> ansB = buildAnswers(n); // Đọc dãy B và tiền xử lý đáp án cho B.
+
+    while (q--) { // Trả lời từng truy vấn.
+        int k = 0; // k là ngưỡng tần suất cần hỏi.
+        cin >> k; // Đọc k.
+        cout << ansA[k] << ' ' << ansB[k] << '\n'; // In số giá trị xuất hiện ít nhất k lần trong A và B.
+    } // Kết thúc xử lý truy vấn.
+
+    return 0; // Kết thúc chương trình.
+} // Kết thúc hàm main.`
+    },
+    "/problem/levelup": {
+      title: "2. Lên đai - Levelup",
+      status: "sample-checked",
+      checkedSamples: [1],
+      idea: "Tính số lượt lên đai từ cao xuống thấp: vàng lên tím, xanh lên vàng, trắng lên xanh. Người mới chỉ ảnh hưởng đai trắng nên không cần in.",
+      complexity: "O(1)",
+      code: String.raw`#include <iostream> // Dùng cin và cout để nhập xuất.
+using namespace std; // Cho phép dùng cin và cout trực tiếp.
+
+int main() { // Hàm chính của chương trình.
+    ios::sync_with_stdio(false); // Tăng tốc nhập xuất.
+    cin.tie(nullptr); // Không tự flush cout trước mỗi lần cin.
+
+    long long whiteBefore = 0, whiteAfter = 0; // Số võ sinh đai trắng trước và sau cuộc thi.
+    long long greenBefore = 0, greenAfter = 0; // Số võ sinh đai xanh trước và sau cuộc thi.
+    long long yellowBefore = 0, yellowAfter = 0; // Số võ sinh đai vàng trước và sau cuộc thi.
+    long long purpleBefore = 0, purpleAfter = 0; // Số võ sinh đai tím trước và sau cuộc thi.
+
+    cin >> whiteBefore >> whiteAfter; // Đọc thống kê đai trắng.
+    cin >> greenBefore >> greenAfter; // Đọc thống kê đai xanh.
+    cin >> yellowBefore >> yellowAfter; // Đọc thống kê đai vàng.
+    cin >> purpleBefore >> purpleAfter; // Đọc thống kê đai tím.
+
+    long long yellowToPurple = purpleAfter - purpleBefore; // Đai tím chỉ tăng do người đai vàng lên tím.
+    long long greenToYellow = yellowAfter - yellowBefore + yellowToPurple; // Bù lại số vàng đã lên tím để biết xanh lên vàng.
+    long long whiteToGreen = greenAfter - greenBefore + greenToYellow; // Bù lại số xanh đã lên vàng để biết trắng lên xanh.
+
+    cout << whiteToGreen << '\n'; // In số lượt từ trắng lên xanh.
+    cout << greenToYellow << '\n'; // In số lượt từ xanh lên vàng.
+    cout << yellowToPurple << '\n'; // In số lượt từ vàng lên tím.
+    return 0; // Kết thúc chương trình.
+} // Kết thúc hàm main.`
+    },
+    "/problem/selbest": {
+      title: "2. Lựa chọn - selbest",
+      status: "sample-checked",
+      checkedSamples: [1, 2],
+      idea: "Bài toán giao của ba tập khi chỉ biết kích thước từng tập. Giao lớn nhất là min(A,B,C), giao nhỏ nhất là max(0,A+B+C-2N).",
+      complexity: "O(1)",
+      code: String.raw`#include <iostream> // Dùng cin và cout để nhập xuất.
+#include <algorithm> // Dùng min để lấy giá trị nhỏ nhất.
+using namespace std; // Cho phép dùng cin, cout, min trực tiếp.
+
+int main() { // Hàm chính của chương trình.
+    ios::sync_with_stdio(false); // Tăng tốc nhập xuất.
+    cin.tie(nullptr); // Không tự flush cout trước mỗi lần cin.
+
+    int type = 0; // type = 1 hỏi ít nhất, type = 2 hỏi nhiều nhất.
+    long long n = 0, a = 0, b = 0, c = 0; // n là tổng học viên; a,b,c là số biết từng ngôn ngữ.
+    cin >> type; // Đọc loại yêu cầu.
+    cin >> n >> a >> b >> c; // Đọc n, a, b, c.
+
+    long long minimumAll = max(0LL, a + b + c - 2 * n); // Giao ba tập nhỏ nhất theo nguyên lý bù trừ cực hạn.
+    long long maximumAll = min(a, min(b, c)); // Giao ba tập lớn nhất không vượt quá tập nhỏ nhất.
+
+    if (type == 1) cout << minimumAll << '\n'; // Nếu hỏi tối thiểu thì in giao nhỏ nhất.
+    else cout << maximumAll << '\n'; // Nếu hỏi tối đa thì in giao lớn nhất.
+    return 0; // Kết thúc chương trình.
+} // Kết thúc hàm main.`
+    },
+    "/problem/duprime": {
+      title: "2. Nguyên tố bội - Duprime",
+      status: "sample-checked",
+      checkedSamples: [1],
+      idea: "Sàng nguyên tố tới 2*5e6+1, sau đó đếm các số p sao cho p và 2p+1 đều nguyên tố cho tới vị trí K.",
+      complexity: "O(L log log L)",
+      code: String.raw`#include <iostream> // Dùng cin và cout để nhập xuất.
+#include <vector> // Dùng vector để lưu bảng nguyên tố.
+using namespace std; // Cho phép dùng cin, cout, vector trực tiếp.
+
+int main() { // Hàm chính của chương trình.
+    ios::sync_with_stdio(false); // Tăng tốc nhập xuất.
+    cin.tie(nullptr); // Không tự flush cout trước mỗi lần cin.
+
+    int k = 0; // k là thứ tự cặp nguyên tố bội hai cần tìm.
+    cin >> k; // Đọc k.
+
+    const int LIMIT_P = 5000000; // Giới hạn đủ để chứa ít nhất 30000 số p hợp lệ.
+    const int LIMIT = 2 * LIMIT_P + 1; // Cần kiểm tra cả số 2p + 1.
+    vector<bool> isPrime(LIMIT + 1, true); // isPrime[x] cho biết x có đang được coi là nguyên tố hay không.
+    isPrime[0] = false; // 0 không phải số nguyên tố.
+    isPrime[1] = false; // 1 không phải số nguyên tố.
+
+    for (int i = 2; 1LL * i * i <= LIMIT; ++i) { // Sàng Eratosthenes tới căn LIMIT.
+        if (!isPrime[i]) continue; // Bỏ qua số đã bị đánh dấu hợp số.
+        for (long long j = 1LL * i * i; j <= LIMIT; j += i) { // Đánh dấu các bội của i.
+            isPrime[(int)j] = false; // Bội lớn hơn i là hợp số.
+        } // Kết thúc đánh dấu bội của i.
+    } // Kết thúc sàng nguyên tố.
+
+    int count = 0; // count là số cặp hợp lệ đã gặp.
+    for (int p = 2; p <= LIMIT_P; ++p) { // Duyệt p tăng dần đúng thứ tự đề yêu cầu.
+        if (isPrime[p] && isPrime[2 * p + 1]) { // Cặp hợp lệ khi p và 2p+1 đều nguyên tố.
+            ++count; // Tăng thứ tự cặp hợp lệ.
+            if (count == k) { // Nếu vừa tới cặp thứ k.
+                cout << p << '\n'; // In p của cặp thứ k.
+                return 0; // Dừng chương trình.
+            } // Kết thúc kiểm tra thứ tự.
+        } // Kết thúc kiểm tra cặp hợp lệ.
+    } // Kết thúc duyệt p.
+
+    return 0; // Dữ liệu đề đảm bảo có đáp án trong giới hạn đã chọn.
+} // Kết thúc hàm main.`
+    },
+    "/problem/remnum": {
+      title: "2. Xóa số - REMNUM",
+      status: "sample-checked",
+      checkedSamples: [1],
+      idea: "Với mỗi giá trị xuất hiện trong cả hai dãy, cần xóa hết giá trị đó ở một trong hai dãy. Chi phí nhỏ nhất là min(cntA, cntB).",
+      complexity: "O((m+n) log (m+n))",
+      code: String.raw`#include <iostream> // Dùng cin và cout để nhập xuất.
+#include <map> // Dùng map để đếm tần suất theo giá trị.
+using namespace std; // Cho phép dùng cin, cout, map trực tiếp.
+
+int main() { // Hàm chính của chương trình.
+    ios::sync_with_stdio(false); // Tăng tốc nhập xuất.
+    cin.tie(nullptr); // Không tự flush cout trước mỗi lần cin.
+
+    int m = 0, n = 0; // m là độ dài dãy A, n là độ dài dãy B.
+    cin >> m >> n; // Đọc m và n.
+
+    map<long long, int> cntA; // cntA[x] là số lần x xuất hiện trong A.
+    map<long long, int> cntB; // cntB[x] là số lần x xuất hiện trong B.
+
+    for (int i = 0; i < m; ++i) { // Đọc dãy A.
+        long long x = 0; // x là phần tử hiện tại.
+        cin >> x; // Đọc x.
+        ++cntA[x]; // Tăng tần suất của x trong A.
+    } // Kết thúc đọc A.
+
+    for (int i = 0; i < n; ++i) { // Đọc dãy B.
+        long long x = 0; // x là phần tử hiện tại.
+        cin >> x; // Đọc x.
+        ++cntB[x]; // Tăng tần suất của x trong B.
+    } // Kết thúc đọc B.
+
+    long long answer = 0; // answer là số phần tử ít nhất phải xóa.
+    for (auto [value, countA] : cntA) { // Duyệt từng giá trị xuất hiện trong A.
+        auto it = cntB.find(value); // Tìm cùng giá trị trong B.
+        if (it != cntB.end()) { // Nếu value xuất hiện ở cả hai dãy.
+            answer += min(countA, it->second); // Xóa hết value ở phía có ít bản sao hơn.
+        } // Kết thúc xử lý giá trị chung.
+    } // Kết thúc duyệt các giá trị.
+
+    cout << answer << '\n'; // In số phần tử tối thiểu cần xóa.
+    return 0; // Kết thúc chương trình.
+} // Kết thúc hàm main.`
+    },
     "/problem/mu_nhanh_fastpow": {
       title: "2. Fast Pow",
       status: "sample-checked",

@@ -3516,6 +3516,139 @@ function specificSampleSteps(problem, sample) {
     }
   }
 
+  if (title.includes("seating")) {
+    const n = Number(tokens[0]);
+    const m = Number(tokens[1]);
+    const k = Number(tokens[2]);
+    if (Number.isFinite(n) && Number.isFinite(m) && Number.isFinite(k)) {
+      const blocked = new Set();
+      const steps = [
+        `Rạp có ${n} hàng, mỗi hàng ${m} ghế, nên nếu chưa có ai ngồi thì có ${n} * (${m} - 1) = ${n * (m - 1)} cặp ghế kề nhau.`,
+        `Có ${k} ghế đã bị chiếm; mỗi ghế bị chiếm làm hỏng tối đa hai cặp kề nhau chứa ghế đó.`
+      ];
+      for (let i = 0; i < k; i++) {
+        const row = Number(tokens[3 + i * 2]);
+        const col = Number(tokens[4 + i * 2]);
+        const before = blocked.size;
+        if (col > 1) blocked.add(`${row}:${col - 1}`);
+        if (col < m) blocked.add(`${row}:${col}`);
+        steps.push(`Ghế đã chiếm (${row}, ${col}) làm hỏng ${blocked.size - before} cặp mới; tổng cặp hỏng phân biệt hiện là ${blocked.size}.`);
+      }
+      steps.push(`Số cách còn lại là ${n * (m - 1)} - ${blocked.size} = ${n * (m - 1) - blocked.size}.`);
+      return steps;
+    }
+  }
+
+  if (title.includes("ts10_cau3")) {
+    const n = Number(tokens[0]);
+    const q = Number(tokens[1]);
+    if (Number.isFinite(n) && Number.isFinite(q)) {
+      const a = tokens.slice(2, 2 + n).map(Number);
+      const b = tokens.slice(2 + n, 2 + 2 * n).map(Number);
+      const queries = tokens.slice(2 + 2 * n, 2 + 2 * n + q).map(Number);
+      const freqMap = (arr) => {
+        const mp = new Map();
+        for (const x of arr) mp.set(x, (mp.get(x) || 0) + 1);
+        return mp;
+      };
+      const fa = freqMap(a);
+      const fb = freqMap(b);
+      const fmt = (mp) => [...mp.entries()].map(([value, count]) => `${value}:${count}`).join(", ");
+      const steps = [
+        `Dãy A có tần suất: ${fmt(fa)}.`,
+        `Dãy B có tần suất: ${fmt(fb)}.`
+      ];
+      queries.forEach((query, index) => {
+        const ca = [...fa.values()].filter((count) => count >= query).length;
+        const cb = [...fb.values()].filter((count) => count >= query).length;
+        steps.push(`Truy vấn ${index + 1} có k = ${query}: A có ${ca} giá trị xuất hiện ít nhất ${query} lần, B có ${cb} giá trị, nên in "${ca} ${cb}".`);
+      });
+      return steps;
+    }
+  }
+
+  if (title.includes("levelup")) {
+    const values = tokens.map(Number);
+    if (values.length >= 8 && values.every(Number.isFinite)) {
+      const [w0, w1, g0, g1, y0, y1, p0, p1] = values;
+      const yToP = p1 - p0;
+      const gToY = y1 - y0 + yToP;
+      const wToG = g1 - g0 + gToY;
+      return [
+        `Trước/sau đai trắng: ${w0} -> ${w1}; xanh: ${g0} -> ${g1}; vàng: ${y0} -> ${y1}; tím: ${p0} -> ${p1}.`,
+        `Đai tím chỉ tăng do vàng lên tím, nên vàng -> tím = ${p1} - ${p0} = ${yToP}.`,
+        `Đai vàng sau cùng bằng vàng cũ - vàng lên tím + xanh lên vàng, nên xanh -> vàng = ${y1} - ${y0} + ${yToP} = ${gToY}.`,
+        `Đai xanh sau cùng bằng xanh cũ - xanh lên vàng + trắng lên xanh, nên trắng -> xanh = ${g1} - ${g0} + ${gToY} = ${wToG}.`,
+        `Vì vậy output lần lượt là ${wToG}, ${gToY}, ${yToP}.`
+      ];
+    }
+  }
+
+  if (title.includes("selbest")) {
+    const type = Number(tokens[0]);
+    const n = Number(tokens[1]);
+    const a = Number(tokens[2]);
+    const b = Number(tokens[3]);
+    const c = Number(tokens[4]);
+    if ([type, n, a, b, c].every(Number.isFinite)) {
+      const minAll = Math.max(0, a + b + c - 2 * n);
+      const maxAll = Math.min(a, b, c);
+      return [
+        `Có N = ${n}, số người biết Pascal/C++/Java lần lượt là ${a}, ${b}, ${c}.`,
+        `Số người biết cả ba nhiều nhất không thể vượt quá nhóm nhỏ nhất, nên max = min(${a}, ${b}, ${c}) = ${maxAll}.`,
+        `Để giao ba tập nhỏ nhất, tổng số lượt biết là ${a + b + c}; mỗi người không thuộc giao ba tập góp tối đa 2 lượt, nên min = max(0, ${a + b + c} - 2 * ${n}) = ${minAll}.`,
+        type === 1 ? `Đề hỏi tối thiểu nên output là ${minAll}.` : `Đề hỏi tối đa nên output là ${maxAll}.`
+      ];
+    }
+  }
+
+  if (title.includes("duprime")) {
+    const k = Number(tokens[0]);
+    if (Number.isFinite(k) && k <= 20) {
+      const isPrime = (x) => {
+        if (x < 2) return false;
+        for (let d = 2; d * d <= x; d++) if (x % d === 0) return false;
+        return true;
+      };
+      const pairs = [];
+      for (let p = 2; pairs.length < k; p++) {
+        if (isPrime(p) && isPrime(2 * p + 1)) pairs.push([p, 2 * p + 1]);
+      }
+      return [
+        `Cặp hợp lệ có dạng (p, 2p + 1) và cả hai số đều nguyên tố.`,
+        `Liệt kê theo p tăng dần được: ${pairs.map(([p, q]) => `(${p}, ${q})`).join(", ")}.`,
+        `Cặp thứ ${k} có p = ${pairs[k - 1][0]}, nên output là ${pairs[k - 1][0]}.`
+      ];
+    }
+  }
+
+  if (title.includes("remnum")) {
+    const m = Number(tokens[0]);
+    const n = Number(tokens[1]);
+    if (Number.isFinite(m) && Number.isFinite(n)) {
+      const a = tokens.slice(2, 2 + m).map(Number);
+      const b = tokens.slice(2 + m, 2 + m + n).map(Number);
+      const count = (arr) => {
+        const mp = new Map();
+        for (const x of arr) mp.set(x, (mp.get(x) || 0) + 1);
+        return mp;
+      };
+      const ca = count(a);
+      const cb = count(b);
+      const steps = [`Dãy A là [${a.join(", ")}], dãy B là [${b.join(", ")}].`];
+      let answer = 0;
+      for (const [value, countA] of ca.entries()) {
+        if (cb.has(value)) {
+          const add = Math.min(countA, cb.get(value));
+          answer += add;
+          steps.push(`Giá trị ${value} xuất hiện ở cả hai dãy: A có ${countA}, B có ${cb.get(value)}, xóa ít nhất ${add} phần tử để giá trị này biến khỏi một dãy.`);
+        }
+      }
+      steps.push(`Tổng số phần tử tối thiểu phải xóa là ${answer}.`);
+      return steps;
+    }
+  }
+
   if (title.includes("salanchokhach")) {
     const m = Number(tokens[0]);
     const n = Number(tokens[1]);
